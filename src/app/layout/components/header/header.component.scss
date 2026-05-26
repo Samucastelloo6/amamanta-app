@@ -1,0 +1,37 @@
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 32px;
+  border-bottom: 1px solid #eee;
+  background-color: white;
+}
+
+.app-header__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-header__logo {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+}
+
+.app-header__title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #8b5cf6;
+}
+
+.app-header__nav {
+  display: flex;
+  gap: 24px;
+}
+
+.app-header__nav a {
+  text-decoration: none;
+  color: #444;
+  font-weight: 500;
+}
