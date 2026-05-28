@@ -1,34 +1,54 @@
-<div class="map-page">
-  <h1>Mapa de recursos Amamanta</h1>
+<section class="map-page">
 
-  <div class="map-filters">
-    <label>
-      <input
-        type="checkbox"
-        [(ngModel)]="showLactationRooms"
-        (change)="refreshMarkers()"
-      />
-      Salas universitarias
-    </label>
+  <h1>Mapa Amamanta</h1>
 
-    <label>
-      <input
-        type="checkbox"
-        [(ngModel)]="showFriendlySpaces"
-        (change)="refreshMarkers()"
-      />
-      Espacios amigos
-    </label>
+  <div class="map-wrapper">
 
-    <select [(ngModel)]="selectedSector" (change)="refreshMarkers()">
-      <option value="all">Todos los sectores</option>
-      <option value="food">Alimentación</option>
-      <option value="fashion">Moda</option>
-      <option value="beauty">Belleza</option>
-      <option value="health">Salud</option>
-      <option value="services">Servicios</option>
-    </select>
+    <google-map
+      height="600px"
+      width="100%"
+      [center]="center"
+      [zoom]="zoom"
+      [options]="mapOptions"
+      mapId="DEMO_MAP_ID">
+
+      @for (marker of markers; track marker.title) {
+        <map-advanced-marker
+          [position]="marker.position"
+          [title]="marker.title"
+          [content]="marker.content"
+          (mapClick)="selectResource(marker.resource)">
+        </map-advanced-marker>
+      }
+
+    </google-map>
+
+    @if (selectedResource) {
+      <article class="resource-card">
+        <button class="close-button" (click)="closeCard()">✕</button>
+
+        <h2>{{ selectedResource.name }}</h2>
+
+        <p class="address">
+          {{ selectedResource.address }}
+        </p>
+
+        <p class="description">
+          {{ selectedResource.description }}
+        </p>
+
+        <div class="card-actions">
+          <button class="primary-button">
+            Cómo llegar
+          </button>
+
+          <button class="secondary-button">
+            Ver detalles
+          </button>
+        </div>
+      </article>
+    }
+
   </div>
 
-  <div id="map"></div>
-</div>
+</section>
