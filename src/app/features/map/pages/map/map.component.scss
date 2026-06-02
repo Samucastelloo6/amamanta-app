@@ -62,3 +62,60 @@
   margin-bottom: 8px;
 }
 
+.filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.filters button {
+  border: none;
+  background: white;
+  padding: 10px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(0,0,0,.08);
+  transition: .2s;
+}
+
+.filters button:hover {
+  transform: translateY(-2px);
+}
+
+.filters button.active {
+  background: #7e22ce;
+  color: white;
+}
+
+.external-navigation {
+  margin-top: 16px;
+}
+
+.external-navigation p {
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+}
+
+.map-button {
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  padding: 10px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.google-button {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.apple-button {
+  background: #f5f5f5;
+  color: #333;
+}
+

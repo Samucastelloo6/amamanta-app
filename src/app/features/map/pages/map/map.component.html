@@ -4,7 +4,35 @@
 
   <div class="map-wrapper">
 
+   <div class="filters">
+
+  <button
+    [class.active]="selectedType === 'all'"
+    (click)="changeFilter('all')">
+    Todos
+  </button>
+
+  <button
+    [class.active]="selectedType === 'lactation_room'"
+    (click)="changeFilter('lactation_room')">
+    Salas en universidades
+  </button>
+
+  <button
+    [class.active]="selectedType === 'friendly_space'"
+    (click)="changeFilter('friendly_space')">
+    Espacios amigos
+  </button>
+
+  <button
+  (click)="locateUser()">
+  📍 Mi ubicación
+</button>
+
+</div>
+
     <google-map
+    #googleMap
       height="600px"
       width="100%"
       [center]="center"
@@ -21,6 +49,14 @@
         </map-advanced-marker>
       }
 
+      @if (userPosition && userMarkerContent) {
+  <map-advanced-marker
+    [position]="userPosition"
+    [content]="userMarkerContent"
+    title="Tu ubicación">
+  </map-advanced-marker>
+}
+
     </google-map>
 
     @if (selectedResource) {
@@ -33,19 +69,47 @@
           {{ selectedResource.address }}
         </p>
 
+        @if (routeInfo) {
+  <p class="route-info">
+    🚗 {{ routeInfo.duration }} · 📍 {{ routeInfo.distance }}
+  </p>
+}
+
         <p class="description">
           {{ selectedResource.description }}
         </p>
 
-        <div class="card-actions">
-          <button class="primary-button">
-            Cómo llegar
-          </button>
+       <div class="card-actions">
 
-          <button class="secondary-button">
-            Ver detalles
-          </button>
-        </div>
+  <button
+    class="primary-button"
+    (click)="navigateToResource()">
+    Ver ruta
+  </button>
+
+</div>
+
+@if (routeInfo) {
+
+  <div class="external-navigation">
+
+    <p>Abrir en</p>
+
+    <button
+      class="map-button google-button"
+      (click)="openGoogleMaps()">
+      Google Maps
+    </button>
+
+    <button
+      class="map-button apple-button"
+      (click)="openAppleMaps()">
+      Apple Maps
+    </button>
+
+  </div>
+
+}
       </article>
     }
 
