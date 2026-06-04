@@ -1,0 +1,194 @@
+<section class="map-page">
+
+  <h1>Talleres de lactancia</h1>
+
+  <div class="map-wrapper">
+
+    <div class="filters">
+
+      <button
+        [class.active]="selectedDay === 'all'"
+        (click)="changeDay('all')">
+        Todos
+      </button>
+
+      <button
+        [class.active]="selectedDay === 'lunes'"
+        (click)="changeDay('lunes')">
+        Lunes
+      </button>
+
+      <button
+        [class.active]="selectedDay === 'martes'"
+        (click)="changeDay('martes')">
+        Martes
+      </button>
+
+      <button
+        [class.active]="selectedDay === 'miércoles'"
+        (click)="changeDay('miércoles')">
+        Miércoles
+      </button>
+
+      <button
+        [class.active]="selectedDay === 'jueves'"
+        (click)="changeDay('jueves')">
+        Jueves
+      </button>
+
+      <button
+        [class.active]="selectedDay === 'viernes'"
+        (click)="changeDay('viernes')">
+        Viernes
+      </button>
+
+      <button
+        [class.active]="selectedTime === 'morning'"
+        (click)="changeTime('morning')">
+        Mañana
+      </button>
+
+      <button
+        [class.active]="selectedTime === 'afternoon'"
+        (click)="changeTime('afternoon')">
+        Tarde
+      </button>
+
+
+    </div>
+
+    <div class="results-header">
+
+  <h2>
+    {{ filteredResources.length }} talleres encontrados
+  </h2>
+
+</div>
+
+<div class="workshops-list">
+
+  @for (workshop of filteredResources; track workshop.id) {
+
+    <article
+      class="workshop-item"
+      (click)="selectResource(workshop)">
+
+      <h3>{{ workshop.name }}</h3>
+
+      <p>
+        {{ workshop.description }}
+      </p>
+
+
+      <p class="address">
+        📍 {{ workshop.address }}
+      </p>
+      @if (userPosition) {
+
+  @if (userPosition) {
+  <p class="distance">
+    🚗 {{ getDistance(workshop).toFixed(1) }} km de tu ubicación
+  </p>
+}
+
+<div class="workshop-actions">
+
+  <button
+    class="secondary-button"
+    type="button"
+    (click)="viewWorkshopOnMap(workshop); $event.stopPropagation()">
+    🗺️ Ver en el mapa
+  </button>
+
+
+</div>
+
+}
+
+    </article>
+
+  }
+
+</div>
+    <google-map
+      #googleMap
+      height="600px"
+      width="100%"
+      [center]="center"
+      [zoom]="zoom"
+      [options]="mapOptions"
+      mapId="DEMO_MAP_ID">
+
+      @for (marker of markers; track marker.resource.id) {
+        <map-advanced-marker
+          [position]="marker.position"
+          [title]="marker.title"
+          [content]="marker.content"
+          (mapClick)="selectResource(marker.resource)">
+        </map-advanced-marker>
+      }
+
+      @if (userPosition && userMarkerContent) {
+        <map-advanced-marker
+          [position]="userPosition"
+          [content]="userMarkerContent"
+          title="Tu ubicación">
+        </map-advanced-marker>
+      }
+
+    </google-map>
+
+    @if (selectedResource) {
+      <article class="resource-card">
+        <button class="close-button" (click)="closeCard()">✕</button>
+
+        <h2>{{ selectedResource.name }}</h2>
+
+        <p class="address">
+          {{ selectedResource.address }}
+        </p>
+
+        @if (routeInfo) {
+          <p class="route-info">
+            🚗 {{ routeInfo.duration }} · 📍 {{ routeInfo.distance }}
+          </p>
+        }
+
+        <p class="description">
+          {{ selectedResource.description }}
+        </p>
+
+        <div class="card-actions">
+          <button
+            class="primary-button"
+            (click)="navigateToResource()">
+            Ver ruta
+          </button>
+        </div>
+
+        @if (routeInfo) {
+          <div class="external-navigation">
+
+            <p>Abrir en</p>
+
+            <button
+              class="map-button google-button"
+              (click)="openGoogleMaps()">
+              Google Maps
+            </button>
+
+            <button
+              class="map-button apple-button"
+              (click)="openAppleMaps()">
+              Apple Maps
+            </button>
+
+          </div>
+        }
+
+      </article>
+    }
+
+  </div>
+
+</section>

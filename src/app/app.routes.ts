@@ -28,6 +28,12 @@ export const routes: Routes = [
           )
       },
       {
+  path: 'talleres',
+  loadComponent: () =>
+    import('./features/workshops/pages/workshops/workshops.component')
+      .then(m => m.WorkshopsComponent)
+},
+      {
         path: 'community',
         loadComponent: () =>
           import('./features/community/pages/community/community.component').then(

@@ -23,6 +23,11 @@
     (click)="changeFilter('friendly_space')">
     Espacios amigos
   </button>
+  <button
+  [class.active]="selectedType === 'workshop'"
+  (click)="changeFilter('workshop')">
+  Talleres
+</button>
 
   <button
   (click)="locateUser()">

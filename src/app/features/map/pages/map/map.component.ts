@@ -32,7 +32,7 @@ export class MapComponent implements AfterViewInit {
   markers: MapMarker[] = [];
 
   selectedResource: ResourcePoint | null = null;
-  selectedType: 'all' | 'lactation_room' | 'friendly_space' = 'all';
+  selectedType: 'all' | 'lactation_room' | 'friendly_space'| 'workshop' = 'all';
 
   userPosition: google.maps.LatLngLiteral | null = null;
   userMarkerContent: HTMLElement | null = null;
@@ -83,22 +83,27 @@ export class MapComponent implements AfterViewInit {
 
   }
 
-  private createMarker(resource: ResourcePoint): MapMarker {
-    const image =
-      resource.type === 'lactation_room'
-        ? '/espacio-universidad.png'
-        : '/espacio-amigo.png';
+private createMarker(resource: ResourcePoint): MapMarker {
+  let image = '/espacio-amigo.png';
 
-    return {
-      position: {
-        lat: resource.latitude,
-        lng: resource.longitude
-      },
-      title: resource.name,
-      content: this.createMarkerContent(image),
-      resource
-    };
+  if (resource.type === 'lactation_room') {
+    image = '/espacio-universidad.png';
   }
+
+  if (resource.type === 'workshop') {
+    image = '/taller-lactancia.png';
+  }
+
+  return {
+    position: {
+      lat: resource.latitude,
+      lng: resource.longitude
+    },
+    title: resource.name,
+    content: this.createMarkerContent(image),
+    resource
+  };
+}
 
   private createMarkerContent(image: string): HTMLElement {
     const marker = document.createElement('div');
@@ -117,8 +122,8 @@ export class MapComponent implements AfterViewInit {
 
     const img = document.createElement('img');
     img.src = image;
-    img.style.width = '28px';
-    img.style.height = '28px';
+    img.style.width = '50px';
+    img.style.height = '50px';
     img.style.objectFit = 'contain';
 
     marker.appendChild(img);
@@ -151,17 +156,31 @@ export class MapComponent implements AfterViewInit {
     this.clearRoute();
   }
 
-  changeFilter(type: 'all' | 'lactation_room' | 'friendly_space'): void {
+ changeFilter(type: 'all' | 'lactation_room' | 'friendly_space' | 'workshop'): void {
+  this.selectedType = type;
+  this.selectedResource = null;
 
+  this.clearRoute();
+  this.loadMarkers();
 
-    this.selectedType = type;
-    this.selectedResource = null;
+  setTimeout(() => {
+    this.fitMapToMarkers();
+  });
+}
 
-    this.clearRoute();
-    this.loadMarkers();
-
-
+private fitMapToMarkers(): void {
+  if (!this.googleMap?.googleMap || this.markers.length === 0) {
+    return;
   }
+
+  const bounds = new google.maps.LatLngBounds();
+
+  this.markers.forEach(marker => {
+    bounds.extend(marker.position);
+  });
+
+  this.googleMap.googleMap.fitBounds(bounds);
+}
 
   locateUser(): void {
 
