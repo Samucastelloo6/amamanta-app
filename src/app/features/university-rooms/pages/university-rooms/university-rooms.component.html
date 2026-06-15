@@ -1,0 +1,148 @@
+<section class="map-page">
+
+  <h1>Salas universitarias</h1>
+
+  <div class="rooms-layout"
+  [class.sidebar-collapsed]="sidebarCollapsed">
+
+   <aside class="rooms-sidebar">
+
+  <button
+    class="toggle-sidebar"
+    (click)="toggleSidebar()">
+    {{ sidebarCollapsed ? '▶' : '◀' }}
+  </button>
+
+  @if (!sidebarCollapsed) {
+
+    <div class="sidebar-header">
+      <h2>{{ filteredResources.length }} salas disponibles</h2>
+
+      @if (userPosition) {
+        <p class="proximity-info">
+          📍 Ordenadas por proximidad
+        </p>
+      }
+    </div>
+
+    <div class="rooms-list">
+
+      @for (room of filteredResources; track room.id) {
+
+        <article
+          class="room-card"
+          [class.active]="selectedResource?.id === room.id"
+          (click)="selectResource(room)">
+
+          <div class="room-icon">
+            🍼
+          </div>
+
+          <div class="room-info">
+            <h3>{{ room.name }}</h3>
+
+            <p class="room-description">
+              {{ room.description }}
+            </p>
+
+            <p class="address">
+              📍 {{ room.address }}
+            </p>
+          </div>
+
+        </article>
+
+      }
+
+    </div>
+
+  }
+
+</aside>
+
+    <div class="map-area">
+
+      <google-map
+        #googleMap
+        height="100%"
+        width="100%"
+        [center]="center"
+        [zoom]="zoom"
+        [options]="mapOptions"
+        mapId="DEMO_MAP_ID">
+
+        @for (marker of markers; track marker.resource.id) {
+          <map-advanced-marker
+            [position]="marker.position"
+            [title]="marker.title"
+            [content]="marker.content"
+            (mapClick)="selectResource(marker.resource)">
+          </map-advanced-marker>
+        }
+
+        @if (userPosition && userMarkerContent) {
+          <map-advanced-marker
+            [position]="userPosition"
+            [content]="userMarkerContent"
+            title="Tu ubicación">
+          </map-advanced-marker>
+        }
+
+      </google-map>
+
+      @if (selectedResource) {
+        <article class="resource-card">
+          <button class="close-button" (click)="closeCard()">✕</button>
+
+          <h2>{{ selectedResource.name }}</h2>
+
+          <p class="address">
+            {{ selectedResource.address }}
+          </p>
+
+          @if (routeInfo) {
+            <p class="route-info">
+              🚗 {{ routeInfo.duration }} · 📍 {{ routeInfo.distance }}
+            </p>
+          }
+
+          <p class="description">
+            {{ selectedResource.description }}
+          </p>
+
+          <div class="card-actions">
+            <button
+              class="primary-button"
+              (click)="navigateToResource()">
+              Ver ruta
+            </button>
+          </div>
+
+          @if (routeInfo) {
+            <div class="external-navigation">
+
+              <p>Abrir en</p>
+
+              <button
+                class="map-button google-button"
+                (click)="openGoogleMaps()">
+                Google Maps
+              </button>
+
+              <button
+                class="map-button apple-button"
+                (click)="openAppleMaps()">
+                Apple Maps
+              </button>
+
+            </div>
+          }
+
+        </article>
+      }
+
+    </div>
+
+  </div>
+
+</section>

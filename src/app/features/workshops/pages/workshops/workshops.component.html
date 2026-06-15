@@ -1,3 +1,4 @@
+
 <section class="map-page">
 
   <h1>Talleres de lactancia</h1>
@@ -7,109 +8,119 @@
     <div class="filters">
 
       <button
-        [class.active]="selectedDay === 'all'"
-        (click)="changeDay('all')">
+        [class.active]="selectedTime === 'all'"
+        (click)="changeTime('all')">
         Todos
-      </button>
-
-      <button
-        [class.active]="selectedDay === 'lunes'"
-        (click)="changeDay('lunes')">
-        Lunes
-      </button>
-
-      <button
-        [class.active]="selectedDay === 'martes'"
-        (click)="changeDay('martes')">
-        Martes
-      </button>
-
-      <button
-        [class.active]="selectedDay === 'miércoles'"
-        (click)="changeDay('miércoles')">
-        Miércoles
-      </button>
-
-      <button
-        [class.active]="selectedDay === 'jueves'"
-        (click)="changeDay('jueves')">
-        Jueves
-      </button>
-
-      <button
-        [class.active]="selectedDay === 'viernes'"
-        (click)="changeDay('viernes')">
-        Viernes
       </button>
 
       <button
         [class.active]="selectedTime === 'morning'"
         (click)="changeTime('morning')">
-        Mañana
+        🌞 Mañana
       </button>
 
       <button
         [class.active]="selectedTime === 'afternoon'"
         (click)="changeTime('afternoon')">
-        Tarde
+        🌙 Tarde
       </button>
-
 
     </div>
 
     <div class="results-header">
 
-  <h2>
-    {{ filteredResources.length }} talleres encontrados
-  </h2>
+      <h2>Calendario semanal de talleres</h2>
 
-</div>
-
-<div class="workshops-list">
-
-  @for (workshop of filteredResources; track workshop.id) {
-
-    <article
-      class="workshop-item"
-      (click)="selectResource(workshop)">
-
-      <h3>{{ workshop.name }}</h3>
-
-      <p>
-        {{ workshop.description }}
+      <p class="proximity-info">
+        Pulsa en <strong>Ver</strong> para localizar el taller en el mapa.
       </p>
 
+    </div>
 
-      <p class="address">
-        📍 {{ workshop.address }}
-      </p>
-      @if (userPosition) {
+    <div class="workshops-calendar">
 
-  @if (userPosition) {
-  <p class="distance">
-    🚗 {{ getDistance(workshop).toFixed(1) }} km de tu ubicación
-  </p>
-}
+      <div class="calendar-header">
+        <div>Día</div>
+        <div>Mañana</div>
+        <div>Tarde</div>
+      </div>
 
-<div class="workshop-actions">
+      @for (day of weekDays; track day.value) {
 
-  <button
-    class="secondary-button"
-    type="button"
-    (click)="viewWorkshopOnMap(workshop); $event.stopPropagation()">
-    🗺️ Ver en el mapa
-  </button>
+        <div class="calendar-row">
 
+          <div class="day-cell">
+            {{ day.label }}
+          </div>
 
-</div>
+          <div class="time-cell">
 
-}
+            @for (workshop of getWorkshopsByDayAndTime(day.value, 'morning'); track workshop.id) {
 
-    </article>
+              <article class="workshop-card">
 
-  }
+                <span class="workshop-time">
+                  {{ workshop.schedule }}
+                </span>
 
-</div>
+                <span class="workshop-name">
+                  {{ workshop.name }}
+                </span>
+
+                <button
+                  class="secondary-button compact-button"
+                  type="button"
+                  (click)="viewWorkshopOnMap(workshop)">
+                  Ver
+                </button>
+
+              </article>
+
+            }
+
+            @if (getWorkshopsByDayAndTime(day.value, 'morning').length === 0) {
+              <p class="empty-cell">—</p>
+            }
+
+          </div>
+
+          <div class="time-cell">
+
+            @for (workshop of getWorkshopsByDayAndTime(day.value, 'afternoon'); track workshop.id) {
+
+              <article class="workshop-card">
+
+                <span class="workshop-time">
+                  {{ workshop.schedule }}
+                </span>
+
+                <span class="workshop-name">
+                  {{ workshop.name }}
+                </span>
+
+                <button
+                  class="secondary-button compact-button"
+                  type="button"
+                  (click)="viewWorkshopOnMap(workshop)">
+                  Ver
+                </button>
+
+              </article>
+
+            }
+
+            @if (getWorkshopsByDayAndTime(day.value, 'afternoon').length === 0) {
+              <p class="empty-cell">—</p>
+            }
+
+          </div>
+
+        </div>
+
+      }
+
+    </div>
+
     <google-map
       #googleMap
       height="600px"
@@ -139,13 +150,15 @@
     </google-map>
 
     @if (selectedResource) {
+
       <article class="resource-card">
+
         <button class="close-button" (click)="closeCard()">✕</button>
 
         <h2>{{ selectedResource.name }}</h2>
 
         <p class="address">
-          {{ selectedResource.address }}
+          📍 {{ selectedResource.address }}
         </p>
 
         @if (routeInfo) {
@@ -159,14 +172,17 @@
         </p>
 
         <div class="card-actions">
+
           <button
             class="primary-button"
             (click)="navigateToResource()">
             Ver ruta
           </button>
+
         </div>
 
         @if (routeInfo) {
+
           <div class="external-navigation">
 
             <p>Abrir en</p>
@@ -184,11 +200,15 @@
             </button>
 
           </div>
+
         }
 
       </article>
+
     }
 
   </div>
 
 </section>
+
+

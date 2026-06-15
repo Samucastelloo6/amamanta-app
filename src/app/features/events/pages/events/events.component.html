@@ -1,0 +1,148 @@
+<section class="events-page">
+
+  <div class="events-header">
+    <div>
+      <h1>Eventos Amamanta</h1>
+      <p>Consulta las actividades, charlas y encuentros del mes.</p>
+    </div>
+
+    <button
+      class="download-button"
+      type="button"
+      (click)="downloadCalendarImage()">
+      📥 Descargar calendario
+    </button>
+  </div>
+
+  <div #calendarImage class="calendar-export" [class.export-mode]="exporting">
+
+    <div class="calendar-top">
+      <button type="button" (click)="previousMonth()">‹</button>
+
+      <div>
+        <h2>CALENDARIO MENSUAL · {{ currentMonthName }}</h2>
+      </div>
+
+      <button type="button" (click)="nextMonth()">›</button>
+    </div>
+
+
+
+    <div class="calendar-grid week-days">
+      @for (day of weekDays; track day) {
+        <div class="week-day">
+          {{ day }}
+        </div>
+      }
+    </div>
+
+    <div class="calendar-grid days-grid">
+      @for (day of calendarDays; track $index){
+        <button
+          type="button"
+          class="calendar-day"
+          [class.muted]="!day.isCurrentMonth"
+          [class.today]="day.isToday"
+          [class.selected]="day.isSelected"
+          [class.has-events]="day.events.length > 0"
+          (click)="selectDay(day)">
+
+          <span class="day-number">
+            {{ day.dayNumber }}
+          </span>
+
+          @if (day.events.length > 0) {
+            <span class="event-count">
+              {{ day.events.length }}
+            </span>
+          }
+
+<div class="day-events">
+@for (event of day.events.slice(0, 2); track event.id) {
+  <div class="day-event-item">
+    <div class="day-event-title">
+      {{ event.startTime || 'Hora por confirmar' }} · {{ event.title }}
+    </div>
+
+  <span class="day-event-location">
+  • {{ event.location }}
+</span>
+  </div>
+}
+
+  @if (day.events.length > 2) {
+    <span class="more-events">
+      +{{ day.events.length - 2 }} más
+    </span>
+  }
+</div>
+
+        </button>
+      }
+    </div>
+
+    <div class="calendar-footer">
+      <img src="/logo-amamanta.png" alt="Amamanta">
+      <span>Amamanta · Grupo de apoyo a lactancia materna</span>
+    </div>
+
+  </div>
+
+  <section #selectedEvents class="selected-events">
+
+   <h2>
+  Eventos del {{ selectedDate | date:'d \'de\' MMMM \'de\' y':'':'es' }}
+</h2>
+
+    @if (selectedDateEvents.length === 0) {
+      <p class="empty-message">
+        No hay eventos programados para este día.
+      </p>
+    }
+
+    <div class="events-list">
+
+      @for (event of selectedDateEvents; track event.id) {
+        <article class="event-card">
+
+          <div class="event-date">
+            {{ event.startTime || 'Hora por confirmar' }}
+          </div>
+
+          <div class="event-content">
+            <h3>{{ event.title }}</h3>
+
+            <p class="event-location">
+              • {{ event.location }}
+            </p>
+       @if (event.workshopId) {
+  <button
+    type="button"
+    class="event-map-button"
+    (click)="goToWorkshop(event.workshopId)"
+  >
+    Ver taller en el mapa
+  </button>
+}
+
+            <p>
+              {{ event.description }}
+            </p>
+
+            @if (event.requiresRegistration) {
+              <span class="registration-badge">
+                Con inscripción
+              </span>
+            }
+          </div>
+
+        </article>
+      }
+
+    </div>
+
+  </section>
+
+
+
+</section>

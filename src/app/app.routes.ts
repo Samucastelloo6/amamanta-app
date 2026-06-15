@@ -27,11 +27,29 @@ export const routes: Routes = [
             (m) => m.MapComponent
           )
       },
+            {
+  path: 'eventos',
+  loadComponent: () =>
+    import('./features/events/pages/events/events.component')
+      .then(m => m.EventsComponent)
+},
+      {
+  path: 'salas-universitarias',
+  loadComponent: () =>
+    import('./features/university-rooms/pages/university-rooms/university-rooms.component')
+      .then(m => m.UniversityRoomsComponent)
+},
       {
   path: 'talleres',
   loadComponent: () =>
     import('./features/workshops/pages/workshops/workshops.component')
       .then(m => m.WorkshopsComponent)
+},
+{
+  path: 'espacios-amigos',
+  loadComponent: () =>
+    import('./features/friendly-spaces/pages/friendly-spaces/friendly-spaces.component')
+      .then(m => m.FriendlySpacesComponent)
 },
       {
         path: 'community',

@@ -1,0 +1,221 @@
+<section class="map-page">
+
+  <h1>Espacios amigos</h1>
+
+  <div
+    class="friendly-layout"
+    [class.sidebar-collapsed]="sidebarCollapsed">
+
+    <aside class="friendly-sidebar">
+
+      <button
+        class="toggle-sidebar"
+        type="button"
+        (click)="toggleSidebar()">
+        {{ sidebarCollapsed ? '▶' : '◀' }}
+      </button>
+
+      @if (!sidebarCollapsed) {
+
+        <div class="search-category-bar">
+
+          <div class="search-inline">
+            <span>🔍</span>
+
+            <input
+              type="text"
+              placeholder="Buscar espacio..."
+              [value]="searchText"
+              (input)="onSearchChange($event)">
+          </div>
+
+          <div class="category-dropdown">
+
+            <button
+              type="button"
+              class="category-button"
+              (click)="toggleCategoryMenu()">
+              <span>🗂️ {{ getSelectedSectorLabel() }}</span>
+              <span>▾</span>
+            </button>
+
+            @if (showCategoryMenu) {
+              <div class="category-menu">
+
+                <button type="button" (click)="selectCategory('all')">
+                  Todas las categorías
+                </button>
+
+                <button type="button" (click)="selectCategory('food')">
+                  Alimentación
+                </button>
+
+                <button type="button" (click)="selectCategory('fashion')">
+                  Ropa, zapatos y complementos
+                </button>
+
+                <button type="button" (click)="selectCategory('books_gifts')">
+                  Librerías, papelerías y regalos
+                </button>
+
+                <button type="button" (click)="selectCategory('beauty')">
+                  Estética, peluquería y perfumería
+                </button>
+
+                <button type="button" (click)="selectCategory('health')">
+                  Clínicas y salud
+                </button>
+
+                <button type="button" (click)="selectCategory('restaurants')">
+                  Café, restaurante y comida
+                </button>
+
+                <button type="button" (click)="selectCategory('financial')">
+                  Servicios financieros
+                </button>
+
+                <button type="button" (click)="selectCategory('others')">
+                  Otros
+                </button>
+
+              </div>
+            }
+
+          </div>
+
+        </div>
+
+        <div class="sidebar-header">
+          <h2>{{ filteredResources.length }} espacios encontrados</h2>
+
+          @if (userPosition) {
+            <p class="proximity-info">
+              📍 Ordenados por proximidad
+            </p>
+          }
+        </div>
+
+        <div class="spaces-list">
+
+          @for (space of filteredResources; track space.id) {
+
+            <article
+              class="space-card"
+              [class.active]="selectedResource?.id === space.id"
+              (click)="selectResource(space)">
+
+              <div class="space-icon">
+                {{ getSectorIcon(space.sector) }}
+              </div>
+
+              <div class="space-info">
+                <h3>{{ space.name }}</h3>
+
+                <p class="address">
+                  📍 {{ space.address }}
+                </p>
+              </div>
+
+            </article>
+
+          } @empty {
+
+            <div class="empty-state">
+              <h3>No hay espacios con estos filtros</h3>
+              <p>Prueba con otra categoría o cambia la búsqueda.</p>
+            </div>
+
+          }
+
+        </div>
+
+      }
+
+    </aside>
+
+    <div class="map-area">
+
+      <google-map
+        #googleMap
+        height="100%"
+        width="100%"
+        [center]="center"
+        [zoom]="zoom"
+        [options]="mapOptions"
+        mapId="DEMO_MAP_ID">
+
+        @for (marker of markers; track marker.resource.id) {
+          <map-advanced-marker
+            [position]="marker.position"
+            [title]="marker.title"
+            [content]="marker.content"
+            (mapClick)="selectResource(marker.resource)">
+          </map-advanced-marker>
+        }
+
+        @if (userPosition && userMarkerContent) {
+          <map-advanced-marker
+            [position]="userPosition"
+            [content]="userMarkerContent"
+            title="Tu ubicación">
+          </map-advanced-marker>
+        }
+
+      </google-map>
+
+      @if (selectedResource) {
+        <article class="resource-card">
+          <button class="close-button" (click)="closeCard()">✕</button>
+
+          <h2>{{ selectedResource.name }}</h2>
+
+          <p class="address">
+            {{ selectedResource.address }}
+          </p>
+
+          @if (routeInfo) {
+            <p class="route-info">
+              🚗 {{ routeInfo.duration }} · 📍 {{ routeInfo.distance }}
+            </p>
+          }
+
+          <p class="description">
+            {{ selectedResource.description }}
+          </p>
+
+          <div class="card-actions">
+            <button
+              class="primary-button"
+              (click)="navigateToResource()">
+              Ver ruta
+            </button>
+          </div>
+
+          @if (routeInfo) {
+            <div class="external-navigation">
+
+              <p>Abrir en</p>
+
+              <button
+                class="map-button google-button"
+                (click)="openGoogleMaps()">
+                Google Maps
+              </button>
+
+              <button
+                class="map-button apple-button"
+                (click)="openAppleMaps()">
+                Apple Maps
+              </button>
+
+            </div>
+          }
+
+        </article>
+      }
+
+    </div>
+
+  </div>
+
+</section>

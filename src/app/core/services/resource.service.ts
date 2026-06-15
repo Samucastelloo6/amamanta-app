@@ -7,7 +7,8 @@ import { ResourcePoint } from '../models/resource';
 export class ResourceService {
 
    private readonly resources: ResourcePoint[] = [
-    {
+
+     {
   id: 'uv-rectorado',
   name: 'Sala de lactancia - Rectorado UV',
   type: 'lactation_room',
@@ -159,12 +160,24 @@ export class ResourceService {
   id: 'cullera-la-terraza-de-julieta',
   name: 'La Terraza de Julieta',
   type: 'friendly_space',
-  sector: 'food',
+  sector: 'restaurants',
   address: 'Calle Poeta Miguel Hernández, 8, Cullera',
   latitude: 39.16475417672589,
   longitude: -0.24399896635783672,
   googleMapsUrl: 'https://maps.app.goo.gl/6JM4JkMDnp4HnYwf6',
   description: 'Cafetería – Gastrobar.',
+  isActive: true
+},
+{
+  id: 'cullera-los-pamplonicas',
+  name: 'Los Pamplonicas',
+  type: 'friendly_space',
+  sector: 'food',
+  address: 'C/ Ciudades Unidas, 2, Cullera',
+  latitude: 39.18197184328208,
+  longitude: -0.23221465244794928,
+  googleMapsUrl: 'https://maps.app.goo.gl/oezNYzwfkp2auKvr7',
+  description: 'Alimentación y prensa.',
   isActive: true
 },
 {
@@ -237,6 +250,246 @@ export class ResourceService {
   longitude: -0.24455023836571466,
   googleMapsUrl: 'https://maps.app.goo.gl/jTTP68FV51n5aW1WA',
   description: 'Comercio de moda para hombre y mujer.',
+  isActive: true
+},
+{
+  id: 'cullera-mayoral',
+  name: 'Mayoral Cullera',
+  type: 'friendly_space',
+  sector: 'fashion',
+  address: 'C/ Baix, 1, Cullera',
+  latitude: 39.16547350568414,
+  longitude: -0.25560589561554675,
+  googleMapsUrl: 'https://maps.app.goo.gl/WbmcgXtzysgZwtcZ6',
+  description: 'Tienda de ropa para niños y niñas.',
+  isActive: true
+},
+{
+  id: 'cullera-dengue',
+  name: 'Dengue',
+  type: 'friendly_space',
+  sector: 'fashion',
+  address: 'Calle La Marina, 39 bajo, Cullera',
+  latitude: 39.16241878889642,
+  longitude: -0.2537362265374509,
+  googleMapsUrl: 'https://maps.app.goo.gl/jpeTapzrU5uPw1ma7',
+  description: 'Indumentària valenciana.',
+  isActive: true
+},
+{
+  id: 'cullera-la-lluna-de-linfant',
+  name: 'La Lluna de l’Infant',
+  type: 'friendly_space',
+  sector: 'fashion',
+  address: 'Carrer Rey Don Jaime, 1, Cullera',
+  latitude: 39.16404286151701,
+  longitude: -0.2533721181242295,
+  googleMapsUrl: 'https://maps.app.goo.gl/j4oiMvpzSY7kayX56',
+  description: 'Moda infantil y puericultura.',
+  isActive: true
+},
+{
+  id: 'cullera-xipinines',
+  name: 'Xipinines',
+  type: 'friendly_space',
+  sector: 'books_gifts',
+  address: 'Plaza del Doctor José Mongrell, 11, Cullera',
+  latitude: 39.16509046265196,
+  longitude: -0.2455518126406031,
+  googleMapsUrl: 'https://maps.app.goo.gl/PwRDHmt8Bj4kREQB6',
+  description: 'Juguetes educativos.',
+  isActive: true
+},
+{
+  id: 'cullera-ines-llibreria-papereria',
+  name: 'Inés Llibreria Papereria',
+  type: 'friendly_space',
+  sector: 'books_gifts',
+  address: 'C/ Rey Don Jaime, 3, Cullera',
+  latitude: 39.16382898263456,
+  longitude: -0.25354260413047475,
+  googleMapsUrl: 'https://maps.app.goo.gl/xcfH4izp6jjNWcgu6',
+  description: 'Librería y papelería.',
+  isActive: true
+},
+{
+  id: 'cullera-naranja-y-limon',
+  name: 'Naranja y Limón',
+  type: 'friendly_space',
+  sector: 'books_gifts',
+  address: 'C/ Cabañal, 13, Cullera',
+  latitude: 39.16426490044833,
+  longitude: -0.24318773550128037,
+  googleMapsUrl: 'https://maps.app.goo.gl/5ruwTsR5bKAeVE6y5',
+  description: 'Artículos de regalo y decoración.',
+  isActive: true
+},
+{
+  id: 'cullera-personalitzat-cullera',
+  name: 'Personalitza’t Cullera',
+  type: 'friendly_space',
+  sector: 'books_gifts',
+  address: 'C/ Rey Don Jaime, 12, Cullera',
+  latitude: 39.1639780239915,
+  longitude: -0.2535442334242838,
+  googleMapsUrl: 'https://maps.app.goo.gl/RTjJnGKagMYDRQa46',
+  description: 'Tienda de productos personalizados.',
+  isActive: true
+},
+{
+  id: 'cullera-papeleria-kevin',
+  name: 'Papelería Kevin',
+  type: 'friendly_space',
+  sector: 'books_gifts',
+  address: 'C/ Ateneo Musical, 26, Cullera',
+  latitude: 39.163210590675085,
+  longitude: -0.25422971290839913,
+  googleMapsUrl: 'https://maps.app.goo.gl/EQRP3Ff1joLn9FX26',
+  description: 'Papelería, librería y regalos.',
+  isActive: true
+},
+{
+  id: 'cullera-gisell-milan-estetica-nails',
+  name: 'Gisell Milán Estética & Nails',
+  type: 'friendly_space',
+  sector: 'beauty',
+  address: 'C/ Colón, 25, Cullera',
+  latitude: 39.162142673686645,
+  longitude: -0.25085897130072576,
+  googleMapsUrl: 'https://maps.app.goo.gl/qN9uXQSJxXPDGb9p8',
+  description: 'Centro de estética.',
+  isActive: true
+},
+{
+  id: 'cullera-clinica-essence',
+  name: 'Clínica Essence',
+  type: 'friendly_space',
+  sector: 'health',
+  address: 'C/ Méndez Núñez, 1, bajo izquierdo, Cullera',
+  latitude: 39.16641429256101,
+  longitude: -0.2445904858210968,
+  googleMapsUrl: 'https://maps.app.goo.gl/7KznT2FvtqNq1RFs5',
+  description: 'Clínica de fisioterapia.',
+  isActive: true
+},
+{
+  id: 'cullera-siveo',
+  name: 'SIVEO',
+  type: 'friendly_space',
+  sector: 'health',
+  address: 'C/ Ateneo Musical, 62, Cullera',
+  latitude: 39.161755659413615,
+  longitude: -0.25182202880101706,
+  googleMapsUrl: 'https://maps.app.goo.gl/xo26ddAf4cvs68Hq6',
+  description: 'Óptica y centro auditivo.',
+  isActive: true
+},
+{
+  id: 'cullera-farmacia-salinas',
+  name: 'Farmacia Salinas CB',
+  type: 'friendly_space',
+  sector: 'health',
+  address: 'Av. Doctor Alemany, 38, Cullera',
+  latitude: 39.16357194051015,
+  longitude: -0.25571726466065015,
+  googleMapsUrl: 'https://maps.app.goo.gl/96SzjdA5EFvQLh1P9',
+  description: 'Farmacia.',
+  isActive: true
+},
+{
+  id: 'cullera-farmacia-margarita-gonzalez',
+  name: 'Farmacia Margarita González',
+  type: 'friendly_space',
+  sector: 'health',
+  address: 'Av. del Racó, Florazar 1, Cullera',
+  latitude: 39.17250472454693,
+  longitude: -0.24241258833609944,
+  googleMapsUrl: 'https://maps.app.goo.gl/coGE12WAdueke7TX8',
+  description: 'Farmacia.',
+  isActive: true
+},
+{
+  id: 'cullera-farmacia-el-raco',
+  name: 'Farmacia El Racó',
+  type: 'friendly_space',
+  sector: 'health',
+  address: 'C/ Jaume Roig, 10, Cullera',
+  latitude: 39.18072590478542,
+  longitude: -0.23604521275927354,
+  googleMapsUrl: 'https://maps.app.goo.gl/DhjpaFSFDewLSK1MA',
+  description: 'Farmacia.',
+  isActive: true
+},
+{
+  id: 'cullera-cafeteria-plaza',
+  name: 'Cafetería Plaza',
+  type: 'friendly_space',
+  sector: 'restaurants',
+  address: 'Plaza Andrés Piles, Cullera',
+  latitude: 39.162194896666534,
+  longitude: -0.24941217808305063,
+  googleMapsUrl: 'https://maps.app.goo.gl/vwSeBgenawjKnbqR8',
+  description: 'Cafetería.',
+  isActive: true
+},
+{
+  id: 'cullera-sucre-cafeteria',
+  name: 'Sucre Cafetería',
+  type: 'friendly_space',
+  sector: 'restaurants',
+  address: 'Ronda Joan Fuster, 8, Cullera',
+  latitude: 39.16015362215675,
+  longitude: -0.2503831340559101,
+  googleMapsUrl: 'https://maps.app.goo.gl/QXbvfFw53dg8W4FJ7',
+  description: 'Cafetería y panadería.',
+  isActive: true
+},
+{
+  id: 'cullera-gaitos-pesca',
+  name: 'Gaitos Pesca',
+  type: 'friendly_space',
+  sector: 'others',
+  address: 'Avenida del Puerto, 11, Cullera',
+  latitude: 39.1609378051822,
+  longitude: -0.25481944451287086,
+  googleMapsUrl: 'https://maps.app.goo.gl/FC2mPyGtMRhyaNVd9',
+  description: 'Tienda de artículos para la pesca.',
+  isActive: true
+},
+{
+  id: 'cullera-milar-senen-ortega',
+  name: 'Milar Senen Ortega',
+  type: 'friendly_space',
+  sector: 'others',
+  address: 'Plaça Sant Isidre, 13, Cullera',
+  latitude: 39.16355651149734,
+  longitude: -0.25684639464691117,
+  googleMapsUrl: 'https://maps.app.goo.gl/BofPb5t6yA8ygeob8',
+  description: 'Venta de electrodomésticos e instalación de aires acondicionados.',
+  isActive: true
+},
+{
+  id: 'cullera-electronday',
+  name: 'Electronday',
+  type: 'friendly_space',
+  sector: 'others',
+  address: 'C/ 25 de Abril, 53 bajo, Cullera',
+  latitude: 39.163763570739086,
+  longitude: -0.24744905720731186,
+  googleMapsUrl: 'https://maps.app.goo.gl/tK5qcsz1qY75dDcW8',
+  description: 'Iluminación y electricidad.',
+  isActive: true
+},
+{
+  id: 'cullera-cafe-bar-manantial',
+  name: 'Café Bar Manantial',
+  type: 'friendly_space',
+  sector: 'restaurants',
+  address: 'Passatge L’Ullal, 2 bajo, Cullera',
+  latitude: 39.162175292310465,
+  longitude: -0.2483148308135999,
+  googleMapsUrl: 'https://maps.app.goo.gl/9VRXRpkBVho7ktBW6',
+  description: 'Almuerzos, comidas y cenas.',
   isActive: true
 },
 {
@@ -339,7 +592,7 @@ export class ResourceService {
   id: 'cullera-caixa-popular',
   name: 'Caixa Popular',
   type: 'friendly_space',
-  sector: 'services',
+  sector: 'financial',
   address: 'Av. Doctor Alemany, 22, Cullera',
   latitude: 39.16394470498962,
   longitude: -0.2552375628625741,
@@ -351,7 +604,7 @@ export class ResourceService {
   id: 'cullera-loterias-sant-antoni',
   name: 'Administración de Loterías Sant Antoni',
   type: 'friendly_space',
-  sector: 'services',
+  sector: 'financial',
   address: 'Plaza Mongrell, 10 bajo, Cullera',
   latitude: 39.16503133906416,
   longitude: -0.24510128402888057,
@@ -367,6 +620,11 @@ export class ResourceService {
   latitude: 39.64879914351661,
   longitude: -0.5102815264406624,
   googleMapsUrl: 'https://maps.app.goo.gl/kV7q7gw78SbNHMt86',
+  day: 'lunes',
+  time: 'morning',
+  schedule: '10:30h',
+  contact: 'María (615 265 650)',
+
   description: 'Lunes · 10:30h · Contacto: María (615 265 650).',
   isActive: true
 },
@@ -378,6 +636,11 @@ export class ResourceService {
   latitude: 39.4832469667412,
   longitude: -0.4484905710044219,
   googleMapsUrl: 'https://maps.app.goo.gl/h751B4sYBjN3Sf7r9',
+  day: 'lunes',
+  time: 'morning',
+  schedule: '11:00h',
+  contact: 'Zoraida (670 577 576)',
+
   description: 'Lunes · 11:00h · Contacto: Zoraida (670 577 576).',
   isActive: true
 },
@@ -389,6 +652,11 @@ export class ResourceService {
   latitude: 39.42453482080201,
   longitude: -0.41624515595820427,
   googleMapsUrl: 'https://maps.app.goo.gl/dMCFuvgXjtE1JrqD9',
+  day: 'lunes',
+  time: 'morning',
+  schedule: '11:00h',
+  contact: 'Esther (651 912 692)',
+
   description: 'Lunes · 11:00h · Contacto: Esther (651 912 692).',
   isActive: true
 },
@@ -400,6 +668,11 @@ export class ResourceService {
   latitude: 39.56591860235202,
   longitude: -0.5341534929608396,
   googleMapsUrl: 'https://maps.app.goo.gl/cxeQ7Sr1hYvrtv4VA',
+  day: 'lunes',
+  time: 'morning',
+  schedule: '11:00h',
+  contact: 'Abi (654 584 209)',
+
   description: 'Lunes · 11:00h · Aula de Yoga del Centro Sociocultural. Contacto: Abi (654 584 209).',
   isActive: true
 },
@@ -411,6 +684,11 @@ export class ResourceService {
   latitude: 39.469324032455866,
   longitude: -0.7125622336976339,
   googleMapsUrl: 'https://maps.app.goo.gl/c9S5dt5sW3663QSWA',
+  day: 'lunes',
+  time: 'morning',
+  schedule: '12:00h',
+  contact: 'Ava (626 397 846)',
+
   description: 'Lunes · 12:00h · Contacto: Ava (626 397 846).',
   isActive: true
 },
@@ -422,6 +700,11 @@ export class ResourceService {
   latitude: 39.124323451815734,
   longitude: -0.4509421322543281,
   googleMapsUrl: 'https://maps.app.goo.gl/BGrdnr1mfxcdWLvt6',
+  day: 'lunes',
+  time: 'afternoon',
+  schedule: '16:30h',
+  contact: 'Fátima (635 325 243) y Cristina (667 208 069)',
+
   description: 'Lunes · 16:30h · Contacto: Fátima (635 325 243) y Cristina (667 208 069).',
   isActive: true
 },
@@ -433,6 +716,11 @@ export class ResourceService {
   latitude: 39.44310412160362,
   longitude: -0.390158539991758,
   googleMapsUrl: 'https://maps.app.goo.gl/Vx7FGxsUPgVxvkez8',
+  day: 'lunes',
+  time: 'afternoon',
+  schedule: '18:00h',
+  contact: 'Agustina (644 309 128)',
+
   description: 'Lunes · 18:00h · Contacto: Agustina (644 309 128).',
   isActive: true
 },
@@ -444,6 +732,11 @@ export class ResourceService {
   latitude: 39.51330563064957,
   longitude: -0.4343889002456898,
   googleMapsUrl: 'https://maps.app.goo.gl/78rKfeDXwXLh3exe8',
+  day: 'martes',
+  time: 'morning',
+  schedule: '11:30h',
+  contact: 'Laura (617 809 876)',
+
   description: 'Martes · 11:30h · Contacto: Laura (617 809 876).',
   isActive: true
 },
@@ -455,6 +748,11 @@ export class ResourceService {
   latitude: 39.43501407954694,
   longitude: -0.4750763145218355,
   googleMapsUrl: 'https://maps.app.goo.gl/GkMajHT5FugeF6937',
+  day: 'martes',
+  time: 'morning',
+  schedule: '12:00h',
+  contact: 'Toya (625 752 683)',
+
   description: 'Martes · 12:00h · Biblioteca del Centro de Salud. Contacto: Toya (625 752 683).',
   isActive: true
 },
@@ -466,6 +764,11 @@ export class ResourceService {
   latitude: 39.47376057950258,
   longitude: -0.39169577919183163,
   googleMapsUrl: 'https://maps.app.goo.gl/bo2BMF6JsWgZVFWcA',
+  day: 'martes',
+  time: 'morning',
+  schedule: '12:00h',
+  contact: 'Candela (661 051 513)',
+
   description: 'Martes · 12:00h · 4º piso del Centro de Salud. Contacto: Candela (661 051 513).',
   isActive: true
 },
@@ -477,6 +780,11 @@ export class ResourceService {
   latitude: 39.570682675047316,
   longitude: -0.6201966569471754,
   googleMapsUrl: 'https://maps.app.goo.gl/MgEYT5vByN3apAVj8',
+  day: 'martes',
+  time: 'afternoon',
+  schedule: '17:30h',
+  contact: 'Bárbara (699 420 414)',
+
   description: 'Martes · 17:30h · Contacto: Bárbara (699 420 414).',
   isActive: true
 },
@@ -488,6 +796,11 @@ export class ResourceService {
   latitude: 39.17052234931397,
   longitude: -0.2592187250259818,
   googleMapsUrl: 'https://maps.app.goo.gl/dZQYYhWyQm5oqyDn9',
+  day: 'miércoles',
+  time: 'morning',
+  schedule: '10:30h',
+  contact: 'Carmen Mª (654 559 534)',
+
   description: 'Miércoles · 10:30h · 2ª planta del Centro de Salud El Raval. Contacto: Carmen Mª (654 559 534).',
   isActive: true
 },
@@ -499,6 +812,11 @@ export class ResourceService {
   latitude: 39.424050656199086,
   longitude: -0.46762060397516414,
   googleMapsUrl: 'https://maps.app.goo.gl/fYFJFz4nQ7G1fm5Q9',
+  day: 'miércoles',
+  time: 'morning',
+  schedule: '11:00h',
+  contact: 'Toya (625 752 683)',
+
   description: 'Miércoles · 11:00h · Contacto: Toya (625 752 683).',
   isActive: true
 },
@@ -510,6 +828,11 @@ export class ResourceService {
   latitude: 39.477562863141465,
   longitude: -0.4005340006529366,
   googleMapsUrl: 'https://maps.app.goo.gl/FFKDaF2MR54GGLyp9',
+  day: 'miércoles',
+  time: 'morning',
+  schedule: '11:30h',
+  contact: 'Luisa (699 133 501)',
+
   description: 'Miércoles · 11:30h · Contacto: Luisa (699 133 501).',
   isActive: true
 },
@@ -521,6 +844,11 @@ export class ResourceService {
   latitude: 39.595776944638835,
   longitude: -0.5500870296279469,
   googleMapsUrl: 'https://maps.app.goo.gl/ZGhFPgGBTqmobxAh8',
+  day: 'miércoles',
+  time: 'afternoon',
+  schedule: '17:00h',
+  contact: 'Yaiza (615 596 123) y Verónica (679 313 704)',
+
   description: 'Miércoles · 17:00h · Contacto: Yaiza (615 596 123) y Verónica (679 313 704).',
   isActive: true
 },
@@ -532,6 +860,11 @@ export class ResourceService {
   latitude: 38.980711974223475,
   longitude: -0.6890699972026841,
   googleMapsUrl: 'https://maps.app.goo.gl/mQGNzyb3uXAe6q129',
+  day: 'miércoles',
+  time: 'afternoon',
+  schedule: '17:00h',
+  contact: 'Gloria (680 955 441)',
+
   description: 'Miércoles · 17:00h · Contacto: Gloria (680 955 441).',
   isActive: true
 },
@@ -543,6 +876,11 @@ export class ResourceService {
   latitude: 39.50562894881844,
   longitude: -0.439981932840129,
   googleMapsUrl: 'https://maps.app.goo.gl/mejn2nPmZaNBHowh8',
+  day: 'jueves',
+  time: 'morning',
+  schedule: '09:30h',
+  contact: 'Elisa (634 604 601)',
+
   description: 'Jueves · 09:30h · Centro Polivalente Alborgí. Contacto: Elisa (634 604 601).',
   isActive: true
 },
@@ -554,6 +892,11 @@ export class ResourceService {
   latitude: 39.49378829395264,
   longitude: -0.34971569189572865,
   googleMapsUrl: 'https://maps.app.goo.gl/Eq1ERgUtdiuPVf1n9',
+  day: 'jueves',
+  time: 'morning',
+  schedule: '10:00h',
+  contact: 'Eva (646 900 772)',
+
   description: 'Jueves · 10:00h · Contacto: Eva (646 900 772).',
   isActive: true
 },
@@ -565,6 +908,11 @@ export class ResourceService {
   latitude: 39.5290646697453,
   longitude: -0.34750816732838286,
   googleMapsUrl: 'https://maps.app.goo.gl/yKqgVSZPDP9GxwQ7A',
+  day: 'jueves',
+  time: 'morning',
+  schedule: '11:00h',
+  contact: 'Claus (618 323 645)',
+
   description: 'Jueves · 11:00h · 2ª planta del Centro de Salud. Contacto: Claus (618 323 645).',
   isActive: true
 },
@@ -576,6 +924,11 @@ export class ResourceService {
   latitude: 39.49350057124096,
   longitude: -0.38387675892568524,
   googleMapsUrl: 'https://maps.app.goo.gl/AUS124y9qbqj93YRA',
+  day: 'jueves',
+  time: 'morning',
+  schedule: '11:30h',
+  contact: 'Marta (611 561 315) y Eliana (635 413 211)',
+
   description: 'Jueves · 11:30h · Contacto: Marta (611 561 315) y Eliana (635 413 211).',
   isActive: true
 },
@@ -587,6 +940,11 @@ export class ResourceService {
   latitude: 39.46963143369986,
   longitude: -0.40061732914792264,
   googleMapsUrl: 'https://maps.app.goo.gl/zK9AWd3LqEDDf8La7',
+  day: 'jueves',
+  time: 'morning',
+  schedule: '11:30h',
+  contact: 'Luisa (699 133 501)',
+
   description: 'Jueves · 11:30h · Contacto: Luisa (699 133 501). Temporalmente cerrado por obras.',
   isActive: true
 },
@@ -598,6 +956,11 @@ export class ResourceService {
   latitude: 39.52820280342294,
   longitude: -0.48868661363446486,
   googleMapsUrl: 'https://maps.app.goo.gl/dD8rkovSntg4B62J8',
+  day: 'jueves',
+  time: 'morning',
+  schedule: '11:30h',
+  contact: 'Bene (654 176 569)',
+
   description: 'Jueves · 11:30h · Salón de Actos del Centro Social. Contacto: Bene (654 176 569).',
   isActive: true
 },
@@ -609,6 +972,11 @@ export class ResourceService {
   latitude: 39.474557181710374,
   longitude: -0.4673014639645459,
   googleMapsUrl: 'https://maps.app.goo.gl/2uj9T3ymCLBh1TSc8',
+  day: 'jueves',
+  time: 'morning',
+  schedule: '12:00h',
+  contact: 'Ester (637 048 268)',
+
   description: 'Jueves · 12:00h · Polideportivo El Perdiguer. Contacto: Ester (637 048 268).',
   isActive: true
 },
@@ -620,6 +988,11 @@ export class ResourceService {
   latitude: 39.47423205494747,
   longitude: -0.41641151529657666,
   googleMapsUrl: 'https://maps.app.goo.gl/FqKiEXoB5949daRu5',
+  day: 'jueves',
+  time: 'afternoon',
+  schedule: '17:30h',
+  contact: 'Elisa (634 604 601) y Candela (661 051 513)',
+
   description: 'Jueves · 17:30h · Casa de la Dona. Contacto: Elisa (634 604 601) y Candela (661 051 513).',
   isActive: true
 },
@@ -631,6 +1004,11 @@ export class ResourceService {
   latitude: 39.546060809419004,
   longitude: -0.5768165366902168,
   googleMapsUrl: 'https://maps.app.goo.gl/t9L9rNDLJejni7Sk7',
+  day: 'viernes',
+  time: 'morning',
+  schedule: '09:30h',
+  contact: 'Nathalie (693 797 371)',
+
   description: 'Viernes · 09:30h · Espai de la Dona. Contacto: Nathalie (693 797 371).',
   isActive: true
 },
@@ -642,6 +1020,11 @@ export class ResourceService {
   latitude: 39.499763027574026,
   longitude: -0.421231085166461,
   googleMapsUrl: 'https://maps.app.goo.gl/Rv7cGJU6cXuT8Rkb6',
+  day: 'viernes',
+  time: 'morning',
+  schedule: '10:30h',
+  contact: 'Silvia (699 992 428)',
+
   description: 'Viernes · 10:30h · Contacto: Silvia (699 992 428).',
   isActive: true
 },
@@ -653,6 +1036,11 @@ export class ResourceService {
   latitude: 39.63323539392256,
   longitude: -0.5909430213311747,
   googleMapsUrl: 'https://maps.app.goo.gl/zZ9ZKMUrudNVFN5y5',
+  day: 'viernes',
+  time: 'morning',
+  schedule: '11:00h',
+  contact: 'Isabel (647 347 731)',
+
   description: 'Viernes · 11:00h · Contacto: Isabel (647 347 731).',
   isActive: true
 },
@@ -664,6 +1052,11 @@ export class ResourceService {
   latitude: 39.484444476538414,
   longitude: -0.3913937628796042,
   googleMapsUrl: 'https://maps.app.goo.gl/KHUdRck92g3s7ffw9',
+  day: 'viernes',
+  time: 'morning',
+  schedule: '11:30h',
+  contact: 'Patricia (636 177 593)',
+
   description: 'Viernes · 11:30h · Contacto: Patricia (636 177 593).',
   isActive: true
 },
@@ -675,6 +1068,11 @@ export class ResourceService {
   latitude: 39.456811027861356,
   longitude: -0.3602305406362371,
   googleMapsUrl: 'https://maps.app.goo.gl/WtXGZoDR5weQcfQG7',
+  day: 'viernes',
+  time: 'morning',
+  schedule: '11:30h',
+  contact: 'Gema (679 467 533)',
+
   description: 'Viernes · 11:30h · Gimnasio del 3er piso. Contacto: Gema (679 467 533).',
   isActive: true
 },
@@ -686,6 +1084,11 @@ export class ResourceService {
   latitude: 39.59577892004099,
   longitude: -0.5500974406648345,
   googleMapsUrl: 'https://maps.app.goo.gl/ToXhLsbUwzGpVLJ67',
+  day: 'viernes',
+  time: 'morning',
+  schedule: '11:30h',
+  contact: 'Yaiza (615 596 123) y Verónica (679 313 704)',
+
   description: 'Viernes · 11:30h · Contacto: Yaiza (615 596 123) y Verónica (679 313 704).',
   isActive: true
 },
@@ -697,6 +1100,11 @@ export class ResourceService {
   latitude: 39.4358701673933,
   longitude: -0.4340321426022026,
   googleMapsUrl: 'https://maps.app.goo.gl/XfCLiVYLdGpFwBqU8',
+  day: 'viernes',
+  time: 'afternoon',
+  schedule: '16:00h',
+  contact: 'Mirella (679 480 470) e Inés (692 157 900)',
+
   description: 'Viernes · 16:00h · Acceso por la puerta trasera del centro. 1er piso, gimnasio. Contacto: Mirella (679 480 470) e Inés (692 157 900).',
   isActive: true
 },
@@ -708,6 +1116,11 @@ export class ResourceService {
   latitude: 38.831343742788256,
   longitude: -0.4974337436968808,
   googleMapsUrl: 'https://maps.app.goo.gl/FecRMgiH3o2Gx2qMA',
+  day: 'viernes',
+  time: 'afternoon',
+  schedule: '17:30h',
+  contact: 'Loli (649 633 817) y Venus (610 795 475)',
+
   description: 'Viernes · 17:30h · Espacio Municipal de Atzeneta d’Albaida. Contacto: Loli (649 633 817) y Venus (610 795 475). Actualmente programado para el 5 de junio. Se comunicarán nuevas fechas.',
   isActive: true
 },

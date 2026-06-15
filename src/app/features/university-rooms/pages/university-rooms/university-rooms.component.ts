@@ -2,7 +2,6 @@ import { AfterViewInit, ChangeDetectorRef, Component, NgZone, ViewChild } from '
 import { GoogleMap, GoogleMapsModule } from '@angular/google-maps';
 import { ResourcePoint } from '../../../../core/models/resource';
 import { ResourceService } from '../../../../core/services/resource.service';
-import { ActivatedRoute } from '@angular/router';
 
 interface MapMarker {
   position: google.maps.LatLngLiteral;
@@ -11,21 +10,18 @@ interface MapMarker {
   resource: ResourcePoint;
 }
 
-type DayFilter = 'all' | 'lunes' | 'martes' | 'miércoles' | 'jueves' | 'viernes';
-type TimeFilter = 'all' | 'morning' | 'afternoon';
-
 @Component({
-  selector: 'app-workshops',
+  selector: 'app-university-rooms',
   imports: [GoogleMapsModule],
-  templateUrl: './workshops.component.html',
-  styleUrl: './workshops.component.scss'
+  templateUrl: './university-rooms.component.html',
+  styleUrl: './university-rooms.component.scss'
 })
-export class WorkshopsComponent implements AfterViewInit {
+export class UniversityRoomsComponent implements AfterViewInit {
 
   @ViewChild(GoogleMap) googleMap!: GoogleMap;
 
   center: google.maps.LatLngLiteral = { lat: 39.4699, lng: -0.3763 };
-  zoom = 9;
+  zoom = 10;
 
   mapOptions: google.maps.MapOptions = {
     gestureHandling: 'greedy',
@@ -37,8 +33,7 @@ export class WorkshopsComponent implements AfterViewInit {
 
   selectedResource: ResourcePoint | null = null;
 
-  selectedDay: DayFilter = 'all';
-  selectedTime: TimeFilter = 'all';
+  sidebarCollapsed = false;
 
   userPosition: google.maps.LatLngLiteral | null = null;
   userMarkerContent: HTMLElement | null = null;
@@ -48,129 +43,42 @@ export class WorkshopsComponent implements AfterViewInit {
 
   routeInfo: { distance: string; duration: string } | null = null;
 
-constructor(
-  private readonly resourceService: ResourceService,
-  private readonly ngZone: NgZone,
-  private readonly cdr: ChangeDetectorRef,
-  private readonly route: ActivatedRoute
-) {
-  this.resourcePoints = this.resourceService
-    .getResources()
-    .filter(resource => resource.type === 'workshop' && resource.isActive);
+  constructor(
+    private readonly resourceService: ResourceService,
+    private readonly ngZone: NgZone,
+    private readonly cdr: ChangeDetectorRef
+  ) {
+    this.resourcePoints = this.resourceService
+      .getResources()
+      .filter(resource => resource.type === 'lactation_room' && resource.isActive);
 
-  this.loadMarkers();
-}
+    this.loadMarkers();
+  }
 
-ngAfterViewInit(): void {
-  this.directionsService = new google.maps.DirectionsService();
+  ngAfterViewInit(): void {
+    this.directionsService = new google.maps.DirectionsService();
 
-  const workshopId = this.route.snapshot.queryParamMap.get('workshopId');
+    this.locateUser();
 
-  if (workshopId) {
     setTimeout(() => {
-      this.openWorkshopFromEvent(workshopId);
+      this.fitMapToMarkers();
     });
-
-    return;
   }
 
-  this.locateUser();
-
-  setTimeout(() => {
-    this.fitMapToMarkers();
-  });
-}
-weekDays = [
-  { value: 'lunes', label: 'Lunes' },
-  { value: 'martes', label: 'Martes' },
-  { value: 'miércoles', label: 'Miércoles' },
-  { value: 'jueves', label: 'Jueves' },
-  { value: 'viernes', label: 'Viernes' }
-];
-
-getWorkshopsByDayAndTime(
-  day: string,
-  time: 'morning' | 'afternoon'
-): ResourcePoint[] {
-  return this.filteredResources.filter(workshop =>
-    workshop.type === 'workshop' &&
-    workshop.day === day &&
-    workshop.time === time
-  );
-}
-
-private openWorkshopFromEvent(workshopId: string): void {
-  const workshop = this.resourcePoints.find(
-    resource => resource.id === workshopId
-  );
-
-  if (!workshop) {
-    console.warn('No se ha encontrado el taller:', workshopId);
-    this.fitMapToMarkers();
-    return;
-  }
-
-  this.selectResource(workshop);
-
-  setTimeout(() => {
-    document
-      .querySelector('google-map')
-      ?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-  });
-}
-
- private loadMarkers(): void {
-
-  this.markers = this.filteredResources.map(resource =>
-    this.createMarker(resource)
-  );
-
-}
-get filteredResources(): ResourcePoint[] {
-  return this.resourcePoints
-    .filter(resource => {
-      const description = (resource.description ?? '').toLowerCase();
-
-      const matchesDay =
-        this.selectedDay === 'all' ||
-        description.includes(this.selectedDay);
-
-      const matchesTime =
-        this.selectedTime === 'all' ||
-        this.matchesTimeFilter(description, this.selectedTime);
-
-      return matchesDay && matchesTime;
-    })
-    .sort((a, b) => {
+  get filteredResources(): ResourcePoint[] {
+    return this.resourcePoints.sort((a, b) => {
       if (!this.userPosition) {
         return 0;
       }
 
       return this.getDistance(a) - this.getDistance(b);
     });
-}
+  }
 
-  private matchesTimeFilter(description: string, timeFilter: TimeFilter): boolean {
-    const timeMatch = description.match(/(\d{1,2})[:.](\d{2})h?/);
-
-    if (!timeMatch) {
-      return true;
-    }
-
-    const hour = Number(timeMatch[1]);
-
-    if (timeFilter === 'morning') {
-      return hour < 14;
-    }
-
-    if (timeFilter === 'afternoon') {
-      return hour >= 14;
-    }
-
-    return true;
+  private loadMarkers(): void {
+    this.markers = this.filteredResources.map(resource =>
+      this.createMarker(resource)
+    );
   }
 
   private createMarker(resource: ResourcePoint): MapMarker {
@@ -180,7 +88,7 @@ get filteredResources(): ResourcePoint[] {
         lng: resource.longitude
       },
       title: resource.name,
-      content: this.createMarkerContent('/taller-lactancia.png'),
+      content: this.createMarkerContent('/espacio-universidad.png'),
       resource
     };
   }
@@ -220,38 +128,29 @@ get filteredResources(): ResourcePoint[] {
       lng: resource.longitude
     };
 
-    this.zoom = 15;
 
     this.googleMap.googleMap?.panTo(this.center);
+   setTimeout(() => {
+  this.googleMap.googleMap?.setZoom(17);
+}, 300);
+  }
+
+  viewRoomOnMap(room: ResourcePoint): void {
+    this.selectResource(room);
+
+    setTimeout(() => {
+      document
+        .querySelector('google-map')
+        ?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+    });
   }
 
   closeCard(): void {
     this.selectedResource = null;
     this.clearRoute();
-  }
-
-  changeDay(day: DayFilter): void {
-    this.selectedDay = day;
-    this.selectedResource = null;
-
-    this.clearRoute();
-    this.loadMarkers();
-
-    setTimeout(() => {
-      this.fitMapToMarkers();
-    });
-  }
-
-  changeTime(time: TimeFilter): void {
-    this.selectedTime = time;
-    this.selectedResource = null;
-
-    this.clearRoute();
-    this.loadMarkers();
-
-    setTimeout(() => {
-      this.fitMapToMarkers();
-    });
   }
 
   private fitMapToMarkers(): void {
@@ -268,21 +167,16 @@ get filteredResources(): ResourcePoint[] {
     this.googleMap.googleMap.fitBounds(bounds);
   }
 
- locateUser(): void {
-  this.getUserLocation(position => {
-    this.userPosition = position;
-    this.userMarkerContent = this.createUserMarkerContent();
+  locateUser(): void {
+    this.getUserLocation(position => {
+      this.userPosition = position;
+      this.userMarkerContent = this.createUserMarkerContent();
 
-    this.center = position;
-    this.zoom = 14;
+      this.loadMarkers();
 
-    this.loadMarkers();
-
-    this.googleMap.googleMap?.panTo(position);
-
-    this.cdr.detectChanges();
-  });
-}
+      this.cdr.detectChanges();
+    });
+  }
 
   navigateToResource(): void {
     if (!this.selectedResource) {
@@ -304,7 +198,6 @@ get filteredResources(): ResourcePoint[] {
 
   private getUserLocation(callback: (position: google.maps.LatLngLiteral) => void): void {
     if (!navigator.geolocation) {
-      alert('Tu navegador no permite usar la ubicación.');
       return;
     }
 
@@ -319,7 +212,6 @@ get filteredResources(): ResourcePoint[] {
       },
       error => {
         console.error(error);
-        alert('No se ha podido obtener tu ubicación.');
       },
       {
         enableHighAccuracy: true,
@@ -386,78 +278,46 @@ get filteredResources(): ResourcePoint[] {
   }
 
   getDistance(resource: ResourcePoint): number {
+    if (!this.userPosition) {
+      return 9999;
+    }
 
-  if (!this.userPosition) {
-    return 9999;
+    const earthRadius = 6371;
+
+    const dLat = this.toRadians(resource.latitude - this.userPosition.lat);
+    const dLng = this.toRadians(resource.longitude - this.userPosition.lng);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(this.toRadians(this.userPosition.lat)) *
+      Math.cos(this.toRadians(resource.latitude)) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+
+    const c = 2 * Math.atan2(
+      Math.sqrt(a),
+      Math.sqrt(1 - a)
+    );
+
+    return earthRadius * c;
   }
 
-  const earthRadius = 6371;
-
-  const dLat = this.toRadians(
-    resource.latitude - this.userPosition.lat
-  );
-
-  const dLng = this.toRadians(
-    resource.longitude - this.userPosition.lng
-  );
-
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(this.toRadians(this.userPosition.lat)) *
-    Math.cos(this.toRadians(resource.latitude)) *
-    Math.sin(dLng / 2) *
-    Math.sin(dLng / 2);
-
-  const c = 2 * Math.atan2(
-    Math.sqrt(a),
-    Math.sqrt(1 - a)
-  );
-
-  return earthRadius * c;
-}
-
-private toRadians(value: number): number {
-  return value * Math.PI / 180;
-}
-
-viewWorkshopOnMap(workshop: ResourcePoint): void {
-  this.selectResource(workshop);
-
-  const position = {
-    lat: workshop.latitude,
-    lng: workshop.longitude
-  };
-
-  this.center = position;
-  this.zoom = 16;
-
-  setTimeout(() => {
-    this.googleMap?.googleMap?.panTo(position);
-    this.googleMap?.googleMap?.setZoom(16);
-
-    document
-      .querySelector('google-map')
-      ?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-  }, 100);
-}
-
-
-
- openGoogleMaps(): void {
-  if (!this.selectedResource) {
-    return;
+  private toRadians(value: number): number {
+    return value * Math.PI / 180;
   }
 
-  const destination = `${this.selectedResource.latitude},${this.selectedResource.longitude}`;
+  openGoogleMaps(): void {
+    if (!this.selectedResource) {
+      return;
+    }
 
-  window.open(
-    `https://www.google.com/maps/dir/?api=1&origin=Current+Location&destination=${destination}&travelmode=driving`,
-    '_blank'
-  );
-}
+    const destination = `${this.selectedResource.latitude},${this.selectedResource.longitude}`;
+
+    window.open(
+      `https://www.google.com/maps/dir/?api=1&origin=Current+Location&destination=${destination}&travelmode=driving`,
+      '_blank'
+    );
+  }
 
   openAppleMaps(): void {
     if (!this.selectedResource) {
@@ -469,4 +329,20 @@ viewWorkshopOnMap(workshop: ResourcePoint): void {
     window.location.href =
       `maps://?saddr=Current%20Location&daddr=${destination}&dirflg=d`;
   }
+
+  onRoomSelected(event: Event): void {
+  const select = event.target as HTMLSelectElement;
+  const roomId = select.value;
+
+  const room = this.resourcePoints.find(resource => resource.id === roomId);
+
+  if (!room) {
+    return;
+  }
+
+  this.selectResource(room);
+}
+toggleSidebar(): void {
+  this.sidebarCollapsed = !this.sidebarCollapsed;
+}
 }
