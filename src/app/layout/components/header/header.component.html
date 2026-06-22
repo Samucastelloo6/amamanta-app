@@ -1,27 +1,33 @@
 <header class="app-header">
-  <div class="app-header__brand">
-    <img
-  src="/logo-amamanta.png"
-  alt="Logo Amamanta"
-  class="app-header__logo"
-/>
-    <span class="app-header__title">Amamanta</span>
+  <div class="app-header__brand" routerLink="/">
+    <img src="/logo-amamanta.png" alt="Amamanta" class="app-header__logo" />
+
+    <span class="app-header__title"> Amamanta </span>
   </div>
 
   <nav class="app-header__nav">
-    <a routerLink="/">Inicio</a>
-    <a routerLink="/resources">Recursos</a>
-     <a routerLink="/eventos">Eventos</a>
-    <a routerLink="/map">Mapa</a>
-    <a routerLink="/salas-universitarias" routerLinkActive="active">
-  Salas universitarias
-</a>
-    <a routerLink="/talleres" routerLinkActive="active">
-  Talleres
-</a>
-<a routerLink="/espacios-amigos" routerLinkActive="active">
-  Espacios amigos
-</a>
-    <a routerLink="/community">Comunidad</a>
+    <a
+      routerLink="/"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      Inicio
+    </a>
+
+    <a routerLink="/eventos" routerLinkActive="active"> Eventos </a>
+
+    <a routerLink="/talleres" routerLinkActive="active"> Talleres </a>
+
+    <a routerLink="/salas-universitarias" routerLinkActive="active"> Salas </a>
+
+    <a routerLink="/espacios-amigos" routerLinkActive="active">
+      Espacios amigos
+    </a>
+
+    <a routerLink="/contacto" routerLinkActive="active"> Contacto </a>
+
+    <a routerLink="/valora" routerLinkActive="active"> Valora </a>
   </nav>
+
+  <a routerLink="/colabora" class="app-header__cta"> Colabora </a>
 </header>

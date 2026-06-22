@@ -1,0 +1,204 @@
+.collaborate-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 48px;
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: 46px;
+}
+
+.hero h1 {
+  margin: 0 0 16px;
+  color: #8b5fbf;
+  font-size: 42px;
+}
+
+.hero p {
+  max-width: 720px;
+  margin: 0 auto;
+  color: #555;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.collaborate-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.collaborate-card {
+  background: white;
+  border: 1px solid #eadff5;
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: 0 12px 30px rgba(139, 95, 191, 0.09);
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+}
+
+.donation-card {
+  grid-column: 1 / -1;
+}
+
+.collaborate-card h2 {
+  margin: 0 0 12px;
+  color: #8b5fbf;
+  font-size: 23px;
+}
+
+.collaborate-card p {
+  margin: 0;
+  color: #555;
+  line-height: 1.6;
+}
+
+.extra-info {
+  margin-top: 18px;
+  padding: 16px;
+  background: #f7f2fb;
+  border-left: 4px solid #4cbc63;
+  border-radius: 14px;
+}
+
+.extra-info p {
+  margin: 0 0 8px;
+  color: #444;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.extra-info p:last-child {
+  margin-bottom: 0;
+}
+
+.primary-button {
+  margin-top: 24px;
+  align-self: flex-start;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 22px;
+  background: #8b5fbf;
+  color: white;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.primary-button:hover {
+  background: #7448a9;
+  transform: translateY(-2px);
+}
+
+.copy-items {
+  margin-top: 20px;
+}
+
+.copy-item {
+  margin-bottom: 18px;
+  padding: 16px;
+  background: #f8f6fc;
+  border: 1px solid #e6def2;
+  border-radius: 14px;
+}
+
+.copy-label {
+  display: block;
+  color: #8b5fbf;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.copy-value {
+  display: block;
+  color: #444;
+  font-family: monospace;
+  margin-bottom: 12px;
+  word-break: break-all;
+}
+
+.copy-button {
+  background: #4cbc63;
+  color: white;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 18px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.copy-button:hover {
+  background: #3ca953;
+}
+
+.donation-card .copy-items {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.donation-card .copy-item {
+  margin-bottom: 0;
+}
+
+.phone-link {
+  color: #8b5fbf;
+  font-weight: 700;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.phone-link:hover {
+  color: #7448a9;
+  text-decoration: underline;
+}
+
+.security-box {
+  margin-top: 50px;
+  padding: 24px 28px;
+  background: #f7f2fb;
+  border-left: 5px solid #4cbc63;
+  border-radius: 18px;
+}
+
+.security-box h3 {
+  margin: 0 0 10px;
+  color: #4cbc63;
+  font-size: 20px;
+}
+
+.security-box p {
+  margin: 0;
+  color: #555;
+  line-height: 1.7;
+}
+
+@media (max-width: 900px) {
+  .collaborate-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .donation-card .copy-items {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .collaborate-page {
+    padding: 24px 18px;
+  }
+
+  .hero h1 {
+    font-size: 34px;
+  }
+
+  .collaborate-card {
+    padding: 22px;
+  }
+}

@@ -14,48 +14,52 @@ export const routes: Routes = [
           )
       },
       {
-        path: 'resources',
+        path: 'salas-universitarias',
         loadComponent: () =>
-          import('./features/resources/pages/resources/resources.component').then(
-            (m) => m.ResourcesComponent
+          import(
+            './features/university-rooms/pages/university-rooms/university-rooms.component'
+          ).then((m) => m.UniversityRoomsComponent)
+      },
+      {
+        path: 'talleres',
+        loadComponent: () =>
+          import('./features/workshops/pages/workshops/workshops.component').then(
+            (m) => m.WorkshopsComponent
           )
       },
       {
-        path: 'map',
+        path: 'eventos',
         loadComponent: () =>
-          import('./features/map/pages/map/map.component').then(
-            (m) => m.MapComponent
+          import('./features/events/pages/events/events.component').then(
+            (m) => m.EventsComponent
           )
       },
-            {
-  path: 'eventos',
-  loadComponent: () =>
-    import('./features/events/pages/events/events.component')
-      .then(m => m.EventsComponent)
-},
       {
-  path: 'salas-universitarias',
-  loadComponent: () =>
-    import('./features/university-rooms/pages/university-rooms/university-rooms.component')
-      .then(m => m.UniversityRoomsComponent)
-},
-      {
-  path: 'talleres',
-  loadComponent: () =>
-    import('./features/workshops/pages/workshops/workshops.component')
-      .then(m => m.WorkshopsComponent)
-},
-{
-  path: 'espacios-amigos',
-  loadComponent: () =>
-    import('./features/friendly-spaces/pages/friendly-spaces/friendly-spaces.component')
-      .then(m => m.FriendlySpacesComponent)
-},
-      {
-        path: 'community',
+        path: 'espacios-amigos',
         loadComponent: () =>
-          import('./features/community/pages/community/community.component').then(
-            (m) => m.CommunityComponent
+          import(
+            './features/friendly-spaces/pages/friendly-spaces/friendly-spaces.component'
+          ).then((m) => m.FriendlySpacesComponent)
+      },
+      {
+        path: 'contacto',
+        loadComponent: () =>
+          import('./features/contact/pages/contact/contact.component').then(
+            (m) => m.ContactComponent
+          )
+      },
+      {
+        path: 'colabora',
+        loadComponent: () =>
+          import(
+            './features/collaborate/pages/collaborate/collaborate.component'
+          ).then((m) => m.CollaborateComponent)
+      },
+      {
+        path: 'valora',
+        loadComponent: () =>
+          import('./features/feedback/pages/feedback/feedback.component').then(
+            (m) => m.FeedbackComponent
           )
       }
     ]

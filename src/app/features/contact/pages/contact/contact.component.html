@@ -1,0 +1,111 @@
+<section class="contact-page">
+
+  <header class="contact-header">
+    <h1>Contacto</h1>
+
+    <p>
+      Ponte en contacto con Amamanta a través de los diferentes canales disponibles.
+    </p>
+  </header>
+
+  <section class="contact-section">
+    <h2>Correos de contacto</h2>
+
+    <div class="contact-grid">
+
+      @for (email of emails; track email.id) {
+        <article class="contact-card">
+          <h3>{{ email.title }}</h3>
+
+          <p>{{ email.description }}</p>
+
+          <span>{{ email.email }}</span>
+
+          <button
+            type="button"
+            class="secondary-button"
+            (click)="sendEmail(email.email)">
+            Enviar correo
+          </button>
+        </article>
+      }
+
+    </div>
+  </section>
+
+  <section class="contact-section">
+    <h2>Apoyo telefónico</h2>
+
+    <p class="section-intro">
+      Si tienes una consulta relacionada con la lactancia materna, puedes contactar
+      telefónicamente con una asesora.
+    </p>
+
+    <div class="phone-grid">
+
+      @for (phone of phones; track phone.id) {
+        <article class="phone-card">
+          <h3>{{ phone.name }}</h3>
+
+          <p>{{ phone.description }}</p>
+
+          <span>{{ phone.phone }}</span>
+
+          <button
+            type="button"
+            class="primary-button"
+            (click)="call(phone.phone)">
+            Llamar
+          </button>
+        </article>
+      }
+
+    </div>
+  </section>
+
+<section class="contact-section">
+
+  <h2>Sede de Amamanta</h2>
+
+  <article class="location-card">
+
+    <div>
+
+      <h3>{{ location.title }}</h3>
+
+      <p class="building">
+        {{ location.building }}
+      </p>
+
+      <p class="floor">
+        {{ location.floor }}
+      </p>
+
+      <p class="address">
+        {{ location.address }}
+      </p>
+
+      <p class="description">
+        {{ location.description }}
+      </p>
+
+      <small>
+        Se recomienda contactar previamente antes de acudir a la sede.
+      </small>
+
+    </div>
+
+    <button
+      type="button"
+      class="primary-button"
+      (click)="openLocation()">
+
+      Ver ubicación
+
+    </button>
+
+  </article>
+
+</section>
+
+</section>

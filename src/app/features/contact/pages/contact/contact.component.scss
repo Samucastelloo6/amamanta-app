@@ -1,0 +1,160 @@
+.contact-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 48px;
+}
+
+.contact-header {
+  max-width: 780px;
+  margin-bottom: 40px;
+}
+
+.contact-header h1 {
+  margin: 0 0 12px;
+  font-size: 42px;
+  color: #8b5fbf;
+}
+
+.contact-header p {
+  margin: 0;
+  font-size: 17px;
+  color: #555;
+  line-height: 1.7;
+}
+
+.contact-section {
+  margin-bottom: 46px;
+}
+
+.contact-section h2 {
+  margin: 0 0 18px;
+  color: #8b5fbf;
+  font-size: 24px;
+}
+
+.section-intro {
+  max-width: 760px;
+  margin: -8px 0 20px;
+  color: #666;
+  line-height: 1.6;
+}
+
+.contact-grid,
+.phone-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+.contact-card,
+.phone-card,
+.location-card {
+  background: white;
+  border: 1px solid #eadff5;
+  border-radius: 24px;
+  padding: 22px;
+  box-shadow: 0 12px 30px rgba(139, 95, 191, 0.09);
+}
+
+.contact-card h3,
+.phone-card h3,
+.location-card h3 {
+  margin: 0 0 8px;
+  color: #8b5fbf;
+  font-size: 19px;
+}
+
+.contact-card p,
+.phone-card p,
+.location-card p {
+  margin: 0 0 12px;
+  color: #555;
+  line-height: 1.5;
+}
+
+.contact-card span,
+.phone-card span {
+  display: block;
+  margin-bottom: 16px;
+  color: #333;
+  font-weight: 700;
+}
+
+.primary-button,
+.secondary-button {
+  border: none;
+  border-radius: 999px;
+  padding: 11px 18px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+  transition: 0.2s ease;
+}
+
+.primary-button {
+  background: #8b5fbf;
+  color: white;
+}
+
+.primary-button:hover {
+  background: #7448a9;
+  transform: translateY(-2px);
+}
+
+.secondary-button {
+  background: #f7f2fb;
+  color: #8b5fbf;
+}
+
+.secondary-button:hover {
+  background: #eadff5;
+  transform: translateY(-2px);
+}
+
+.location-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 32px;
+  border-left: 5px solid #4cbc63;
+}
+
+.location-card .building {
+  margin-top: 12px;
+  font-weight: 700;
+  color: #8b5fbf;
+}
+
+.location-card .floor {
+  margin-top: 4px;
+  color: #666;
+  font-size: 14px;
+}
+
+.location-card .address {
+  margin-top: 12px;
+  font-weight: 600;
+}
+
+.location-card small {
+  display: block;
+  margin-top: 18px;
+  color: #666;
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .contact-page {
+    padding: 24px 18px;
+  }
+
+  .contact-header h1 {
+    font-size: 34px;
+  }
+
+  .location-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

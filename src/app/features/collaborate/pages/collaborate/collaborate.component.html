@@ -1,0 +1,124 @@
+<section class="collaborate-page">
+
+  <header class="hero">
+
+    <h1>Colabora con Amamanta</h1>
+
+    <p>
+      Tu colaboración contribuye a mantener los talleres de lactancia,
+      el voluntariado hospitalario y las actividades de apoyo a las familias.
+    </p>
+
+  </header>
+
+  <section class="collaborate-grid">
+
+    @for (option of options; track option.id) {
+
+      <article
+        class="collaborate-card"
+        [class.donation-card]="option.id === 'donation'">
+
+        <h2>{{ option.title }}</h2>
+
+        <p>
+          {{ option.description }}
+        </p>
+
+        @if (option.extraInfo) {
+
+          <div class="extra-info">
+
+            @for (info of option.extraInfo; track info) {
+
+              @if (info.startsWith('Teléfono:')) {
+
+                <p>
+                  Teléfono:
+
+                  <a
+                    class="phone-link"
+                    [href]="'tel:' + info.replace('Teléfono: ', '').replaceAll(' ', '')">
+
+                    {{ info.replace('Teléfono: ', '') }}
+
+                  </a>
+                </p>
+
+              } @else {
+
+                <p>{{ info }}</p>
+
+              }
+
+            }
+
+          </div>
+
+        }
+
+        @if (option.copyItems) {
+
+          <div class="copy-items">
+
+            @for (item of option.copyItems; track item.label) {
+
+              <div class="copy-item">
+
+                <span class="copy-label">
+                  {{ item.label }}
+                </span>
+
+                <span class="copy-value">
+                  {{ item.value }}
+                </span>
+
+                <button
+                  type="button"
+                  class="copy-button"
+                  (click)="copyToClipboard(item.copyText)">
+
+                  {{ item.buttonText }}
+
+                </button>
+
+              </div>
+
+            }
+
+          </div>
+
+        }
+
+        @if (option.buttonText) {
+
+          <button
+            class="primary-button"
+            type="button"
+            (click)="openOption(option)">
+
+            {{ option.buttonText }}
+
+          </button>
+
+        }
+
+      </article>
+
+    }
+
+  </section>
+
+  <section class="security-box">
+
+    <h3>Protección de datos</h3>
+
+    <p>
+      Los formularios oficiales de alta de socias y colaboración económica
+      se gestionan desde la página web oficial de Amamanta para garantizar
+      la seguridad y la protección de los datos personales.
+    </p>
+
+  </section>
+
+</section>

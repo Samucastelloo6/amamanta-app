@@ -1,0 +1,138 @@
+<section class="feedback-page">
+
+  <header class="feedback-header">
+
+    <h1>Valora la aplicación</h1>
+
+    <p>
+      Tu opinión es muy importante para nosotras y nos ayuda a seguir mejorando la aplicación para adaptarla a las necesidades reales de las madres.
+    </p>
+
+  </header>
+
+  <section class="feedback-card">
+
+    <h2>¿Cómo valorarías tu experiencia?</h2>
+
+    <div class="stars">
+
+      @for (star of [1,2,3,4,5]; track star) {
+
+        <button
+          type="button"
+          class="star"
+          [class.active]="star <= rating"
+          (click)="setRating(star)">
+
+          ★
+
+        </button>
+
+      }
+
+    </div>
+
+    <p class="rating-text">
+      {{ getRatingText() }}
+    </p>
+
+    <div class="field">
+
+      <label>
+        ¿Qué aspecto de la aplicación deseas valorar?
+      </label>
+
+      <div class="categories-grid">
+
+        @for (category of categories; track category) {
+
+          <button
+            type="button"
+            class="category-card"
+            [class.selected]="isSelected(category)"
+            (click)="toggleCategory(category)">
+
+            {{ category }}
+
+          </button>
+
+        }
+
+      </div>
+
+    </div>
+
+    <div class="field">
+
+      <label>
+        ¿Qué es lo que más te ha gustado?
+      </label>
+
+      <textarea
+        rows="4"
+        [(ngModel)]="positive"
+        placeholder="Cuéntanos qué te ha resultado más útil...">
+      </textarea>
+
+    </div>
+
+    <div class="field">
+
+      <label>
+        ¿Qué mejorarías?
+      </label>
+
+      <textarea
+        rows="4"
+        [(ngModel)]="improvement"
+        placeholder="Escribe aquí cualquier sugerencia o propuesta de mejora...">
+      </textarea>
+
+    </div>
+
+    <button
+      type="button"
+      class="primary-button"
+      (click)="sendFeedback()">
+
+      Enviar valoración
+
+    </button>
+
+    @if (submitted) {
+
+      <p class="success-message">
+
+        Gracias por compartir tu valoración.
+
+      </p>
+
+    }
+
+  </section>
+
+  <section class="info-box">
+
+    <h3>Tu opinión nos ayuda a mejorar</h3>
+
+    <p>
+
+      Cada valoración y cada sugerencia nos ayudan a seguir desarrollando la aplicación para adaptarla, cada día más, a las necesidades reales de las madres que acompañamos.
+
+    </p>
+
+    <p>
+
+      Todas las valoraciones recibidas serán revisadas y procesadas por el equipo de desarrollo de la aplicación para estudiar posibles mejoras y nuevas funcionalidades.
+
+    </p>
+
+    <p>
+
+      Esta valoración es anónima y no es necesario facilitar ningún dato personal.
+
+    </p>
+
+  </section>
+
+</section>
