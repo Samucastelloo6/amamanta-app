@@ -1,57 +1,126 @@
-<section class="home-page">
-  <div class="home-header">
-    <img class="home-logo" src="/logo-amamanta.png" alt="Amamanta" />
+<section
+  class="min-h-screen bg-gradient-to-b from-[#fbf7fd] via-white to-[#f6fbf3] px-4 py-5 sm:px-6 lg:px-8"
+>
+  <div class="mx-auto max-w-6xl">
+    <header class="mb-6 text-center">
+      <img
+        class="mx-auto mb-3 w-20 sm:w-28 lg:w-32"
+        src="/logo-amamanta.png"
+        alt="Amamanta"
+      />
 
-    <p class="home-subtitle">Grupo de apoyo a la lactancia materna</p>
+      <p class="mb-2 text-sm font-bold text-[#8f50c4] sm:text-base">
+        Grupo de apoyo a la lactancia materna
+      </p>
 
-    <h1>Apoyo y recursos cerca de ti</h1>
-  </div>
+      <h1
+        class="mx-auto max-w-3xl text-2xl font-extrabold leading-tight tracking-tight text-zinc-800 sm:text-4xl lg:text-5xl"
+      >
+        Apoyo y recursos cerca de ti
+      </h1>
+    </header>
 
-  <div class="home-grid">
-    <a routerLink="/salas-universitarias" class="home-card">
-      <img src="/espacio-universidad.png" alt="" />
-      <span>Salas universitarias</span>
-    </a>
+    <div class="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-5">
+      <a
+        routerLink="/talleres"
+        class="group flex flex-col items-center justify-center rounded-[22px] border border-[#eadff5] bg-white/95 p-3 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl"
+      >
+        <img
+          src="/logo-taller.png"
+          alt=""
+          class="mb-2 h-16 w-16 object-contain transition duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
+        />
+        <span class="text-base font-bold text-zinc-800">Talleres LM</span>
+      </a>
+      <a
+        routerLink="/espacios-amigos"
+        class="group flex flex-col items-center justify-center rounded-[22px] border border-[#eadff5] bg-white/95 p-3 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl"
+      >
+        <img
+          src="/logo-espacio.png"
+          alt=""
+          class="mb-2 h-16 w-16 object-contain transition duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
+        />
+        <span class="text-base font-bold text-zinc-800"
+          >Espacios amigos LM</span
+        >
+      </a>
 
-    <a routerLink="/talleres" class="home-card">
-      <img src="/logo-taller.png" alt="" />
-      <span>Talleres</span>
-    </a>
+      <a
+        routerLink="/eventos"
+        class="group flex flex-col items-center justify-center rounded-[22px] border border-[#eadff5] bg-white/95 p-3 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl"
+      >
+        <img
+          src="/logo-evento.png"
+          alt=""
+          class="mb-2 h-16 w-16 object-contain transition duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
+        />
+        <span class="text-base font-bold text-zinc-800">Actividades</span>
+      </a>
 
-    <a routerLink="/eventos" class="home-card">
-      <img src="/logo-evento.png" alt="" />
-      <span>Eventos</span>
-    </a>
+      <a
+        routerLink="/salas-universitarias"
+        class="group flex flex-col items-center justify-center rounded-[22px] border border-[#eadff5] bg-white/95 p-3 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl"
+      >
+        <img
+          src="/espacio-universidad.png"
+          alt=""
+          class="mb-2 h-16 w-16 object-contain transition duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
+        />
+        <span class="text-base font-bold text-zinc-800">
+          Salas lactancia UV
+        </span>
+      </a>
 
-    <a routerLink="/espacios-amigos" class="home-card">
-      <img src="/logo-espacio.png" alt="" />
-      <span>Espacios amigos</span>
-    </a>
+      <a
+        routerLink="/hospitales"
+        class="group flex flex-col items-center justify-center rounded-[22px] border border-[#eadff5] bg-white/95 p-3 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl"
+      >
+        <img
+          src="/hospitales.png"
+          alt=""
+          class="mb-2 h-16 w-16 object-contain transition duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
+        />
+        <span class="text-base font-bold text-zinc-800">Hospitales</span>
+      </a>
 
-    <a routerLink="/contacto" class="home-card">
-      <img src="/logo-contacta.png" alt="" />
-      <span>Contacta</span>
-    </a>
+      <a
+        routerLink="/contacto"
+        class="group flex flex-col items-center justify-center rounded-[22px] border border-[#eadff5] bg-white/95 p-3 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl"
+      >
+        <img
+          src="/logo-contacta.png"
+          alt=""
+          class="mb-2 h-16 w-16 object-contain transition duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
+        />
+        <span class="text-base font-bold text-zinc-800">Contacta</span>
+      </a>
 
-    <a routerLink="/colabora" class="home-card">
-      <img src="/logo-colabora.png" alt="" />
-      <span>Colabora</span>
-    </a>
+      <a
+        routerLink="/colabora"
+        class="group flex flex-col items-center justify-center rounded-[22px] border border-[#eadff5] bg-white/95 p-3 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl"
+      >
+        <img
+          src="/logo-colabora.png"
+          alt=""
+          class="mb-2 h-16 w-16 object-contain transition duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
+        />
+        <span class="text-base font-bold text-zinc-800">Colabora</span>
+      </a>
 
-    <a routerLink="/valora" class="home-card home-card-wide">
-      <img src="/logo-valora.png" alt="" />
-      <span>Valora la aplicación</span>
-    </a>
-  </div>
-
-  <div class="home-footer-action">
-    <a
-      class="official-link"
-      href="https://amamanta.es"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      Conocer Amamanta
-    </a>
+      <a
+        routerLink="/valora"
+        class="group col-span-2 flex flex-col items-center justify-center rounded-[22px] border border-[#eadff5] bg-white/95 p-3 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl lg:col-span-1"
+      >
+        <img
+          src="/logo-valora.png"
+          alt=""
+          class="mb-2 h-16 w-16 object-contain transition duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
+        />
+        <span class="text-base font-bold text-zinc-800">
+          Valora la aplicación
+        </span>
+      </a>
+    </div>
   </div>
 </section>

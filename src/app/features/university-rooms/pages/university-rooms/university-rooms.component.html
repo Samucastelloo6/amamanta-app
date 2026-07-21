@@ -1,148 +1,77 @@
-<section class="map-page">
+<section
+  class="min-h-screen w-full overflow-x-hidden bg-gradient-to-b from-[#fbf7fd] via-white to-[#f6fbf3] px-3 py-4 sm:px-5 lg:px-6"
+>
+  <div class="mx-auto w-full max-w-6xl overflow-hidden">
+    <header class="mb-5 text-center">
+      <p
+        class="text-xs font-extrabold uppercase tracking-[0.22em] text-[#8f50c4]"
+      >
+        Amamanta
+      </p>
 
-  <h1>Salas universitarias</h1>
+      <h1
+        class="mx-auto mt-1 max-w-4xl text-2xl font-extrabold leading-tight text-zinc-800 sm:text-3xl lg:text-[2.2rem]"
+      >
+        Salas de Lactancia Materna en la Universidad de Valencia - IHAN
+      </h1>
 
-  <div class="rooms-layout"
-  [class.sidebar-collapsed]="sidebarCollapsed">
+      <p
+        class="mx-auto mt-3 max-w-3xl text-sm leading-6 font-medium text-zinc-500 sm:text-base"
+      >
+        Localiza lugares seguros y tranquilos para poder amamantar al bebé,
+        extraerse leche, cambiar el pañal o, sencillamente, descansar,
+        habilitados en diferentes espacios de la Universidad de Valencia para el
+        uso de cualquier persona, pertenezca o no a la comunidad universitaria.
+      </p>
+    </header>
 
-   <aside class="rooms-sidebar">
+    <app-university-room-list
+      [rooms]="rooms"
+      [userPosition]="userPosition"
+      [selectedRoomId]="selectedResource?.id ?? null"
+      (roomSelected)="viewRoomOnMap($event)"
+    />
 
-  <button
-    class="toggle-sidebar"
-    (click)="toggleSidebar()">
-    {{ sidebarCollapsed ? '▶' : '◀' }}
-  </button>
+    <section class="grid gap-4 lg:grid-cols-[1fr_320px]">
+      <div
+        class="relative overflow-hidden rounded-[22px] border border-[#eadff5] bg-white shadow-lg shadow-purple-100/60"
+      >
+        <app-resource-map
+          class="block h-[560px] w-full"
+          [resources]="rooms"
+          [selectedResource]="selectedResource"
+          markerImage="/espacio-universidad.png"
+          [initialCenter]="initialMapCenter"
+          [initialZoom]="11"
+          [selectedZoom]="17"
+          [boundsPadding]="80"
+          [locateUserOnInit]="true"
+          [fitMarkersOnInit]="true"
+          [highlightSelectedMarker]="true"
+          (resourceSelected)="selectResource($event)"
+          (userPositionChanged)="updateUserPosition($event)"
+        />
 
-  @if (!sidebarCollapsed) {
-
-    <div class="sidebar-header">
-      <h2>{{ filteredResources.length }} salas disponibles</h2>
-
-      @if (userPosition) {
-        <p class="proximity-info">
-          📍 Ordenadas por proximidad
-        </p>
-      }
-    </div>
-
-    <div class="rooms-list">
-
-      @for (room of filteredResources; track room.id) {
-
-        <article
-          class="room-card"
-          [class.active]="selectedResource?.id === room.id"
-          (click)="selectResource(room)">
-
-          <div class="room-icon">
-            🍼
-          </div>
-
-          <div class="room-info">
-            <h3>{{ room.name }}</h3>
-
-            <p class="room-description">
-              {{ room.description }}
-            </p>
-
-            <p class="address">
-              📍 {{ room.address }}
-            </p>
-          </div>
-
-        </article>
-
-      }
-
-    </div>
-
-  }
-
-</aside>
-
-    <div class="map-area">
-
-      <google-map
-        #googleMap
-        height="100%"
-        width="100%"
-        [center]="center"
-        [zoom]="zoom"
-        [options]="mapOptions"
-        mapId="DEMO_MAP_ID">
-
-        @for (marker of markers; track marker.resource.id) {
-          <map-advanced-marker
-            [position]="marker.position"
-            [title]="marker.title"
-            [content]="marker.content"
-            (mapClick)="selectResource(marker.resource)">
-          </map-advanced-marker>
+        @if (selectedResource; as room) {
+          <app-university-room-detail-card
+            [room]="room"
+            [routeActive]="routeActive"
+            variant="mobile"
+            (close)="closeCard()"
+            (navigate)="navigateToResource()"
+          />
         }
+      </div>
 
-        @if (userPosition && userMarkerContent) {
-          <map-advanced-marker
-            [position]="userPosition"
-            [content]="userMarkerContent"
-            title="Tu ubicación">
-          </map-advanced-marker>
-        }
-
-      </google-map>
-
-      @if (selectedResource) {
-        <article class="resource-card">
-          <button class="close-button" (click)="closeCard()">✕</button>
-
-          <h2>{{ selectedResource.name }}</h2>
-
-          <p class="address">
-            {{ selectedResource.address }}
-          </p>
-
-          @if (routeInfo) {
-            <p class="route-info">
-              🚗 {{ routeInfo.duration }} · 📍 {{ routeInfo.distance }}
-            </p>
-          }
-
-          <p class="description">
-            {{ selectedResource.description }}
-          </p>
-
-          <div class="card-actions">
-            <button
-              class="primary-button"
-              (click)="navigateToResource()">
-              Ver ruta
-            </button>
-          </div>
-
-          @if (routeInfo) {
-            <div class="external-navigation">
-
-              <p>Abrir en</p>
-
-              <button
-                class="map-button google-button"
-                (click)="openGoogleMaps()">
-                Google Maps
-              </button>
-
-              <button
-                class="map-button apple-button"
-                (click)="openAppleMaps()">
-                Apple Maps
-              </button>
-
-            </div>
-          }
-
-        </article>
+      @if (selectedResource; as room) {
+        <app-university-room-detail-card
+          [room]="room"
+          [routeActive]="routeActive"
+          variant="desktop"
+          (close)="closeCard()"
+          (navigate)="navigateToResource()"
+        />
       }
-
-    </div>
-
+    </section>
   </div>
-
 </section>

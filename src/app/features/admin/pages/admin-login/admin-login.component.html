@@ -1,0 +1,78 @@
+<section
+  class="min-h-screen bg-gradient-to-br from-[#fbf7ff] via-white to-[#f6fff2] px-4 py-8"
+>
+  <div
+    class="mx-auto grid min-h-[calc(100vh-4rem)] max-w-6xl items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]"
+  >
+    <div class="hidden lg:block">
+      <img src="/logo-amamanta.png" alt="Amamanta" class="mb-8 h-20 w-auto" />
+
+      <p
+        class="mb-3 text-sm font-bold uppercase tracking-[0.25em] text-[#8f50c4]"
+      >
+        Panel privado
+      </p>
+
+      <h1
+        class="max-w-xl text-5xl font-black leading-tight tracking-tight text-zinc-900"
+      >
+        Gestión interna de Amamanta
+      </h1>
+
+      <p class="mt-5 max-w-lg text-lg leading-8 text-zinc-600">
+        Acceso reservado para administrar actividades, talleres, experiencias y
+        contenido de la aplicación.
+      </p>
+    </div>
+
+    <div
+      class="mx-auto w-full max-w-md rounded-[32px] border border-[#eadff5] bg-white/90 p-6 shadow-2xl shadow-purple-100/80 backdrop-blur sm:p-8"
+    >
+      <div class="mb-7 text-center lg:hidden">
+        <img
+          src="/logo-amamanta.png"
+          alt="Amamanta"
+          class="mx-auto mb-4 h-16 w-auto"
+        />
+
+        <p class="text-sm font-bold uppercase tracking-[0.22em] text-[#8f50c4]">
+          Panel privado
+        </p>
+      </div>
+
+      <div class="mb-6">
+        <a
+          routerLink="/"
+          class="mb-6 inline-flex items-center gap-2 rounded-full border border-[#eadff5] bg-white px-4 py-2 text-sm font-extrabold text-[#8f50c4] shadow-sm transition hover:bg-[#faf5ff]"
+        >
+          <iconify-icon
+            icon="solar:arrow-left-linear"
+            class="text-lg"
+          ></iconify-icon>
+          Volver a la app
+        </a>
+        <h2 class="text-2xl font-black tracking-tight text-zinc-900">
+          Iniciar sesión
+        </h2>
+
+        <p class="mt-2 text-sm leading-6 text-zinc-500">
+          Introduce tus datos para acceder al panel de administración.
+        </p>
+      </div>
+
+      @if (errorMessage()) {
+        <div
+          class="mb-5 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600"
+        >
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <app-login-form (login)="login($event)" />
+
+      <p class="mt-6 text-center text-xs leading-5 text-zinc-400">
+        Acceso exclusivo para personas autorizadas por Amamanta.
+      </p>
+    </div>
+  </div>
+</section>

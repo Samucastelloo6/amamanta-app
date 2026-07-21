@@ -1,214 +1,92 @@
-
-<section class="map-page">
-
-  <h1>Talleres de lactancia</h1>
-
-  <div class="map-wrapper">
-
-    <div class="filters">
-
-      <button
-        [class.active]="selectedTime === 'all'"
-        (click)="changeTime('all')">
-        Todos
-      </button>
-
-      <button
-        [class.active]="selectedTime === 'morning'"
-        (click)="changeTime('morning')">
-        🌞 Mañana
-      </button>
-
-      <button
-        [class.active]="selectedTime === 'afternoon'"
-        (click)="changeTime('afternoon')">
-        🌙 Tarde
-      </button>
-
-    </div>
-
-    <div class="results-header">
-
-      <h2>Calendario semanal de talleres</h2>
-
-      <p class="proximity-info">
-        Pulsa en <strong>Ver</strong> para localizar el taller en el mapa.
+<section
+  class="min-h-screen w-full overflow-x-hidden bg-gradient-to-b from-[#fbf7fd] via-white to-[#f6fbf3] px-3 py-3 sm:px-5 lg:px-6"
+>
+  <div class="mx-auto w-full max-w-6xl overflow-x-hidden">
+    <header class="mb-3 text-center">
+      <p
+        class="text-xs font-extrabold uppercase tracking-[0.22em] text-[#8f50c4]"
+      >
+        Amamanta
       </p>
 
-    </div>
+      <h1
+        class="mt-1 text-2xl font-extrabold leading-tight text-zinc-800 sm:text-3xl lg:text-4xl"
+      >
+        Talleres de lactancia materna
+      </h1>
 
-    <div class="workshops-calendar">
+      <p class="mx-auto mt-1 max-w-2xl text-sm font-medium text-zinc-500">
+        Consulta horarios y localiza cada taller de lactancia en el mapa.
+      </p>
+    </header>
 
-      <div class="calendar-header">
-        <div>Día</div>
-        <div>Mañana</div>
-        <div>Tarde</div>
+    <app-workshop-week-calendar
+      [workshops]="workshops"
+      [userPosition]="userPosition"
+      (workshopSelected)="viewWorkshopOnMap($event)"
+    />
+
+    <section id="workshop-detail">
+      <!-- El mapa permanece siempre creado para conservar su estado -->
+      <div
+        [class.hidden]="selectedResource?.mode === 'online'"
+        class="grid gap-4 lg:grid-cols-[1fr_340px]"
+      >
+        <div
+          class="relative overflow-hidden rounded-[20px] border border-[#eadff5] bg-white shadow-lg shadow-purple-100/60"
+        >
+          <app-resource-map
+            class="block w-full"
+            [resources]="mapWorkshops"
+            [selectedResource]="
+              selectedResource?.mode === 'online' ? null : selectedResource
+            "
+            markerImage="/taller-lactancia.JPG"
+            mapId="DEMO_MAP_ID"
+            mapHeight="600px"
+            [initialCenter]="initialMapCenter"
+            [initialZoom]="9"
+            [selectedZoom]="16"
+            [boundsPadding]="80"
+            [locateUserOnInit]="true"
+            [fitMarkersOnInit]="true"
+            [highlightSelectedMarker]="true"
+            (resourceSelected)="selectResource($event)"
+            (userPositionChanged)="updateUserPosition($event)"
+          />
+
+          @if (selectedResource; as workshop) {
+            @if (workshop.mode !== "online") {
+              <app-workshop-detail-card
+                [workshop]="workshop"
+                [routeActive]="routeActive"
+                variant="mobile"
+                (close)="closeCard()"
+                (navigate)="navigateToResource()"
+              />
+            }
+          }
+        </div>
+
+        @if (selectedResource; as workshop) {
+          @if (workshop.mode !== "online") {
+            <app-workshop-detail-card
+              [workshop]="workshop"
+              [routeActive]="routeActive"
+              variant="desktop"
+              (close)="closeCard()"
+              (navigate)="navigateToResource()"
+            />
+          }
+        }
       </div>
 
-      @for (day of weekDays; track day.value) {
-
-        <div class="calendar-row">
-
-          <div class="day-cell">
-            {{ day.label }}
-          </div>
-
-          <div class="time-cell">
-
-            @for (workshop of getWorkshopsByDayAndTime(day.value, 'morning'); track workshop.id) {
-
-              <article class="workshop-card">
-
-                <span class="workshop-time">
-                  {{ workshop.schedule }}
-                </span>
-
-                <span class="workshop-name">
-                  {{ workshop.name }}
-                </span>
-
-                <button
-                  class="secondary-button compact-button"
-                  type="button"
-                  (click)="viewWorkshopOnMap(workshop)">
-                  Ver
-                </button>
-
-              </article>
-
-            }
-
-            @if (getWorkshopsByDayAndTime(day.value, 'morning').length === 0) {
-              <p class="empty-cell">—</p>
-            }
-
-          </div>
-
-          <div class="time-cell">
-
-            @for (workshop of getWorkshopsByDayAndTime(day.value, 'afternoon'); track workshop.id) {
-
-              <article class="workshop-card">
-
-                <span class="workshop-time">
-                  {{ workshop.schedule }}
-                </span>
-
-                <span class="workshop-name">
-                  {{ workshop.name }}
-                </span>
-
-                <button
-                  class="secondary-button compact-button"
-                  type="button"
-                  (click)="viewWorkshopOnMap(workshop)">
-                  Ver
-                </button>
-
-              </article>
-
-            }
-
-            @if (getWorkshopsByDayAndTime(day.value, 'afternoon').length === 0) {
-              <p class="empty-cell">—</p>
-            }
-
-          </div>
-
-        </div>
-
+      @if (selectedResource?.mode === "online") {
+        <app-workshop-online-panel
+          [workshop]="selectedResource!"
+          (close)="closeCard()"
+        />
       }
-
-    </div>
-
-    <google-map
-      #googleMap
-      height="600px"
-      width="100%"
-      [center]="center"
-      [zoom]="zoom"
-      [options]="mapOptions"
-      mapId="DEMO_MAP_ID">
-
-      @for (marker of markers; track marker.resource.id) {
-        <map-advanced-marker
-          [position]="marker.position"
-          [title]="marker.title"
-          [content]="marker.content"
-          (mapClick)="selectResource(marker.resource)">
-        </map-advanced-marker>
-      }
-
-      @if (userPosition && userMarkerContent) {
-        <map-advanced-marker
-          [position]="userPosition"
-          [content]="userMarkerContent"
-          title="Tu ubicación">
-        </map-advanced-marker>
-      }
-
-    </google-map>
-
-    @if (selectedResource) {
-
-      <article class="resource-card">
-
-        <button class="close-button" (click)="closeCard()">✕</button>
-
-        <h2>{{ selectedResource.name }}</h2>
-
-        <p class="address">
-          📍 {{ selectedResource.address }}
-        </p>
-
-        @if (routeInfo) {
-          <p class="route-info">
-            🚗 {{ routeInfo.duration }} · 📍 {{ routeInfo.distance }}
-          </p>
-        }
-
-        <p class="description">
-          {{ selectedResource.description }}
-        </p>
-
-        <div class="card-actions">
-
-          <button
-            class="primary-button"
-            (click)="navigateToResource()">
-            Ver ruta
-          </button>
-
-        </div>
-
-        @if (routeInfo) {
-
-          <div class="external-navigation">
-
-            <p>Abrir en</p>
-
-            <button
-              class="map-button google-button"
-              (click)="openGoogleMaps()">
-              Google Maps
-            </button>
-
-            <button
-              class="map-button apple-button"
-              (click)="openAppleMaps()">
-              Apple Maps
-            </button>
-
-          </div>
-
-        }
-
-      </article>
-
-    }
-
+    </section>
   </div>
-
 </section>
-
-

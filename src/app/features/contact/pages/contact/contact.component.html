@@ -1,111 +1,186 @@
-<section class="contact-page">
+<section class="px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
+  <header class="mx-auto mb-5 max-w-[1180px] text-center">
+    <h1
+      class="text-3xl font-extrabold tracking-tight text-[#8f50c4] sm:text-4xl"
+    >
+      Estamos para ayudarte
+    </h1>
 
-  <header class="contact-header">
-    <h1>Contacto</h1>
-
-    <p>
-      Ponte en contacto con Amamanta a través de los diferentes canales disponibles.
+    <p
+      class="mx-auto mt-2 max-w-[700px] text-sm leading-6 text-zinc-500 sm:text-base"
+    >
+      Te ofrecemos diferentes canales para consultar con Amamanta
     </p>
   </header>
 
-  <section class="contact-section">
-    <h2>Correos de contacto</h2>
+  <div class="mx-auto max-w-[1180px] space-y-4">
+    <section
+      class="rounded-[22px] border border-[#eadff5] bg-white p-3 shadow-xl shadow-purple-100/70 sm:rounded-[24px] sm:p-5"
+    >
+      <div class="mb-4">
+        <p
+          class="text-xs font-black uppercase tracking-[0.18em] text-[#8f50c4]"
+        >
+          Correos
+        </p>
 
-    <div class="contact-grid">
+        <h2 class="mt-1 text-xl font-extrabold text-[#8f50c4]">
+          Correos de contacto
+        </h2>
+      </div>
 
-      @for (email of emails; track email.id) {
-        <article class="contact-card">
-          <h3>{{ email.title }}</h3>
+      <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        @for (email of emails; track email.id) {
+          <article
+            class="flex h-full flex-col rounded-2xl border border-[#eadff5] bg-[#fcfaff] p-3 shadow-sm sm:p-4"
+          >
+            <h3 class="text-base font-extrabold leading-tight text-[#8f50c4]">
+              {{ email.title }}
+            </h3>
 
-          <p>{{ email.description }}</p>
+            <p class="mt-2 text-sm leading-5 text-zinc-600">
+              {{ email.description }}
+            </p>
 
-          <span>{{ email.email }}</span>
+            <a
+              [href]="'mailto:' + email.email"
+              class="mt-3 block break-words rounded-xl bg-[#faf8fc] px-3 py-1.5 text-sm font-bold text-[#6f329b] transition hover:bg-[#f5effb]"
+            >
+              {{ email.email }}
+            </a>
 
-          <button
-            type="button"
-            class="secondary-button"
-            (click)="sendEmail(email.email)">
-            Enviar correo
-          </button>
-        </article>
-      }
+            <a
+              [href]="'mailto:' + email.email"
+              class="mt-auto block w-full rounded-full bg-[#8f50c4] px-4 py-1.5 text-center text-sm font-extrabold text-white transition hover:-translate-y-0.5 hover:bg-[#7b3fb1] sm:py-2"
+            >
+              Enviar
+            </a>
+          </article>
+        }
+      </div>
+    </section>
 
-    </div>
-  </section>
+    <section
+      class="rounded-[22px] border border-[#eadff5] bg-white p-3 shadow-xl shadow-purple-100/70 sm:rounded-[24px] sm:p-5"
+    >
+      <div class="mb-4">
+        <p
+          class="text-xs font-black uppercase tracking-[0.18em] text-[#8f50c4]"
+        >
+          Teléfono
+        </p>
 
-  <section class="contact-section">
-    <h2>Apoyo telefónico</h2>
+        <h2 class="mt-1 text-xl font-extrabold text-[#8f50c4]">
+          Apoyo telefónico
+        </h2>
 
-    <p class="section-intro">
-      Si tienes una consulta relacionada con la lactancia materna, puedes contactar
-      telefónicamente con una asesora.
-    </p>
+        <p class="mt-2 text-sm leading-6 text-zinc-500">
+          Para consultas relacionadas con la lactancia materna, puedes contactar
+          telefónicamente con una asesora.
+        </p>
+      </div>
 
-    <div class="phone-grid">
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        @for (phone of phones; track phone.id) {
+          <article
+            class="flex h-full flex-col rounded-2xl border border-[#eadff5] bg-[#fcfaff] p-3 shadow-sm sm:p-4"
+          >
+            <h3 class="text-base font-extrabold leading-tight text-[#8f50c4]">
+              {{ phone.name }}
+            </h3>
 
-      @for (phone of phones; track phone.id) {
-        <article class="phone-card">
-          <h3>{{ phone.name }}</h3>
+            <p class="mt-1 text-sm leading-5 text-zinc-600">
+              {{ phone.description }}
+            </p>
 
-          <p>{{ phone.description }}</p>
+            <p
+              class="mt-3 rounded-xl bg-[#faf8fc] px-3 py-2 text-center text-sm font-bold text-[#6f329b]"
+            >
+              {{ phone.phone }}
+            </p>
 
-          <span>{{ phone.phone }}</span>
+            <div class="mt-auto grid grid-cols-2 gap-2 pt-3">
+              <a
+                [href]="'tel:' + phone.phone"
+                class="flex items-center justify-center gap-2 rounded-full bg-[#8f50c4] px-4 py-2 text-sm font-extrabold text-white transition hover:bg-[#7b3fb1]"
+              >
+                <iconify-icon
+                  icon="solar:phone-bold"
+                  class="text-lg"
+                ></iconify-icon>
 
-          <button
-            type="button"
-            class="primary-button"
-            (click)="call(phone.phone)">
-            Llamar
-          </button>
-        </article>
-      }
+                Llamar
+              </a>
 
-    </div>
-  </section>
+              <a
+                [href]="'https://wa.me/34' + phone.phone"
+                target="_blank"
+                rel="noopener"
+                class="flex items-center justify-center gap-2 rounded-full bg-[#25D366] px-4 py-2 text-sm font-extrabold text-white transition hover:brightness-95"
+              >
+                <iconify-icon
+                  icon="ic:baseline-whatsapp"
+                  class="text-lg"
+                ></iconify-icon>
 
-<section class="contact-section">
+                WhatsApp
+              </a>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
 
-  <h2>Sede de Amamanta</h2>
+    <section
+      class="rounded-[22px] border border-[#eadff5] bg-white p-3 shadow-xl shadow-purple-100/70 sm:rounded-[24px] sm:p-5"
+    >
+      <div class="mb-4">
+        <p
+          class="text-xs font-black uppercase tracking-[0.18em] text-[#4aa84f]"
+        >
+          Sede
+        </p>
 
-  <article class="location-card">
+        <h2 class="mt-1 text-xl font-extrabold text-[#8f50c4]">
+          Sede de Amamanta
+        </h2>
+      </div>
 
-    <div>
+      <div class="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-center">
+        <div>
+          <h3 class="text-base font-extrabold text-[#8f50c4]">
+            {{ location.title }}
+          </h3>
 
-      <h3>{{ location.title }}</h3>
+          <p class="mt-2 font-bold text-[#6f329b]">
+            {{ location.building }}
+          </p>
 
-      <p class="building">
-        {{ location.building }}
-      </p>
+          <p class="mt-1 text-zinc-500">
+            {{ location.floor }}
+          </p>
 
-      <p class="floor">
-        {{ location.floor }}
-      </p>
+          <p class="mt-3 font-semibold text-zinc-700">
+            {{ location.address }}
+          </p>
 
-      <p class="address">
-        {{ location.address }}
-      </p>
+          <p class="mt-3 text-sm leading-6 text-zinc-600">
+            {{ location.description }}
+          </p>
 
-      <p class="description">
-        {{ location.description }}
-      </p>
+          <p class="mt-2 text-xs font-semibold leading-5 text-zinc-500">
+            Se recomienda contactar previamente antes de acudir a la sede.
+          </p>
+        </div>
 
-      <small>
-        Se recomienda contactar previamente antes de acudir a la sede.
-      </small>
-
-    </div>
-
-    <button
-      type="button"
-      class="primary-button"
-      (click)="openLocation()">
-
-      Ver ubicación
-
-    </button>
-
-  </article>
-
-</section>
-
+        <button
+          type="button"
+          class="w-full rounded-full bg-[#8f50c4] px-6 py-1.5 text-sm font-extrabold text-white transition hover:-translate-y-0.5 hover:bg-[#7b3fb1] sm:py-2 lg:w-auto"
+          (click)="openLocation()"
+        >
+          Ver ubicación
+        </button>
+      </div>
+    </section>
+  </div>
 </section>

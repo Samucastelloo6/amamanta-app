@@ -1,0 +1,95 @@
+<section
+  class="mb-4 rounded-[22px] border border-[#eadff5] bg-white/95 p-3 shadow-lg shadow-purple-100/60 sm:p-4"
+>
+  <div class="border-b border-[#eadff5] pb-3">
+    <h2 class="text-base font-extrabold text-[#8f50c4] sm:text-lg">
+      Hospitales con voluntariado
+    </h2>
+
+    <p class="mt-0.5 text-xs font-medium text-zinc-500">
+      Pulsa en Ver para consultar el horario y localizar el hospital.
+    </p>
+  </div>
+
+  <div
+    class="mt-3 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between"
+  >
+    <p
+      class="text-[11px] font-extrabold uppercase tracking-wide text-[#8f50c4]"
+    >
+      {{ orderedHospitals.length }} hospitales disponibles
+    </p>
+
+    @if (userPosition) {
+      <p class="text-[11px] font-bold text-zinc-400">
+        Ordenados por proximidad
+      </p>
+    }
+  </div>
+
+  <div class="mt-3 grid gap-2 sm:grid-cols-2">
+    @for (hospital of orderedHospitals; track hospital.id) {
+      <article
+        class="overflow-hidden rounded-[16px] border border-[#eadff5] bg-white p-2.5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+        [class.bg-[#faf5ff]]="selectedHospitalId === hospital.id"
+        [class.border-[#8f50c4]]="selectedHospitalId === hospital.id"
+      >
+        <div
+          class="grid grid-cols-[40px_minmax(0,1fr)_48px] items-center gap-2"
+        >
+          <div
+            class="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-[#f4eafa] text-[#8f50c4]"
+          >
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M8 3v4H4v10a2 2 0 0 0 2 2h4v-4h4v4h4a2 2 0 0 0 2-2V7h-4V3H8Zm2 2h4v4h4v8h-2v-4H8v4H6V9h4V5Zm1 2v2H9v2h2v2h2v-2h2V9h-2V7h-2Z"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
+
+          <div class="min-w-0">
+            <p
+              class="truncate text-[10px] font-extrabold uppercase tracking-wide text-[#8f50c4]"
+            >
+              Voluntariado hospitalario
+            </p>
+
+            <h3
+              class="truncate text-sm font-extrabold leading-tight text-zinc-800"
+            >
+              {{ hospital.name }}
+            </h3>
+
+            <p class="truncate text-xs font-medium text-zinc-500">
+              {{ hospital.schedule }}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            class="w-12 rounded-full bg-[#8f50c4] py-1.5 text-[11px] font-extrabold text-white"
+            (click)="selectHospital(hospital)"
+          >
+            Ver
+          </button>
+        </div>
+      </article>
+    } @empty {
+      <div
+        class="rounded-[20px] border border-[#eadff5] bg-white p-6 text-center sm:col-span-2"
+      >
+        <h3 class="text-base font-extrabold text-[#8f50c4]">
+          No hay hospitales disponibles
+        </h3>
+
+        <p class="mt-1 text-sm font-medium text-zinc-500">
+          Actualmente no hay hospitales con voluntariado visibles.
+        </p>
+      </div>
+    }
+  </div>
+</section>

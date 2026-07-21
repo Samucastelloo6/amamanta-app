@@ -1,0 +1,55 @@
+@if (open) {
+  <div
+    class="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950/50 px-3 py-4 backdrop-blur-md sm:px-6"
+    role="dialog"
+    aria-modal="true"
+    (click)="onBackdropClick()"
+  >
+    <section
+      class="w-full max-w-2xl animate-[modalIn_0.18s_ease-out] overflow-hidden rounded-[30px] border border-[#eadff5] bg-white shadow-2xl shadow-purple-950/20"
+      (click)="$event.stopPropagation()"
+    >
+      <header
+        class="flex items-start justify-between gap-4 border-b border-[#eadff5] bg-gradient-to-r from-[#fbf7ff] via-white to-[#f6fff2] px-5 py-4 sm:px-6 sm:py-5"
+      >
+        <div class="flex min-w-0 items-start gap-3">
+          <div
+            class="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#8f50c4] text-white shadow-lg shadow-purple-200"
+          >
+            <iconify-icon [icon]="icon" class="text-2xl"></iconify-icon>
+          </div>
+
+          <div class="min-w-0">
+            <h2
+              class="truncate text-xl font-black tracking-tight text-zinc-900 sm:text-2xl"
+            >
+              {{ title }}
+            </h2>
+
+            @if (subtitle) {
+              <p class="mt-1 text-sm font-semibold leading-5 text-zinc-500">
+                {{ subtitle }}
+              </p>
+            }
+          </div>
+        </div>
+
+        <button
+          type="button"
+          (click)="close()"
+          class="grid size-10 shrink-0 place-items-center rounded-2xl border border-[#eadff5] bg-white text-zinc-500 shadow-sm transition hover:scale-105 hover:text-[#8f50c4]"
+          aria-label="Cerrar modal"
+        >
+          <iconify-icon
+            icon="solar:close-circle-bold"
+            class="text-2xl"
+          ></iconify-icon>
+        </button>
+      </header>
+
+      <div class="max-h-[72vh] overflow-y-auto px-5 py-5 sm:px-6">
+        <ng-content />
+      </div>
+    </section>
+  </div>
+}

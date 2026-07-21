@@ -3,11 +3,9 @@ export interface AmamantaEvent {
   title: string;
   date: string;
   startTime: string;
-  endTime?: string;
   location: string;
+  googleMapsUrl: string;
   description: string;
-  speaker?: string;
   requiresRegistration?: boolean;
-  workshopId?: string;
   isActive: boolean;
 }

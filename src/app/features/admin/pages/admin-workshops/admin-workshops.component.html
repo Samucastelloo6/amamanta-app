@@ -1,0 +1,192 @@
+<section class="space-y-5">
+  <header
+    class="rounded-[24px] border border-[#eadff5] bg-white p-4 shadow-lg shadow-purple-100/60 sm:rounded-[28px] sm:p-5"
+  >
+    <div
+      class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <div class="min-w-0">
+        <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#8f50c4]">
+          Gestión de contenido
+        </p>
+
+        <h1
+          class="mt-1 text-2xl font-black tracking-tight text-zinc-900 sm:text-3xl"
+        >
+          Talleres
+        </h1>
+
+        <p class="mt-2 max-w-2xl text-sm leading-6 text-zinc-500">
+          Añade, modifica, cierra temporalmente o elimina los talleres que
+          aparecerán en la aplicación.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        (click)="openCreateWorkshop()"
+        class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#8f50c4] px-5 py-3 text-sm font-extrabold text-white shadow-lg shadow-purple-200 transition hover:scale-[1.02] hover:bg-[#7b3fb1] sm:w-auto"
+      >
+        <iconify-icon
+          icon="solar:add-circle-bold"
+          class="text-xl"
+        ></iconify-icon>
+
+        Añadir taller
+      </button>
+    </div>
+  </header>
+
+  <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    @for (workshop of workshops(); track workshop.id) {
+      <article
+        class="flex min-h-[300px] flex-col rounded-[24px] border bg-white p-4 shadow-lg sm:rounded-[28px] sm:p-5"
+        [ngClass]="
+          workshop.status === 'temporarily_closed'
+            ? 'border-red-200 shadow-red-100'
+            : 'border-[#eadff5] shadow-purple-100/60'
+        "
+      >
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <h2 class="text-lg font-black leading-6 text-zinc-900">
+              {{ workshop.name }}
+            </h2>
+
+            <p class="mt-1 text-sm font-extrabold capitalize text-[#8f50c4]">
+              {{ workshop.day }} · {{ workshop.schedule }}
+            </p>
+          </div>
+
+          <span
+            class="shrink-0 rounded-full px-3 py-1 text-[10px] font-extrabold uppercase"
+            [class.bg-[#f4eafa]]="workshop.mode !== 'online'"
+            [class.text-[#8f50c4]]="workshop.mode !== 'online'"
+            [class.bg-blue-50]="workshop.mode === 'online'"
+            [class.text-blue-700]="workshop.mode === 'online'"
+          >
+            {{ workshop.mode === "online" ? "Online" : "Presencial" }}
+          </span>
+        </div>
+
+        <div class="mt-4 flex flex-wrap gap-2">
+          @if (workshop.status === "temporarily_closed") {
+            <span
+              class="rounded-full bg-red-100 px-3 py-1 text-xs font-extrabold text-red-700"
+            >
+              Cerrado temporalmente
+            </span>
+          } @else {
+            <span
+              class="rounded-full bg-green-50 px-3 py-1 text-xs font-extrabold text-green-700"
+            >
+              Abierto
+            </span>
+          }
+
+          @if (!workshop.isActive) {
+            <span
+              class="rounded-full bg-zinc-100 px-3 py-1 text-xs font-extrabold text-zinc-600"
+            >
+              Oculto
+            </span>
+          }
+        </div>
+
+        <div class="mt-4 space-y-2 text-sm font-semibold text-zinc-600">
+          <p>
+            <span class="text-[#8f50c4]">Franja:</span>
+            {{ workshop.time === "morning" ? "Mañana" : "Tarde" }}
+          </p>
+
+          <p>
+            <span class="text-[#8f50c4]">Lugar:</span>
+            {{
+              workshop.mode === "online"
+                ? "Online mediante Zoom"
+                : workshop.address
+            }}
+          </p>
+
+          <p>
+            <span class="text-[#8f50c4]">Responsables:</span>
+            {{ workshop.contacts.length }}
+          </p>
+        </div>
+
+        @if (
+          workshop.status === "temporarily_closed" && workshop.closureMessage
+        ) {
+          <p
+            class="mt-4 rounded-2xl bg-red-50 px-3 py-2 text-sm font-bold leading-5 text-red-700"
+          >
+            {{ workshop.closureMessage }}
+          </p>
+        } @else if (workshop.notes) {
+          <p class="mt-4 line-clamp-3 text-sm leading-6 text-zinc-500">
+            {{ workshop.notes }}
+          </p>
+        }
+
+        <div class="mt-auto grid grid-cols-2 gap-3 pt-5">
+          <button
+            type="button"
+            (click)="openEditWorkshop(workshop)"
+            class="rounded-2xl border border-[#eadff5] bg-white px-3 py-2.5 text-sm font-extrabold text-[#8f50c4] transition hover:bg-[#faf5ff]"
+          >
+            Editar
+          </button>
+
+          <button
+            type="button"
+            (click)="openDeleteConfirm(workshop)"
+            class="rounded-2xl border border-red-100 bg-red-50 px-3 py-2.5 text-sm font-extrabold text-red-600 transition hover:bg-red-100"
+          >
+            Eliminar
+          </button>
+        </div>
+      </article>
+    }
+  </section>
+</section>
+
+<app-modal
+  [open]="showWorkshopForm()"
+  [title]="selectedWorkshop() ? 'Editar taller' : 'Añadir taller'"
+  [subtitle]="
+    selectedWorkshop()
+      ? 'Modifica los datos del taller seleccionado.'
+      : 'Completa los datos para publicar un nuevo taller.'
+  "
+  icon="solar:users-group-rounded-bold"
+  [closeOnBackdrop]="false"
+  (closed)="closeWorkshopForm()"
+>
+  <app-workshop-form
+    [workshop]="selectedWorkshop()"
+    (saved)="saveWorkshop($event)"
+    (cancelled)="closeWorkshopForm()"
+  />
+</app-modal>
+
+@if (showDeleteConfirm()) {
+  <app-confirm-modal
+    title="Eliminar taller"
+    [message]="
+      '¿Seguro que quieres eliminar “' + workshopToDelete()?.name + '”?'
+    "
+    confirmText="Eliminar"
+    cancelText="Cancelar"
+    (confirm)="deleteSelectedWorkshop()"
+    (cancel)="closeDeleteConfirm()"
+  />
+}
+
+@if (showSuccessModal()) {
+  <app-success-modal
+    [title]="successTitle()"
+    [message]="successMessage()"
+    buttonText="Aceptar"
+    (close)="closeSuccessModal()"
+  />
+}

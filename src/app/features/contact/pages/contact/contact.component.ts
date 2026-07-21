@@ -1,15 +1,19 @@
-import { Component } from '@angular/core';
-import { ContactEmail, ContactLocation, ContactPhone } from '../../../../core/models/contact';
+import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import {
+  ContactEmail,
+  ContactLocation,
+  ContactPhone,
+} from '../../../../core/models/contact';
 import { ContactService } from '../../../../core/services/contact.service';
 
 @Component({
   selector: 'app-contact',
   imports: [],
   templateUrl: './contact.component.html',
-  styleUrl: './contact.component.scss'
+  styleUrl: './contact.component.scss',
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class ContactComponent {
-
   emails: ContactEmail[] = [];
   phones: ContactPhone[] = [];
   location!: ContactLocation;
@@ -29,6 +33,11 @@ export class ContactComponent {
   }
 
   openLocation(): void {
-    window.open(this.location.googleMapsUrl, '_blank');
+    const destination = `${this.location.latitude},${this.location.longitude}`;
+
+    window.open(
+      `https://www.google.com/maps/dir/?api=1&destination=${destination}&travelmode=driving`,
+      '_blank',
+    );
   }
 }

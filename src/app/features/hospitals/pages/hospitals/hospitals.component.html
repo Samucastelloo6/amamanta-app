@@ -1,0 +1,89 @@
+<section
+  class="min-h-screen w-full overflow-x-hidden bg-gradient-to-b from-[#fbf7fd] via-white to-[#f6fbf3] px-3 py-4 sm:px-5 lg:px-6"
+>
+  <div class="mx-auto w-full max-w-6xl overflow-hidden">
+    <header class="mb-5 text-center">
+      <p
+        class="text-xs font-extrabold uppercase tracking-[0.22em] text-[#8f50c4]"
+      >
+        Amamanta
+      </p>
+
+      <h1
+        class="mt-1 text-2xl font-extrabold leading-tight text-zinc-800 sm:text-3xl lg:text-4xl"
+      >
+        Voluntariado hospitalario
+      </h1>
+
+      <p class="mx-auto mt-1 max-w-2xl text-sm font-medium text-zinc-500">
+        Consulta los hospitales donde Amamanta ofrece voluntariado hospitalario
+        y sus horarios.
+      </p>
+    </header>
+
+    <app-hospital-list
+      [hospitals]="hospitals"
+      [userPosition]="userPosition"
+      [selectedHospitalId]="selectedResource?.id ?? null"
+      (hospitalSelected)="viewHospitalOnMap($event)"
+    />
+
+    <section class="grid gap-4 lg:grid-cols-[1fr_320px]">
+      <div
+        class="relative overflow-hidden rounded-[22px] border border-[#eadff5] bg-white shadow-lg shadow-purple-100/60"
+      >
+        <app-resource-map
+          class="block w-full"
+          [resources]="hospitals"
+          [selectedResource]="selectedResource"
+          markerImage="/icono-hospitales.png"
+          mapId="DEMO_MAP_ID"
+          mapHeight="560px"
+          [initialCenter]="initialMapCenter"
+          [initialZoom]="10"
+          [selectedZoom]="17"
+          [boundsPadding]="80"
+          [locateUserOnInit]="true"
+          [fitMarkersOnInit]="true"
+          [highlightSelectedMarker]="true"
+          (resourceSelected)="selectResource($event)"
+          (userPositionChanged)="updateUserPosition($event)"
+        />
+
+        @if (selectedResource; as hospital) {
+          <app-hospital-detail-card
+            [hospital]="hospital"
+            [routeActive]="routeActive"
+            variant="mobile"
+            (close)="closeCard()"
+            (navigate)="navigateToResource()"
+          />
+        }
+      </div>
+
+      @if (selectedResource; as hospital) {
+        <app-hospital-detail-card
+          [hospital]="hospital"
+          [routeActive]="routeActive"
+          variant="desktop"
+          (close)="closeCard()"
+          (navigate)="navigateToResource()"
+        />
+      }
+    </section>
+
+    <aside
+      class="mt-4 rounded-[22px] border border-amber-200 bg-amber-50 px-4 py-3"
+    >
+      <p class="text-xs font-black uppercase tracking-[0.14em] text-amber-700">
+        Información importante
+      </p>
+
+      <p class="mt-1 text-sm font-semibold leading-6 text-amber-800">
+        Durante el mes de agosto y los días festivos no se ofrece voluntariado
+        en hospitales. Puedes acudir a los talleres presenciales o virtuales de
+        Amamanta si necesitas apoyo.
+      </p>
+    </aside>
+  </div>
+</section>

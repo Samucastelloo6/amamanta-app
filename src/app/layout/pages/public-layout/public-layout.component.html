@@ -1,11 +1,15 @@
-@if (!isHomePage()) {
-  <app-header></app-header>
-}
+<div
+  class="flex min-h-screen flex-col bg-gradient-to-b from-[#faf7fc] via-white to-[#f7fbf5]"
+>
+  @if (!isHomePage()) {
+    <app-header></app-header>
+  }
 
-<main>
-  <router-outlet></router-outlet>
-</main>
+  <main class="flex-1">
+    <router-outlet></router-outlet>
+  </main>
 
-@if (!isHomePage()) {
-  <app-footer></app-footer>
-}
+  @if (!isHomePage()) {
+    <app-footer></app-footer>
+  }
+</div>

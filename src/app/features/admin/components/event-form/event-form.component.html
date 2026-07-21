@@ -1,0 +1,233 @@
+<form class="space-y-4" (ngSubmit)="save()">
+  <div>
+    <label class="block text-sm font-extrabold text-zinc-600">
+      Título del evento <span class="text-red-500">*</span>
+    </label>
+
+    <input
+      type="text"
+      name="title"
+      [(ngModel)]="form.title"
+      (input)="clearFieldError('title')"
+      [ngClass]="
+        fieldErrors.title
+          ? 'border-red-300 bg-red-50 focus:border-red-500'
+          : 'border-[#eadff5] bg-[#fcfaff] focus:border-[#8f50c4] focus:bg-white'
+      "
+      class="mt-2 w-full rounded-2xl border px-4 py-3 text-sm font-semibold text-zinc-700 outline-none transition placeholder:text-zinc-400"
+      placeholder="Ej. Acto de agradecimiento a las donantes de leche"
+      autocomplete="off"
+    />
+
+    @if (fieldErrors.title) {
+      <p class="mt-1 text-xs font-bold text-red-600">
+        {{ fieldErrors.title }}
+      </p>
+    }
+  </div>
+
+  <div class="grid gap-4 sm:grid-cols-2">
+    <div>
+      <label class="block text-sm font-extrabold text-zinc-600">
+        Fecha <span class="text-red-500">*</span>
+      </label>
+
+      <input
+        type="date"
+        name="date"
+        [(ngModel)]="form.date"
+        (change)="clearFieldError('date')"
+        [ngClass]="
+          fieldErrors.date
+            ? 'border-red-300 bg-red-50 focus:border-red-500'
+            : 'border-[#eadff5] bg-[#fcfaff] focus:border-[#8f50c4] focus:bg-white'
+        "
+        class="mt-2 w-full rounded-2xl border px-4 py-3 text-sm font-semibold text-zinc-700 outline-none transition"
+      />
+
+      @if (fieldErrors.date) {
+        <p class="mt-1 text-xs font-bold text-red-600">
+          {{ fieldErrors.date }}
+        </p>
+      }
+    </div>
+
+    <div>
+      <label class="block text-sm font-extrabold text-zinc-600">
+        Hora <span class="text-red-500">*</span>
+      </label>
+
+      <input
+        type="time"
+        name="startTime"
+        step="300"
+        [(ngModel)]="form.startTime"
+        (change)="clearFieldError('startTime')"
+        [ngClass]="
+          fieldErrors.startTime
+            ? 'border-red-300 bg-red-50 focus:border-red-500'
+            : 'border-[#eadff5] bg-[#fcfaff] focus:border-[#8f50c4] focus:bg-white'
+        "
+        class="mt-2 w-full rounded-2xl border px-4 py-3 text-sm font-semibold text-zinc-700 outline-none transition"
+      />
+
+      @if (fieldErrors.startTime) {
+        <p class="mt-1 text-xs font-bold text-red-600">
+          {{ fieldErrors.startTime }}
+        </p>
+      }
+    </div>
+  </div>
+
+  <div>
+    <label class="block text-sm font-extrabold text-zinc-600">
+      Lugar <span class="text-red-500">*</span>
+    </label>
+
+    <input
+      type="text"
+      name="location"
+      [(ngModel)]="form.location"
+      (input)="clearFieldError('location')"
+      [ngClass]="
+        fieldErrors.location
+          ? 'border-red-300 bg-red-50 focus:border-red-500'
+          : 'border-[#eadff5] bg-[#fcfaff] focus:border-[#8f50c4] focus:bg-white'
+      "
+      class="mt-2 w-full rounded-2xl border px-4 py-3 text-sm font-semibold text-zinc-700 outline-none transition placeholder:text-zinc-400"
+      placeholder="Ej. Banco de Leche Materna de La Fe"
+      autocomplete="off"
+    />
+
+    @if (fieldErrors.location) {
+      <p class="mt-1 text-xs font-bold text-red-600">
+        {{ fieldErrors.location }}
+      </p>
+    }
+  </div>
+
+  <div>
+    <label class="block text-sm font-extrabold text-zinc-600">
+      Enlace de Google Maps
+    </label>
+
+    <input
+      type="url"
+      name="googleMapsUrl"
+      [(ngModel)]="form.googleMapsUrl"
+      class="mt-2 w-full rounded-2xl border border-[#eadff5] bg-[#fcfaff] px-4 py-3 text-sm font-semibold text-zinc-700 outline-none transition placeholder:text-zinc-400 focus:border-[#8f50c4] focus:bg-white"
+      placeholder="https://maps.app.goo.gl/..."
+      autocomplete="off"
+    />
+
+    <p class="mt-1 text-xs font-semibold leading-5 text-zinc-500">
+      Pega el enlace del lugar en Google Maps para que las familias puedan
+      abrirlo.
+    </p>
+  </div>
+
+  <div>
+    <label class="block text-sm font-extrabold text-zinc-600">
+      Descripción <span class="text-red-500">*</span>
+    </label>
+
+    <textarea
+      rows="4"
+      name="description"
+      [(ngModel)]="form.description"
+      (input)="clearFieldError('description')"
+      [ngClass]="
+        fieldErrors.description
+          ? 'border-red-300 bg-red-50 focus:border-red-500'
+          : 'border-[#eadff5] bg-[#fcfaff] focus:border-[#8f50c4] focus:bg-white'
+      "
+      class="mt-2 w-full resize-y rounded-2xl border px-4 py-3 text-sm font-semibold leading-6 text-zinc-700 outline-none transition placeholder:text-zinc-400"
+      placeholder="Ej. Participación en el acto organizado por el Banco de Leche Materna de La Fe."
+    ></textarea>
+
+    @if (fieldErrors.description) {
+      <p class="mt-1 text-xs font-bold text-red-600">
+        {{ fieldErrors.description }}
+      </p>
+    }
+  </div>
+
+  <div class="grid gap-3 sm:grid-cols-2">
+    <label
+      class="flex cursor-pointer items-center justify-between gap-4 rounded-2xl border border-[#eadff5] bg-[#fcfaff] px-4 py-3 transition hover:bg-[#faf5ff]"
+    >
+      <span>
+        <span class="block text-sm font-extrabold text-zinc-700">
+          Requiere inscripción
+        </span>
+
+        <span class="block text-xs font-semibold text-zinc-500">
+          Activa esta opción si las familias deben apuntarse.
+        </span>
+      </span>
+
+      <input
+        type="checkbox"
+        name="requiresRegistration"
+        [(ngModel)]="form.requiresRegistration"
+        class="size-5 accent-[#8f50c4]"
+      />
+    </label>
+
+    <label
+      class="flex cursor-pointer items-center justify-between gap-4 rounded-2xl border border-[#eadff5] bg-[#fcfaff] px-4 py-3 transition hover:bg-[#faf5ff]"
+    >
+      <span>
+        <span class="block text-sm font-extrabold text-zinc-700">
+          Visible en la app
+        </span>
+
+        <span class="block text-xs font-semibold text-zinc-500">
+          Si está desactivado, no aparecerá en el calendario público.
+        </span>
+      </span>
+
+      <input
+        type="checkbox"
+        name="isActive"
+        [(ngModel)]="form.isActive"
+        class="size-5 accent-[#8f50c4]"
+      />
+    </label>
+  </div>
+
+  <p
+    class="rounded-2xl bg-[#faf5ff] px-4 py-3 text-xs font-semibold leading-5 text-zinc-500"
+  >
+    Los campos marcados con
+    <span class="font-black text-red-500">*</span>
+    son obligatorios. El identificador interno del evento se genera
+    automáticamente.
+  </p>
+
+  <div class="grid gap-3 pt-2 sm:grid-cols-2">
+    <button
+      type="button"
+      (click)="cancel()"
+      class="rounded-full border border-[#eadff5] bg-white px-6 py-3 text-sm font-extrabold text-zinc-600 transition hover:bg-[#faf5ff] hover:text-[#8f50c4]"
+    >
+      Cancelar
+    </button>
+
+    <button
+      type="submit"
+      class="rounded-full bg-gradient-to-r from-[#8f50c4] to-[#7b3fb1] px-6 py-3 text-sm font-extrabold text-white shadow-lg shadow-purple-200 transition hover:-translate-y-0.5 hover:scale-[1.02]"
+    >
+      {{ event ? "Guardar cambios" : "Guardar evento" }}
+    </button>
+  </div>
+</form>
+
+@if (showWarningModal) {
+  <app-warning-modal
+    title="Revisa el formulario"
+    [message]="warningMessage"
+    buttonText="Revisar formulario"
+    (close)="closeWarningModal()"
+  />
+}

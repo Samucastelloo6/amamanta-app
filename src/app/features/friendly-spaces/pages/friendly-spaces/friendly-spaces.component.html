@@ -1,221 +1,80 @@
-<section class="map-page">
+<section
+  class="min-h-screen w-full overflow-x-hidden bg-gradient-to-b from-[#fbf7fd] via-white to-[#f6fbf3] px-3 py-4 sm:px-5 lg:px-6"
+>
+  <div class="mx-auto w-full max-w-6xl overflow-hidden">
+    <header class="mb-5 text-center">
+      <p
+        class="text-xs font-extrabold uppercase tracking-[0.22em] text-[#8f50c4]"
+      >
+        Amamanta
+      </p>
 
-  <h1>Espacios amigos</h1>
+      <h1
+        class="mt-1 text-2xl font-extrabold leading-tight text-zinc-800 sm:text-3xl lg:text-4xl"
+      >
+        Espacios Amigos de la Lactancia Materna
+      </h1>
 
-  <div
-    class="friendly-layout"
-    [class.sidebar-collapsed]="sidebarCollapsed">
+      <p class="mx-auto mt-1 max-w-2xl text-sm font-medium text-zinc-500">
+        Localiza comercios que protegen la lactancia ofreciendo un espacio para
+        amamantar sin necesidad de comprar o consumir.
+      </p>
+    </header>
 
-    <aside class="friendly-sidebar">
+    <app-friendly-space-filters-list
+      [spaces]="spaces"
+      [categories]="categories"
+      [userPosition]="userPosition"
+      [selectedSpaceId]="selectedResource?.id ?? null"
+      (spaceSelected)="viewSpaceOnMap($event)"
+      (filteredSpacesChanged)="onFilteredSpacesChanged($event)"
+    />
 
-      <button
-        class="toggle-sidebar"
-        type="button"
-        (click)="toggleSidebar()">
-        {{ sidebarCollapsed ? '▶' : '◀' }}
-      </button>
+    <section class="grid gap-4 lg:grid-cols-[1fr_320px]">
+      <div
+        class="relative overflow-hidden rounded-[22px] border border-[#eadff5] bg-white shadow-lg shadow-purple-100/60"
+      >
+        <app-resource-map
+          class="block w-full"
+          [resources]="displayedSpaces"
+          [selectedResource]="selectedResource"
+          markerImage="/espacio-amigo.png"
+          mapId="DEMO_MAP_ID"
+          mapHeight="560px"
+          [initialCenter]="initialMapCenter"
+          [initialZoom]="14"
+          [selectedZoom]="17"
+          [boundsPadding]="80"
+          [minimumFitZoom]="13"
+          [locateUserOnInit]="true"
+          [fitMarkersOnInit]="true"
+          [highlightSelectedMarker]="true"
+          (resourceSelected)="selectResource($event)"
+          (userPositionChanged)="updateUserPosition($event)"
+        />
 
-      @if (!sidebarCollapsed) {
-
-        <div class="search-category-bar">
-
-          <div class="search-inline">
-            <span>🔍</span>
-
-            <input
-              type="text"
-              placeholder="Buscar espacio..."
-              [value]="searchText"
-              (input)="onSearchChange($event)">
-          </div>
-
-          <div class="category-dropdown">
-
-            <button
-              type="button"
-              class="category-button"
-              (click)="toggleCategoryMenu()">
-              <span>🗂️ {{ getSelectedSectorLabel() }}</span>
-              <span>▾</span>
-            </button>
-
-            @if (showCategoryMenu) {
-              <div class="category-menu">
-
-                <button type="button" (click)="selectCategory('all')">
-                  Todas las categorías
-                </button>
-
-                <button type="button" (click)="selectCategory('food')">
-                  Alimentación
-                </button>
-
-                <button type="button" (click)="selectCategory('fashion')">
-                  Ropa, zapatos y complementos
-                </button>
-
-                <button type="button" (click)="selectCategory('books_gifts')">
-                  Librerías, papelerías y regalos
-                </button>
-
-                <button type="button" (click)="selectCategory('beauty')">
-                  Estética, peluquería y perfumería
-                </button>
-
-                <button type="button" (click)="selectCategory('health')">
-                  Clínicas y salud
-                </button>
-
-                <button type="button" (click)="selectCategory('restaurants')">
-                  Café, restaurante y comida
-                </button>
-
-                <button type="button" (click)="selectCategory('financial')">
-                  Servicios financieros
-                </button>
-
-                <button type="button" (click)="selectCategory('others')">
-                  Otros
-                </button>
-
-              </div>
-            }
-
-          </div>
-
-        </div>
-
-        <div class="sidebar-header">
-          <h2>{{ filteredResources.length }} espacios encontrados</h2>
-
-          @if (userPosition) {
-            <p class="proximity-info">
-              📍 Ordenados por proximidad
-            </p>
-          }
-        </div>
-
-        <div class="spaces-list">
-
-          @for (space of filteredResources; track space.id) {
-
-            <article
-              class="space-card"
-              [class.active]="selectedResource?.id === space.id"
-              (click)="selectResource(space)">
-
-              <div class="space-icon">
-                {{ getSectorIcon(space.sector) }}
-              </div>
-
-              <div class="space-info">
-                <h3>{{ space.name }}</h3>
-
-                <p class="address">
-                  📍 {{ space.address }}
-                </p>
-              </div>
-
-            </article>
-
-          } @empty {
-
-            <div class="empty-state">
-              <h3>No hay espacios con estos filtros</h3>
-              <p>Prueba con otra categoría o cambia la búsqueda.</p>
-            </div>
-
-          }
-
-        </div>
-
-      }
-
-    </aside>
-
-    <div class="map-area">
-
-      <google-map
-        #googleMap
-        height="100%"
-        width="100%"
-        [center]="center"
-        [zoom]="zoom"
-        [options]="mapOptions"
-        mapId="DEMO_MAP_ID">
-
-        @for (marker of markers; track marker.resource.id) {
-          <map-advanced-marker
-            [position]="marker.position"
-            [title]="marker.title"
-            [content]="marker.content"
-            (mapClick)="selectResource(marker.resource)">
-          </map-advanced-marker>
+        @if (selectedResource; as space) {
+          <app-friendly-space-detail-card
+            [space]="space"
+            [categories]="categories"
+            [routeActive]="routeActive"
+            variant="mobile"
+            (close)="closeCard()"
+            (navigate)="navigateToResource()"
+          />
         }
+      </div>
 
-        @if (userPosition && userMarkerContent) {
-          <map-advanced-marker
-            [position]="userPosition"
-            [content]="userMarkerContent"
-            title="Tu ubicación">
-          </map-advanced-marker>
-        }
-
-      </google-map>
-
-      @if (selectedResource) {
-        <article class="resource-card">
-          <button class="close-button" (click)="closeCard()">✕</button>
-
-          <h2>{{ selectedResource.name }}</h2>
-
-          <p class="address">
-            {{ selectedResource.address }}
-          </p>
-
-          @if (routeInfo) {
-            <p class="route-info">
-              🚗 {{ routeInfo.duration }} · 📍 {{ routeInfo.distance }}
-            </p>
-          }
-
-          <p class="description">
-            {{ selectedResource.description }}
-          </p>
-
-          <div class="card-actions">
-            <button
-              class="primary-button"
-              (click)="navigateToResource()">
-              Ver ruta
-            </button>
-          </div>
-
-          @if (routeInfo) {
-            <div class="external-navigation">
-
-              <p>Abrir en</p>
-
-              <button
-                class="map-button google-button"
-                (click)="openGoogleMaps()">
-                Google Maps
-              </button>
-
-              <button
-                class="map-button apple-button"
-                (click)="openAppleMaps()">
-                Apple Maps
-              </button>
-
-            </div>
-          }
-
-        </article>
+      @if (selectedResource; as space) {
+        <app-friendly-space-detail-card
+          [space]="space"
+          [categories]="categories"
+          [routeActive]="routeActive"
+          variant="desktop"
+          (close)="closeCard()"
+          (navigate)="navigateToResource()"
+        />
       }
-
-    </div>
-
+    </section>
   </div>
-
 </section>

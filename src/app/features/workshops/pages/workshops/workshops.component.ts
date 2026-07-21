@@ -1,472 +1,129 @@
-import { AfterViewInit, ChangeDetectorRef, Component, NgZone, ViewChild } from '@angular/core';
-import { GoogleMap, GoogleMapsModule } from '@angular/google-maps';
-import { ResourcePoint } from '../../../../core/models/resource';
-import { ResourceService } from '../../../../core/services/resource.service';
+import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
-interface MapMarker {
-  position: google.maps.LatLngLiteral;
-  title: string;
-  content: HTMLElement;
-  resource: ResourcePoint;
-}
-
-type DayFilter = 'all' | 'lunes' | 'martes' | 'miércoles' | 'jueves' | 'viernes';
-type TimeFilter = 'all' | 'morning' | 'afternoon';
+import { Workshop } from '../../../../core/models/workshop';
+import { WorkshopService } from '../../../../core/services/workshop.service';
+import { ResourceMapComponent } from '../../../../shared/components/resource-map/resource-map.component';
+import { WorkshopDetailCardComponent } from '../../components/workshop-detail-card/workshop-detail-card.component';
+import { WorkshopOnlinePanelComponent } from '../../components/workshop-online-panel/workshop-online-panel.component';
+import { WorkshopWeekCalendarComponent } from '../../components/workshop-week-calendar/workshop-week-calendar.component';
 
 @Component({
   selector: 'app-workshops',
-  imports: [GoogleMapsModule],
+  imports: [
+    ResourceMapComponent,
+    WorkshopWeekCalendarComponent,
+    WorkshopDetailCardComponent,
+    WorkshopOnlinePanelComponent,
+  ],
   templateUrl: './workshops.component.html',
-  styleUrl: './workshops.component.scss'
+  styleUrl: './workshops.component.scss',
 })
 export class WorkshopsComponent implements AfterViewInit {
+  @ViewChild(ResourceMapComponent)
+  private resourceMap?: ResourceMapComponent<Workshop>;
 
-  @ViewChild(GoogleMap) googleMap!: GoogleMap;
-
-  center: google.maps.LatLngLiteral = { lat: 39.4699, lng: -0.3763 };
-  zoom = 9;
-
-  mapOptions: google.maps.MapOptions = {
-    gestureHandling: 'greedy',
-    clickableIcons: false
+  readonly initialMapCenter: google.maps.LatLngLiteral = {
+    lat: 39.4699,
+    lng: -0.3763,
   };
 
-  resourcePoints: ResourcePoint[] = [];
-  markers: MapMarker[] = [];
+  readonly workshops: Workshop[];
+  readonly mapWorkshops: Workshop[];
 
-  selectedResource: ResourcePoint | null = null;
-
-  selectedDay: DayFilter = 'all';
-  selectedTime: TimeFilter = 'all';
-
+  selectedResource: Workshop | null = null;
   userPosition: google.maps.LatLngLiteral | null = null;
-  userMarkerContent: HTMLElement | null = null;
+  routeActive = false;
 
-  directionsService!: google.maps.DirectionsService;
-  routePolyline: google.maps.Polyline | null = null;
+  constructor(
+    private readonly workshopService: WorkshopService,
+    private readonly route: ActivatedRoute,
+  ) {
+    this.workshops = this.workshopService.getWorkshops();
 
-  routeInfo: { distance: string; duration: string } | null = null;
-
-constructor(
-  private readonly resourceService: ResourceService,
-  private readonly ngZone: NgZone,
-  private readonly cdr: ChangeDetectorRef,
-  private readonly route: ActivatedRoute
-) {
-  this.resourcePoints = this.resourceService
-    .getResources()
-    .filter(resource => resource.type === 'workshop' && resource.isActive);
-
-  this.loadMarkers();
-}
-
-ngAfterViewInit(): void {
-  this.directionsService = new google.maps.DirectionsService();
-
-  const workshopId = this.route.snapshot.queryParamMap.get('workshopId');
-
-  if (workshopId) {
-    setTimeout(() => {
-      this.openWorkshopFromEvent(workshopId);
-    });
-
-    return;
-  }
-
-  this.locateUser();
-
-  setTimeout(() => {
-    this.fitMapToMarkers();
-  });
-}
-weekDays = [
-  { value: 'lunes', label: 'Lunes' },
-  { value: 'martes', label: 'Martes' },
-  { value: 'miércoles', label: 'Miércoles' },
-  { value: 'jueves', label: 'Jueves' },
-  { value: 'viernes', label: 'Viernes' }
-];
-
-getWorkshopsByDayAndTime(
-  day: string,
-  time: 'morning' | 'afternoon'
-): ResourcePoint[] {
-  return this.filteredResources.filter(workshop =>
-    workshop.type === 'workshop' &&
-    workshop.day === day &&
-    workshop.time === time
-  );
-}
-
-private openWorkshopFromEvent(workshopId: string): void {
-  const workshop = this.resourcePoints.find(
-    resource => resource.id === workshopId
-  );
-
-  if (!workshop) {
-    console.warn('No se ha encontrado el taller:', workshopId);
-    this.fitMapToMarkers();
-    return;
-  }
-
-  this.selectResource(workshop);
-
-  setTimeout(() => {
-    document
-      .querySelector('google-map')
-      ?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-  });
-}
-
- private loadMarkers(): void {
-
-  this.markers = this.filteredResources.map(resource =>
-    this.createMarker(resource)
-  );
-
-}
-get filteredResources(): ResourcePoint[] {
-  return this.resourcePoints
-    .filter(resource => {
-      const description = (resource.description ?? '').toLowerCase();
-
-      const matchesDay =
-        this.selectedDay === 'all' ||
-        description.includes(this.selectedDay);
-
-      const matchesTime =
-        this.selectedTime === 'all' ||
-        this.matchesTimeFilter(description, this.selectedTime);
-
-      return matchesDay && matchesTime;
-    })
-    .sort((a, b) => {
-      if (!this.userPosition) {
-        return 0;
-      }
-
-      return this.getDistance(a) - this.getDistance(b);
-    });
-}
-
-  private matchesTimeFilter(description: string, timeFilter: TimeFilter): boolean {
-    const timeMatch = description.match(/(\d{1,2})[:.](\d{2})h?/);
-
-    if (!timeMatch) {
-      return true;
-    }
-
-    const hour = Number(timeMatch[1]);
-
-    if (timeFilter === 'morning') {
-      return hour < 14;
-    }
-
-    if (timeFilter === 'afternoon') {
-      return hour >= 14;
-    }
-
-    return true;
-  }
-
-  private createMarker(resource: ResourcePoint): MapMarker {
-    return {
-      position: {
-        lat: resource.latitude,
-        lng: resource.longitude
-      },
-      title: resource.name,
-      content: this.createMarkerContent('/taller-lactancia.png'),
-      resource
-    };
-  }
-
-  private createMarkerContent(image: string): HTMLElement {
-    const marker = document.createElement('div');
-
-    marker.style.width = '46px';
-    marker.style.height = '46px';
-    marker.style.borderRadius = '50%';
-    marker.style.overflow = 'hidden';
-    marker.style.border = '3px solid #7e22ce';
-    marker.style.background = 'white';
-    marker.style.display = 'flex';
-    marker.style.alignItems = 'center';
-    marker.style.justifyContent = 'center';
-    marker.style.boxShadow = '0 4px 10px rgba(0,0,0,.25)';
-    marker.style.cursor = 'pointer';
-
-    const img = document.createElement('img');
-    img.src = image;
-    img.style.width = '50px';
-    img.style.height = '50px';
-    img.style.objectFit = 'contain';
-
-    marker.appendChild(img);
-
-    return marker;
-  }
-
-  selectResource(resource: ResourcePoint): void {
-    this.selectedResource = resource;
-    this.clearRoute();
-
-    this.center = {
-      lat: resource.latitude,
-      lng: resource.longitude
-    };
-
-    this.zoom = 15;
-
-    this.googleMap.googleMap?.panTo(this.center);
-  }
-
-  closeCard(): void {
-    this.selectedResource = null;
-    this.clearRoute();
-  }
-
-  changeDay(day: DayFilter): void {
-    this.selectedDay = day;
-    this.selectedResource = null;
-
-    this.clearRoute();
-    this.loadMarkers();
-
-    setTimeout(() => {
-      this.fitMapToMarkers();
-    });
-  }
-
-  changeTime(time: TimeFilter): void {
-    this.selectedTime = time;
-    this.selectedResource = null;
-
-    this.clearRoute();
-    this.loadMarkers();
-
-    setTimeout(() => {
-      this.fitMapToMarkers();
-    });
-  }
-
-  private fitMapToMarkers(): void {
-    if (!this.googleMap?.googleMap || this.markers.length === 0) {
-      return;
-    }
-
-    const bounds = new google.maps.LatLngBounds();
-
-    this.markers.forEach(marker => {
-      bounds.extend(marker.position);
-    });
-
-    this.googleMap.googleMap.fitBounds(bounds);
-  }
-
- locateUser(): void {
-  this.getUserLocation(position => {
-    this.userPosition = position;
-    this.userMarkerContent = this.createUserMarkerContent();
-
-    this.center = position;
-    this.zoom = 14;
-
-    this.loadMarkers();
-
-    this.googleMap.googleMap?.panTo(position);
-
-    this.cdr.detectChanges();
-  });
-}
-
-  navigateToResource(): void {
-    if (!this.selectedResource) {
-      return;
-    }
-
-    this.getUserLocation(origin => {
-      this.userPosition = origin;
-      this.userMarkerContent = this.createUserMarkerContent();
-
-      const destination: google.maps.LatLngLiteral = {
-        lat: this.selectedResource!.latitude,
-        lng: this.selectedResource!.longitude
-      };
-
-      this.calculateRoute(origin, destination);
-    });
-  }
-
-  private getUserLocation(callback: (position: google.maps.LatLngLiteral) => void): void {
-    if (!navigator.geolocation) {
-      alert('Tu navegador no permite usar la ubicación.');
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      position => {
-        this.ngZone.run(() => {
-          callback({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          });
-        });
-      },
-      error => {
-        console.error(error);
-        alert('No se ha podido obtener tu ubicación.');
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0
-      }
+    this.mapWorkshops = this.workshops.filter(
+      (workshop) => workshop.mode !== 'online',
     );
   }
 
-  private calculateRoute(
-    origin: google.maps.LatLngLiteral,
-    destination: google.maps.LatLngLiteral
-  ): void {
-    this.clearRoute();
+  ngAfterViewInit(): void {
+    const workshopId = this.route.snapshot.queryParamMap.get('workshopId');
 
-    this.directionsService.route({
-      origin,
-      destination,
-      travelMode: google.maps.TravelMode.DRIVING
-    }).then(result => {
-      const route = result.routes[0];
-      const leg = route.legs[0];
-
-      this.routeInfo = {
-        distance: leg.distance?.text ?? '',
-        duration: leg.duration?.text ?? ''
-      };
-
-      this.routePolyline = new google.maps.Polyline({
-        path: route.overview_path,
-        map: this.googleMap.googleMap!,
-        strokeColor: '#7e22ce',
-        strokeOpacity: 1,
-        strokeWeight: 6
-      });
-
-      this.cdr.detectChanges();
-    }).catch(error => {
-      console.error(error);
-      alert('No se ha podido calcular la ruta.');
-    });
-  }
-
-  private clearRoute(): void {
-    if (this.routePolyline) {
-      this.routePolyline.setMap(null);
-      this.routePolyline = null;
-    }
-
-    this.routeInfo = null;
-  }
-
-  private createUserMarkerContent(): HTMLElement {
-    const marker = document.createElement('div');
-
-    marker.style.width = '20px';
-    marker.style.height = '20px';
-    marker.style.borderRadius = '50%';
-    marker.style.background = '#2563eb';
-    marker.style.border = '4px solid white';
-    marker.style.boxShadow = '0 0 0 4px rgba(37, 99, 235, 0.25)';
-
-    return marker;
-  }
-
-  getDistance(resource: ResourcePoint): number {
-
-  if (!this.userPosition) {
-    return 9999;
-  }
-
-  const earthRadius = 6371;
-
-  const dLat = this.toRadians(
-    resource.latitude - this.userPosition.lat
-  );
-
-  const dLng = this.toRadians(
-    resource.longitude - this.userPosition.lng
-  );
-
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(this.toRadians(this.userPosition.lat)) *
-    Math.cos(this.toRadians(resource.latitude)) *
-    Math.sin(dLng / 2) *
-    Math.sin(dLng / 2);
-
-  const c = 2 * Math.atan2(
-    Math.sqrt(a),
-    Math.sqrt(1 - a)
-  );
-
-  return earthRadius * c;
-}
-
-private toRadians(value: number): number {
-  return value * Math.PI / 180;
-}
-
-viewWorkshopOnMap(workshop: ResourcePoint): void {
-  this.selectResource(workshop);
-
-  const position = {
-    lat: workshop.latitude,
-    lng: workshop.longitude
-  };
-
-  this.center = position;
-  this.zoom = 16;
-
-  setTimeout(() => {
-    this.googleMap?.googleMap?.panTo(position);
-    this.googleMap?.googleMap?.setZoom(16);
-
-    document
-      .querySelector('google-map')
-      ?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-  }, 100);
-}
-
-
-
- openGoogleMaps(): void {
-  if (!this.selectedResource) {
-    return;
-  }
-
-  const destination = `${this.selectedResource.latitude},${this.selectedResource.longitude}`;
-
-  window.open(
-    `https://www.google.com/maps/dir/?api=1&origin=Current+Location&destination=${destination}&travelmode=driving`,
-    '_blank'
-  );
-}
-
-  openAppleMaps(): void {
-    if (!this.selectedResource) {
+    if (!workshopId) {
       return;
     }
 
-    const destination = `${this.selectedResource.latitude},${this.selectedResource.longitude}`;
+    setTimeout(() => {
+      this.openWorkshopFromEvent(workshopId);
+    });
+  }
 
-    window.location.href =
-      `maps://?saddr=Current%20Location&daddr=${destination}&dirflg=d`;
+  selectResource(workshop: Workshop): void {
+    this.selectedResource = workshop;
+    this.routeActive = false;
+  }
+
+  viewWorkshopOnMap(workshop: Workshop): void {
+    this.selectedResource = workshop;
+    this.routeActive = false;
+
+    if (workshop.mode === 'online') {
+      this.resourceMap?.clearRoute();
+
+      setTimeout(() => {
+        document.querySelector('#workshop-detail')?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      });
+
+      return;
+    }
+
+    document.querySelector('app-resource-map')?.scrollIntoView({
+      behavior: 'auto',
+      block: 'start',
+    });
+
+    requestAnimationFrame(() => {
+      this.resourceMap?.focusResource(workshop, 16);
+    });
+  }
+  closeCard(): void {
+    this.selectedResource = null;
+    this.routeActive = false;
+
+    this.resourceMap?.clearRoute();
+  }
+
+  navigateToResource(): void {
+    if (
+      !this.selectedResource ||
+      this.selectedResource.mode === 'online' ||
+      this.selectedResource.status === 'temporarily_closed'
+    ) {
+      return;
+    }
+
+    this.routeActive = true;
+
+    this.resourceMap?.navigateToResource(this.selectedResource);
+  }
+
+  updateUserPosition(position: google.maps.LatLngLiteral): void {
+    this.userPosition = position;
+  }
+
+  private openWorkshopFromEvent(workshopId: string): void {
+    const workshop = this.workshops.find((item) => item.id === workshopId);
+
+    if (!workshop) {
+      console.warn('No se ha encontrado el taller:', workshopId);
+
+      this.resourceMap?.fitMapToMarkers();
+      return;
+    }
+
+    this.viewWorkshopOnMap(workshop);
   }
 }

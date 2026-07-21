@@ -1,0 +1,317 @@
+<section class="space-y-5">
+  <header
+    class="rounded-[24px] border border-[#eadff5] bg-white p-4 shadow-lg shadow-purple-100/60 sm:rounded-[28px] sm:p-5"
+  >
+    <div
+      class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <div class="min-w-0">
+        <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#8f50c4]">
+          Gestión de contenido
+        </p>
+
+        <h1
+          class="mt-1 text-2xl font-black tracking-tight text-zinc-900 sm:text-3xl"
+        >
+          Espacios amigos
+        </h1>
+
+        <p class="mt-2 max-w-2xl text-sm leading-6 text-zinc-500">
+          Gestiona los comercios colaboradores y las categorías utilizadas en
+          los filtros de la aplicación.
+        </p>
+      </div>
+
+      @if (activeTab() === "spaces") {
+        <button
+          type="button"
+          (click)="openCreateSpace()"
+          class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#8f50c4] px-5 py-3 text-sm font-extrabold text-white shadow-lg shadow-purple-200 transition hover:scale-[1.02] hover:bg-[#7b3fb1] sm:w-auto"
+        >
+          <iconify-icon
+            icon="solar:add-circle-bold"
+            class="text-xl"
+          ></iconify-icon>
+
+          Añadir espacio
+        </button>
+      } @else {
+        <button
+          type="button"
+          (click)="openCreateCategory()"
+          class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#8f50c4] px-5 py-3 text-sm font-extrabold text-white shadow-lg shadow-purple-200 transition hover:scale-[1.02] hover:bg-[#7b3fb1] sm:w-auto"
+        >
+          <iconify-icon
+            icon="solar:add-circle-bold"
+            class="text-xl"
+          ></iconify-icon>
+
+          Añadir categoría
+        </button>
+      }
+    </div>
+  </header>
+
+  <section
+    class="grid grid-cols-2 gap-1 rounded-2xl border border-[#eadff5] bg-[#f4eafa] p-1"
+  >
+    <button
+      type="button"
+      (click)="changeTab('spaces')"
+      class="rounded-xl px-4 py-3 text-sm font-extrabold transition"
+      [ngClass]="
+        activeTab() === 'spaces'
+          ? 'bg-white text-[#8f50c4] shadow-sm'
+          : 'text-zinc-500 hover:text-[#8f50c4]'
+      "
+    >
+      Espacios
+    </button>
+
+    <button
+      type="button"
+      (click)="changeTab('categories')"
+      class="rounded-xl px-4 py-3 text-sm font-extrabold transition"
+      [ngClass]="
+        activeTab() === 'categories'
+          ? 'bg-white text-[#8f50c4] shadow-sm'
+          : 'text-zinc-500 hover:text-[#8f50c4]'
+      "
+    >
+      Categorías
+    </button>
+  </section>
+
+  @if (activeTab() === "spaces") {
+    <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      @for (space of spaces(); track space.id) {
+        <article
+          class="flex min-h-[300px] flex-col rounded-[24px] border border-[#eadff5] bg-white p-4 shadow-lg shadow-purple-100/60 sm:rounded-[28px] sm:p-5"
+        >
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <p
+                class="text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#8f50c4]"
+              >
+                {{ getCategoryName(space.categoryId) }}
+              </p>
+
+              <h2 class="mt-1 text-lg font-black leading-6 text-zinc-900">
+                {{ space.name }}
+              </h2>
+            </div>
+
+            @if (space.isActive) {
+              <span
+                class="shrink-0 rounded-full bg-green-50 px-3 py-1 text-[10px] font-extrabold uppercase text-green-700"
+              >
+                Visible
+              </span>
+            } @else {
+              <span
+                class="shrink-0 rounded-full bg-zinc-100 px-3 py-1 text-[10px] font-extrabold uppercase text-zinc-600"
+              >
+                Oculto
+              </span>
+            }
+          </div>
+
+          <div class="mt-4 space-y-2 text-sm font-semibold text-zinc-600">
+            <p>
+              <span class="text-[#8f50c4]">Dirección:</span>
+              {{ space.address }}
+            </p>
+
+            <p>
+              <span class="text-[#8f50c4]">Coordenadas:</span>
+              {{ space.latitude }}, {{ space.longitude }}
+            </p>
+          </div>
+
+          @if (space.description) {
+            <p class="mt-4 line-clamp-3 text-sm leading-6 text-zinc-500">
+              {{ space.description }}
+            </p>
+          }
+
+          <div class="mt-auto grid grid-cols-2 gap-3 pt-5">
+            <button
+              type="button"
+              (click)="openEditSpace(space)"
+              class="rounded-2xl border border-[#eadff5] bg-white px-3 py-2.5 text-sm font-extrabold text-[#8f50c4] transition hover:bg-[#faf5ff]"
+            >
+              Editar
+            </button>
+
+            <button
+              type="button"
+              (click)="openSpaceDeleteConfirm(space)"
+              class="rounded-2xl border border-red-100 bg-red-50 px-3 py-2.5 text-sm font-extrabold text-red-600 transition hover:bg-red-100"
+            >
+              Eliminar
+            </button>
+          </div>
+        </article>
+      } @empty {
+        <div
+          class="rounded-[24px] border border-[#eadff5] bg-white p-8 text-center sm:col-span-2 xl:col-span-3"
+        >
+          <h2 class="text-lg font-black text-zinc-900">
+            No hay espacios registrados
+          </h2>
+
+          <p class="mt-2 text-sm text-zinc-500">
+            Añade el primer espacio amigo para mostrarlo en la aplicación.
+          </p>
+        </div>
+      }
+    </section>
+  } @else {
+    <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      @for (category of categories(); track category.id) {
+        <article
+          class="flex min-h-[210px] flex-col rounded-[24px] border border-[#eadff5] bg-white p-4 shadow-lg shadow-purple-100/60 sm:rounded-[28px] sm:p-5"
+        >
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <p
+                class="text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#8f50c4]"
+              >
+                Categoría
+              </p>
+
+              <h2 class="mt-1 text-lg font-black leading-6 text-zinc-900">
+                {{ category.name }}
+              </h2>
+            </div>
+
+            @if (category.isActive) {
+              <span
+                class="shrink-0 rounded-full bg-green-50 px-3 py-1 text-[10px] font-extrabold uppercase text-green-700"
+              >
+                Visible
+              </span>
+            } @else {
+              <span
+                class="shrink-0 rounded-full bg-zinc-100 px-3 py-1 text-[10px] font-extrabold uppercase text-zinc-600"
+              >
+                Oculta
+              </span>
+            }
+          </div>
+
+          <div class="mt-4 rounded-2xl bg-[#faf5ff] px-4 py-3">
+            <p class="text-xs font-bold uppercase tracking-wide text-zinc-500">
+              Espacios asociados
+            </p>
+
+            <p class="mt-1 text-2xl font-black text-[#8f50c4]">
+              {{ getCategorySpacesCount(category.id) }}
+            </p>
+          </div>
+
+          <div class="mt-auto grid grid-cols-2 gap-3 pt-5">
+            <button
+              type="button"
+              (click)="openEditCategory(category)"
+              class="rounded-2xl border border-[#eadff5] bg-white px-3 py-2.5 text-sm font-extrabold text-[#8f50c4] transition hover:bg-[#faf5ff]"
+            >
+              Editar
+            </button>
+
+            <button
+              type="button"
+              (click)="openCategoryDeleteConfirm(category)"
+              class="rounded-2xl border border-red-100 bg-red-50 px-3 py-2.5 text-sm font-extrabold text-red-600 transition hover:bg-red-100"
+            >
+              Eliminar
+            </button>
+          </div>
+        </article>
+      }
+    </section>
+  }
+</section>
+
+<app-modal
+  [open]="showSpaceForm()"
+  [title]="selectedSpace() ? 'Editar espacio' : 'Añadir espacio'"
+  [subtitle]="
+    selectedSpace()
+      ? 'Modifica los datos del espacio seleccionado.'
+      : 'Completa los datos para publicar un nuevo espacio amigo.'
+  "
+  icon="solar:shop-bold"
+  [closeOnBackdrop]="false"
+  (closed)="closeSpaceForm()"
+>
+  <app-friendly-space-form
+    [space]="selectedSpace()"
+    [categories]="categories()"
+    (saved)="saveSpace($event)"
+    (cancelled)="closeSpaceForm()"
+  />
+</app-modal>
+
+<app-modal
+  [open]="showCategoryForm()"
+  [title]="selectedCategory() ? 'Editar categoría' : 'Añadir categoría'"
+  [subtitle]="
+    selectedCategory()
+      ? 'Modifica el nombre o la visibilidad de la categoría.'
+      : 'Crea una nueva categoría para organizar los espacios.'
+  "
+  icon="solar:tag-bold"
+  [closeOnBackdrop]="false"
+  (closed)="closeCategoryForm()"
+>
+  <app-friendly-space-category-form
+    [category]="selectedCategory()"
+    (saved)="saveCategory($event)"
+    (cancelled)="closeCategoryForm()"
+  />
+</app-modal>
+
+@if (showSpaceDeleteConfirm()) {
+  <app-confirm-modal
+    title="Eliminar espacio"
+    [message]="'¿Seguro que quieres eliminar “' + spaceToDelete()?.name + '”?'"
+    confirmText="Eliminar"
+    cancelText="Cancelar"
+    (confirm)="deleteSelectedSpace()"
+    (cancel)="closeSpaceDeleteConfirm()"
+  />
+}
+
+@if (showCategoryDeleteConfirm()) {
+  <app-confirm-modal
+    title="Eliminar categoría"
+    [message]="
+      '¿Seguro que quieres eliminar la categoría “' +
+      categoryToDelete()?.name +
+      '”?'
+    "
+    confirmText="Eliminar"
+    cancelText="Cancelar"
+    (confirm)="deleteSelectedCategory()"
+    (cancel)="closeCategoryDeleteConfirm()"
+  />
+}
+
+@if (showSuccessModal()) {
+  <app-success-modal
+    [title]="successTitle()"
+    [message]="successMessage()"
+    buttonText="Aceptar"
+    (close)="closeSuccessModal()"
+  />
+}
+
+@if (showWarningModal()) {
+  <app-warning-modal
+    [title]="warningTitle()"
+    [message]="warningMessage()"
+    buttonText="Aceptar"
+    (close)="closeWarningModal()"
+  />
+}

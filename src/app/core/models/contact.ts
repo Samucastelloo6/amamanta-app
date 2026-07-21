@@ -18,5 +18,7 @@ export interface ContactLocation {
   floor: string;
   address: string;
   description: string;
-  googleMapsUrl: string;
+
+  latitude: number;
+  longitude: number;
 }

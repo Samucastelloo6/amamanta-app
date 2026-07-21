@@ -1,0 +1,313 @@
+<section
+  class="mb-4 rounded-[20px] border border-[#eadff5] bg-white/95 p-3 shadow-lg shadow-purple-100/60"
+>
+  <div
+    class="mb-3 flex flex-col gap-3 border-b border-[#eadff5] pb-3 sm:flex-row sm:items-center sm:justify-between"
+  >
+    <div>
+      <h2 class="text-base font-extrabold text-[#8f50c4] sm:text-lg">
+        Calendario semanal
+      </h2>
+
+      <p class="text-xs font-medium text-zinc-500">
+        Pulsa en Ver para consultar toda la información del taller.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-3 rounded-full bg-[#f4eafa] p-1">
+      <button
+        type="button"
+        (click)="changeTime('all')"
+        class="rounded-full px-3 py-1.5 text-xs font-extrabold transition"
+        [class.bg-white]="selectedTime === 'all'"
+        [class.text-[#8f50c4]]="selectedTime === 'all'"
+        [class.shadow]="selectedTime === 'all'"
+        [class.text-zinc-500]="selectedTime !== 'all'"
+      >
+        Todos
+      </button>
+
+      <button
+        type="button"
+        (click)="changeTime('morning')"
+        class="rounded-full px-3 py-1.5 text-xs font-extrabold transition"
+        [class.bg-white]="selectedTime === 'morning'"
+        [class.text-[#8f50c4]]="selectedTime === 'morning'"
+        [class.shadow]="selectedTime === 'morning'"
+        [class.text-zinc-500]="selectedTime !== 'morning'"
+      >
+        Mañana
+      </button>
+
+      <button
+        type="button"
+        (click)="changeTime('afternoon')"
+        class="rounded-full px-3 py-1.5 text-xs font-extrabold transition"
+        [class.bg-white]="selectedTime === 'afternoon'"
+        [class.text-[#8f50c4]]="selectedTime === 'afternoon'"
+        [class.shadow]="selectedTime === 'afternoon'"
+        [class.text-zinc-500]="selectedTime !== 'afternoon'"
+      >
+        Tarde
+      </button>
+    </div>
+  </div>
+
+  <div class="space-y-3 md:columns-2 md:space-y-0 md:gap-3">
+    @for (day of weekDays; track day.value) {
+      <section
+        class="mb-3 break-inside-avoid overflow-hidden rounded-[18px] border border-[#eadff5] bg-white shadow-sm"
+      >
+        <div class="flex items-center justify-between bg-[#8f50c4] px-3 py-2">
+          <h3 class="text-sm font-extrabold uppercase tracking-wide text-white">
+            {{ day.label }}
+          </h3>
+
+          <span
+            class="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-extrabold uppercase text-white"
+          >
+            Talleres
+          </span>
+        </div>
+
+        <div class="divide-y divide-[#eadff5]">
+          @if (selectedTime === "all" || selectedTime === "morning") {
+            @for (
+              workshop of getWorkshopsByDayAndTime(day.value, "morning");
+              track workshop.id
+            ) {
+              <article
+                class="grid grid-cols-[52px_minmax(0,1fr)_auto] items-center gap-2 px-2.5 py-2 sm:px-3"
+                [class.bg-amber-50]="
+                  workshop.status === 'temporarily_closed' &&
+                  workshop.closureType === 'specific_days'
+                "
+                [class.bg-red-50]="
+                  workshop.status === 'temporarily_closed' &&
+                  workshop.closureType !== 'specific_days'
+                "
+                [class.bg-[#fbf7fd]]="workshop.status !== 'temporarily_closed'"
+              >
+                <div>
+                  <p
+                    class="text-xs font-extrabold"
+                    [class.text-amber-700]="
+                      workshop.status === 'temporarily_closed' &&
+                      workshop.closureType === 'specific_days'
+                    "
+                    [class.text-red-700]="
+                      workshop.status === 'temporarily_closed' &&
+                      workshop.closureType !== 'specific_days'
+                    "
+                    [class.text-[#8f50c4]]="
+                      workshop.status !== 'temporarily_closed'
+                    "
+                  >
+                    {{ workshop.schedule }}
+                  </p>
+
+                  <p class="text-[10px] font-bold uppercase text-zinc-400">
+                    Mañana
+                  </p>
+                </div>
+
+                <div class="min-w-0">
+                  <h4
+                    class="text-xs font-extrabold leading-snug sm:text-sm"
+                    [class.text-amber-800]="
+                      workshop.status === 'temporarily_closed' &&
+                      workshop.closureType === 'specific_days'
+                    "
+                    [class.text-red-800]="
+                      workshop.status === 'temporarily_closed' &&
+                      workshop.closureType !== 'specific_days'
+                    "
+                    [class.text-zinc-800]="
+                      workshop.status !== 'temporarily_closed'
+                    "
+                  >
+                    {{ workshop.name }}
+                  </h4>
+
+                  @if (workshop.status === "temporarily_closed") {
+                    <p
+                      class="mt-0.5 break-words text-[10px] font-semibold leading-4"
+                      [class.text-amber-700]="
+                        workshop.closureType === 'specific_days'
+                      "
+                      [class.text-red-600]="
+                        workshop.closureType !== 'specific_days'
+                      "
+                    >
+                      {{
+                        workshop.closureMessage ||
+                          "Taller cerrado temporalmente."
+                      }}
+                    </p>
+                  }
+                </div>
+
+                <button
+                  type="button"
+                  (click)="selectWorkshop(workshop)"
+                  class="rounded-full px-2.5 py-1 text-[11px] font-extrabold shadow-sm transition"
+                  [class.bg-amber-100]="
+                    workshop.status === 'temporarily_closed' &&
+                    workshop.closureType === 'specific_days'
+                  "
+                  [class.text-amber-700]="
+                    workshop.status === 'temporarily_closed' &&
+                    workshop.closureType === 'specific_days'
+                  "
+                  [class.hover:bg-amber-200]="
+                    workshop.status === 'temporarily_closed' &&
+                    workshop.closureType === 'specific_days'
+                  "
+                  [class.bg-red-100]="
+                    workshop.status === 'temporarily_closed' &&
+                    workshop.closureType !== 'specific_days'
+                  "
+                  [class.text-red-700]="
+                    workshop.status === 'temporarily_closed' &&
+                    workshop.closureType !== 'specific_days'
+                  "
+                  [class.hover:bg-red-200]="
+                    workshop.status === 'temporarily_closed' &&
+                    workshop.closureType !== 'specific_days'
+                  "
+                  [class.bg-[#8f50c4]]="
+                    workshop.status !== 'temporarily_closed'
+                  "
+                  [class.text-white]="workshop.status !== 'temporarily_closed'"
+                  [class.hover:bg-[#7e3db5]]="
+                    workshop.status !== 'temporarily_closed'
+                  "
+                >
+                  Ver
+                </button>
+              </article>
+            }
+          }
+
+          @if (selectedTime === "all" || selectedTime === "afternoon") {
+            @for (
+              workshop of getWorkshopsByDayAndTime(day.value, "afternoon");
+              track workshop.id
+            ) {
+              <article
+                class="grid grid-cols-[52px_minmax(0,1fr)_auto] items-center gap-2 px-2.5 py-2 sm:px-3"
+                [class.bg-amber-50]="
+                  workshop.status === 'temporarily_closed' &&
+                  workshop.closureType === 'specific_days'
+                "
+                [class.bg-red-50]="
+                  workshop.status === 'temporarily_closed' &&
+                  workshop.closureType !== 'specific_days'
+                "
+                [class.bg-[#f6fbf3]]="workshop.status !== 'temporarily_closed'"
+              >
+                <div>
+                  <p
+                    class="text-xs font-extrabold"
+                    [class.text-amber-700]="
+                      workshop.status === 'temporarily_closed' &&
+                      workshop.closureType === 'specific_days'
+                    "
+                    [class.text-red-700]="
+                      workshop.status === 'temporarily_closed' &&
+                      workshop.closureType !== 'specific_days'
+                    "
+                    [class.text-[#8f50c4]]="
+                      workshop.status !== 'temporarily_closed'
+                    "
+                  >
+                    {{ workshop.schedule }}
+                  </p>
+
+                  <p class="text-[10px] font-bold uppercase text-zinc-400">
+                    Tarde
+                  </p>
+                </div>
+
+                <div class="min-w-0">
+                  <h4
+                    class="text-xs font-extrabold leading-snug sm:text-sm"
+                    [class.text-amber-800]="
+                      workshop.status === 'temporarily_closed' &&
+                      workshop.closureType === 'specific_days'
+                    "
+                    [class.text-red-800]="
+                      workshop.status === 'temporarily_closed' &&
+                      workshop.closureType !== 'specific_days'
+                    "
+                    [class.text-zinc-800]="
+                      workshop.status !== 'temporarily_closed'
+                    "
+                  >
+                    {{ workshop.name }}
+                  </h4>
+
+                  @if (workshop.status === "temporarily_closed") {
+                    <p
+                      class="mt-0.5 break-words text-[10px] font-semibold leading-4"
+                      [class.text-amber-700]="
+                        workshop.closureType === 'specific_days'
+                      "
+                      [class.text-red-600]="
+                        workshop.closureType !== 'specific_days'
+                      "
+                    >
+                      {{
+                        workshop.closureMessage ||
+                          "Taller cerrado temporalmente."
+                      }}
+                    </p>
+                  }
+                </div>
+
+                <button
+                  type="button"
+                  (click)="selectWorkshop(workshop)"
+                  class="rounded-full px-2.5 py-1 text-[11px] font-extrabold shadow-sm transition"
+                  [class.bg-amber-100]="
+                    workshop.status === 'temporarily_closed' &&
+                    workshop.closureType === 'specific_days'
+                  "
+                  [class.text-amber-700]="
+                    workshop.status === 'temporarily_closed' &&
+                    workshop.closureType === 'specific_days'
+                  "
+                  [class.hover:bg-amber-200]="
+                    workshop.status === 'temporarily_closed' &&
+                    workshop.closureType === 'specific_days'
+                  "
+                  [class.bg-red-100]="
+                    workshop.status === 'temporarily_closed' &&
+                    workshop.closureType !== 'specific_days'
+                  "
+                  [class.text-red-700]="
+                    workshop.status === 'temporarily_closed' &&
+                    workshop.closureType !== 'specific_days'
+                  "
+                  [class.hover:bg-red-200]="
+                    workshop.status === 'temporarily_closed' &&
+                    workshop.closureType !== 'specific_days'
+                  "
+                  [class.bg-[#8f50c4]]="
+                    workshop.status !== 'temporarily_closed'
+                  "
+                  [class.text-white]="workshop.status !== 'temporarily_closed'"
+                  [class.hover:bg-[#7e3db5]]="
+                    workshop.status !== 'temporarily_closed'
+                  "
+                >
+                  Ver
+                </button>
+              </article>
+            }
+          }
+        </div>
+      </section>
+    }
+  </div>
+</section>

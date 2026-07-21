@@ -1,0 +1,44 @@
+<google-map
+  [height]="mapHeight"
+  width="100%"
+  [center]="center"
+  [zoom]="zoom"
+  [options]="mapOptions"
+  [mapId]="mapId"
+>
+  @for (marker of visibleMarkers; track marker.resource.id) {
+    <map-advanced-marker
+      [position]="marker.position"
+      [title]="marker.title"
+      [content]="marker.content"
+      (mapClick)="onMarkerClick(marker.resource)"
+    />
+  }
+
+  @if (userPosition && userMarkerContent) {
+    <map-advanced-marker
+      [position]="userPosition"
+      [content]="userMarkerContent"
+      title="Tu ubicación"
+      [zIndex]="1000"
+    />
+  }
+</google-map>
+
+@if (showWarningModal) {
+  <app-warning-modal
+    [title]="warningTitle"
+    [message]="warningMessage"
+    buttonText="Aceptar"
+    (close)="closeWarningModal()"
+  />
+}
+
+@if (showErrorModal) {
+  <app-error-modal
+    [title]="errorTitle"
+    [message]="errorMessage"
+    buttonText="Aceptar"
+    (close)="closeErrorModal()"
+  />
+}

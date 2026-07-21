@@ -1,0 +1,246 @@
+<section class="space-y-5">
+  <header
+    class="rounded-[24px] border border-[#eadff5] bg-white p-4 shadow-lg shadow-purple-100/60 sm:rounded-[28px] sm:p-5"
+  >
+    <div class="flex flex-col gap-4">
+      <div class="min-w-0">
+        <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#8f50c4]">
+          Gestión de contenido
+        </p>
+
+        <h1
+          class="mt-1 text-2xl font-black tracking-tight text-zinc-900 sm:text-3xl"
+        >
+          Valoraciones de la aplicación
+        </h1>
+
+        <p class="mt-2 max-w-2xl text-sm leading-6 text-zinc-500">
+          Consulta las valoraciones privadas recibidas, revisa las sugerencias y
+          marca las que ya hayan sido atendidas.
+        </p>
+      </div>
+
+      <div class="grid gap-3 sm:grid-cols-3">
+        <div class="rounded-2xl bg-[#faf5ff] px-4 py-3">
+          <p
+            class="text-[10px] font-black uppercase tracking-[0.14em] text-zinc-500"
+          >
+            Valoraciones mostradas
+          </p>
+
+          <p class="mt-1 text-2xl font-black text-[#8f50c4]">
+            {{ filteredFeedback().length }}
+          </p>
+        </div>
+
+        <div class="rounded-2xl bg-amber-50 px-4 py-3">
+          <p
+            class="text-[10px] font-black uppercase tracking-[0.14em] text-amber-700"
+          >
+            Pendientes de revisar
+          </p>
+
+          <p class="mt-1 text-2xl font-black text-amber-700">
+            {{ pendingCount() }}
+          </p>
+        </div>
+
+        <div class="rounded-2xl bg-[#f6fbf3] px-4 py-3">
+          <p
+            class="text-[10px] font-black uppercase tracking-[0.14em] text-zinc-500"
+          >
+            Valoración media
+          </p>
+
+          <div class="mt-1 flex items-center gap-2">
+            <p class="text-2xl font-black text-[#4aa84f]">
+              {{ averageRating() | number: "1.1-1" }}
+            </p>
+
+            <span class="text-lg text-[#4aa84f]">★</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section
+    class="grid grid-cols-3 gap-1 rounded-2xl border border-[#eadff5] bg-[#f4eafa] p-1"
+  >
+    <button
+      type="button"
+      (click)="changeFilter('all')"
+      class="rounded-xl px-3 py-3 text-xs font-extrabold transition sm:text-sm"
+      [ngClass]="
+        selectedFilter() === 'all'
+          ? 'bg-white text-[#8f50c4] shadow-sm'
+          : 'text-zinc-500 hover:text-[#8f50c4]'
+      "
+    >
+      Todas
+    </button>
+
+    <button
+      type="button"
+      (click)="changeFilter('pending')"
+      class="rounded-xl px-3 py-3 text-xs font-extrabold transition sm:text-sm"
+      [ngClass]="
+        selectedFilter() === 'pending'
+          ? 'bg-white text-[#8f50c4] shadow-sm'
+          : 'text-zinc-500 hover:text-[#8f50c4]'
+      "
+    >
+      Pendientes
+    </button>
+
+    <button
+      type="button"
+      (click)="changeFilter('reviewed')"
+      class="rounded-xl px-3 py-3 text-xs font-extrabold transition sm:text-sm"
+      [ngClass]="
+        selectedFilter() === 'reviewed'
+          ? 'bg-white text-[#8f50c4] shadow-sm'
+          : 'text-zinc-500 hover:text-[#8f50c4]'
+      "
+    >
+      Revisadas
+    </button>
+  </section>
+
+  <section class="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
+    @for (item of filteredFeedback(); track item.id) {
+      <article
+        class="flex min-h-[330px] flex-col rounded-[24px] border bg-white p-4 shadow-lg sm:rounded-[28px] sm:p-5"
+        [ngClass]="
+          item.isReviewed
+            ? 'border-green-100 shadow-green-100/60'
+            : 'border-amber-200 shadow-amber-100/70'
+        "
+      >
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <div class="flex gap-0.5">
+              @for (star of [1, 2, 3, 4, 5]; track star) {
+                <span
+                  class="text-lg"
+                  [ngClass]="{
+                    'text-[#4aa84f]': star <= item.rating,
+                    'text-[#d8cde8]': star > item.rating,
+                  }"
+                >
+                  ★
+                </span>
+              }
+            </div>
+
+            <p class="mt-1 text-xs font-extrabold text-[#8f50c4]">
+              {{ getRatingText(item.rating) }}
+            </p>
+          </div>
+
+          <span
+            class="shrink-0 rounded-full px-3 py-1 text-[10px] font-extrabold uppercase"
+            [ngClass]="
+              item.isReviewed
+                ? 'bg-green-50 text-green-700'
+                : 'bg-amber-100 text-amber-700'
+            "
+          >
+            {{ item.isReviewed ? "Revisada" : "Pendiente" }}
+          </span>
+        </div>
+
+        <p class="mt-3 text-xs font-bold text-zinc-400">
+          {{ item.date | date: "dd/MM/yyyy · HH:mm" }}
+        </p>
+
+        @if (item.categories.length > 0) {
+          <div class="mt-4">
+            <p
+              class="text-[10px] font-black uppercase tracking-[0.14em] text-zinc-400"
+            >
+              Aspectos valorados
+            </p>
+
+            <div class="mt-2 flex flex-wrap gap-2">
+              @for (category of item.categories; track category) {
+                <span
+                  class="rounded-full bg-[#f4eafa] px-3 py-1 text-xs font-extrabold text-[#8f50c4]"
+                >
+                  {{ category }}
+                </span>
+              }
+            </div>
+          </div>
+        }
+
+        @if (item.positive) {
+          <div class="mt-4">
+            <p
+              class="text-[10px] font-black uppercase tracking-[0.14em] text-[#4aa84f]"
+            >
+              Lo que más le ha gustado
+            </p>
+
+            <p class="mt-1 text-sm leading-6 text-zinc-600">
+              {{ item.positive }}
+            </p>
+          </div>
+        }
+
+        @if (item.improvement) {
+          <div
+            class="mt-4 rounded-2xl border border-[#eadff5] bg-[#faf5ff] px-4 py-3"
+          >
+            <p
+              class="text-[10px] font-black uppercase tracking-[0.14em] text-[#8f50c4]"
+            >
+              Propuesta de mejora
+            </p>
+
+            <p class="mt-1 text-sm leading-6 text-zinc-600">
+              {{ item.improvement }}
+            </p>
+          </div>
+        }
+
+        @if (!item.isReviewed) {
+          <button
+            type="button"
+            (click)="markAsReviewed(item)"
+            class="mt-auto rounded-2xl bg-[#8f50c4] px-4 py-3 text-sm font-extrabold text-white shadow-md shadow-purple-100 transition hover:bg-[#7b3fb1]"
+          >
+            Marcar como revisada
+          </button>
+        } @else {
+          <div
+            class="mt-auto flex items-center justify-center rounded-2xl bg-green-50 px-4 py-3 text-sm font-extrabold text-green-700"
+          >
+            Valoración revisada
+          </div>
+        }
+      </article>
+    } @empty {
+      <div
+        class="rounded-[24px] border border-[#eadff5] bg-white p-8 text-center lg:col-span-2 xl:col-span-3"
+      >
+        <h2 class="text-lg font-black text-zinc-900">
+          No hay valoraciones en este estado
+        </h2>
+
+        <p class="mt-2 text-sm text-zinc-500">
+          Las nuevas valoraciones privadas aparecerán aquí automáticamente.
+        </p>
+      </div>
+    }
+  </section>
+</section>
+
+@if (showSuccessModal()) {
+  <app-success-modal
+    [title]="successTitle()"
+    [message]="successMessage()"
+    buttonText="Aceptar"
+    (close)="closeSuccessModal()"
+  />
+}

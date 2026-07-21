@@ -1,9 +1,12 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import html2canvas from 'html2canvas';
+import { toPng } from 'html-to-image';
 import { AmamantaEvent } from '../../../../core/models/amamanta-event';
 import { EventsService } from '../../../../core/services/events.service';
 import { Router, RouterLink } from '@angular/router';
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgClass } from '@angular/common';
+import { ErrorModalComponent } from '../../../../shared/components/status-modals/error-modal/error-modal.component';
+import { SuccessModalComponent } from '../../../../shared/components/status-modals/success-modal/success-modal.component';
+import { LoadingService } from '../../../../shared/services/loading.service';
 
 interface CalendarDay {
   date: Date;
@@ -13,54 +16,76 @@ interface CalendarDay {
   isSelected: boolean;
   events: AmamantaEvent[];
 }
+type MobileCalendarView = 'month' | 'week';
 
+interface CalendarWeek {
+  days: CalendarDay[];
+}
 
 @Component({
   selector: 'app-events',
-  imports: [RouterLink, DatePipe],
+  imports: [DatePipe, NgClass, ErrorModalComponent, SuccessModalComponent],
   templateUrl: './events.component.html',
-  styleUrl: './events.component.scss'
+  styleUrl: './events.component.scss',
 })
 export class EventsComponent {
-
-
-
   @ViewChild('calendarImage') calendarImage!: ElementRef<HTMLElement>;
   @ViewChild('selectedEvents') selectedEvents!: ElementRef<HTMLElement>;
 
-  currentDate = new Date(2026, 5, 1);
-  selectedDate = new Date(2026, 5, 2);
+  today = new Date();
+
+  currentDate = new Date(this.today.getFullYear(), this.today.getMonth(), 1);
+
+  selectedDate = new Date(this.today);
   exporting = false;
+
+  showSuccessModal = false;
+
+  showErrorModal = false;
+  errorTitle = '';
+  errorMessage = '';
+
+  mobileCalendarView: MobileCalendarView = 'month';
 
   weekDays = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 
   events: AmamantaEvent[] = [];
 
- constructor(
-  private readonly eventsService: EventsService,
-  private readonly router: Router
-) {
-  this.events = this.eventsService.getEvents();
-}
+  constructor(
+    private readonly eventsService: EventsService,
+    private readonly router: Router,
+    private readonly loadingService: LoadingService,
+  ) {
+    this.events = this.eventsService.getEvents();
+  }
 
-goToWorkshop(workshopId: string): void {
-  this.router.navigate(['/talleres'], {
-    queryParams: {
-      workshopId
-    }
-  });
-}
+  goToWorkshop(workshopId: string): void {
+    this.router.navigate(['/talleres'], {
+      queryParams: {
+        workshopId,
+      },
+    });
+  }
 
-goToMap(): void {
-  this.router.navigate(['/mapa-talleres']);
-}
+  goToMap(): void {
+    this.router.navigate(['/mapa-talleres']);
+  }
+
+  closeSuccessModal(): void {
+    this.showSuccessModal = false;
+  }
+
+  closeErrorModal(): void {
+    this.showErrorModal = false;
+  }
 
   get currentMonthName(): string {
-    return this.currentDate.toLocaleDateString('es-ES', {
-      month: 'long',
-      year: 'numeric'
-    })
-    .toUpperCase();
+    return this.currentDate
+      .toLocaleDateString('es-ES', {
+        month: 'long',
+        year: 'numeric',
+      })
+      .toUpperCase();
   }
 
   get calendarDays(): CalendarDay[] {
@@ -90,7 +115,7 @@ goToMap(): void {
       const nextDate = new Date(
         lastDate.getFullYear(),
         lastDate.getMonth(),
-        lastDate.getDate() + 1
+        lastDate.getDate() + 1,
       );
 
       days.push(this.createCalendarDay(nextDate, false));
@@ -100,29 +125,117 @@ goToMap(): void {
   }
 
   get selectedDateEvents(): AmamantaEvent[] {
-    return this.events.filter(event =>
-      this.isSameDate(this.parseLocalDate(event.date), this.selectedDate)
+    return this.events.filter((event) =>
+      this.isSameDate(this.parseLocalDate(event.date), this.selectedDate),
     );
   }
 
   get monthEvents(): AmamantaEvent[] {
     return this.events
-      .filter(event => {
+      .filter((event) => {
         const eventDate = this.parseLocalDate(event.date);
 
-        return eventDate.getFullYear() === this.currentDate.getFullYear() &&
-          eventDate.getMonth() === this.currentDate.getMonth();
+        return (
+          eventDate.getFullYear() === this.currentDate.getFullYear() &&
+          eventDate.getMonth() === this.currentDate.getMonth()
+        );
       })
       .sort((a, b) =>
-        `${a.date} ${a.startTime}`.localeCompare(`${b.date} ${b.startTime}`)
+        `${a.date} ${a.startTime}`.localeCompare(`${b.date} ${b.startTime}`),
       );
+  }
+
+  get calendarWeeks(): CalendarWeek[] {
+    const weeks: CalendarWeek[] = [];
+
+    for (let i = 0; i < this.calendarDays.length; i += 7) {
+      weeks.push({
+        days: this.calendarDays.slice(i, i + 7),
+      });
+    }
+
+    return weeks;
+  }
+
+  get selectedWeek(): CalendarDay[] {
+    const selectedTime = this.selectedDate.getTime();
+
+    const week = this.calendarWeeks.find((calendarWeek) =>
+      calendarWeek.days.some((day) => day.date.getTime() === selectedTime),
+    );
+
+    return week?.days ?? this.calendarWeeks[0]?.days ?? [];
+  }
+
+  get selectedWeekEvents(): AmamantaEvent[] {
+    return this.selectedWeek
+      .flatMap((day) => day.events)
+      .sort((a, b) =>
+        `${a.date} ${a.startTime || ''}`.localeCompare(
+          `${b.date} ${b.startTime || ''}`,
+        ),
+      );
+  }
+  getEventLocality(event: AmamantaEvent): string {
+    const location = event.location;
+
+    if (location.includes('L’Eliana')) return 'L’Eliana';
+    if (location.includes('La Fe')) return 'València';
+    if (location.includes('Mislata')) return 'Mislata';
+    if (location.includes('Picanya')) return 'Picanya';
+    if (location.includes('Vilamarxant')) return 'Vilamarxant';
+    if (location.includes('Torrent')) return 'Torrent';
+    if (location.includes('Quart de Poblet')) return 'Quart';
+    if (location.includes('Valterna')) return 'Valterna';
+
+    return location;
+  }
+
+  setMobileCalendarView(view: MobileCalendarView): void {
+    this.mobileCalendarView = view;
+
+    if (view === 'week') {
+      this.currentDate = new Date(
+        this.selectedDate.getFullYear(),
+        this.selectedDate.getMonth(),
+        1,
+      );
+    }
+  }
+
+  previousWeek(): void {
+    this.selectedDate = new Date(
+      this.selectedDate.getFullYear(),
+      this.selectedDate.getMonth(),
+      this.selectedDate.getDate() - 7,
+    );
+
+    this.currentDate = new Date(
+      this.selectedDate.getFullYear(),
+      this.selectedDate.getMonth(),
+      1,
+    );
+  }
+
+  nextWeek(): void {
+    this.selectedDate = new Date(
+      this.selectedDate.getFullYear(),
+      this.selectedDate.getMonth(),
+      this.selectedDate.getDate() + 7,
+    );
+
+    this.currentDate = new Date(
+      this.selectedDate.getFullYear(),
+      this.selectedDate.getMonth(),
+      1,
+    );
   }
 
   previousMonth(): void {
     this.currentDate = new Date(
       this.currentDate.getFullYear(),
       this.currentDate.getMonth() - 1,
-      1
+      1,
     );
 
     this.selectedDate = new Date(this.currentDate);
@@ -132,7 +245,7 @@ goToMap(): void {
     this.currentDate = new Date(
       this.currentDate.getFullYear(),
       this.currentDate.getMonth() + 1,
-      1
+      1,
     );
 
     this.selectedDate = new Date(this.currentDate);
@@ -141,59 +254,88 @@ goToMap(): void {
   goToToday(): void {
     const today = new Date();
 
-    this.currentDate = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      1
-    );
+    this.currentDate = new Date(today.getFullYear(), today.getMonth(), 1);
 
     this.selectedDate = today;
   }
 
   selectDay(day: CalendarDay): void {
-  this.selectedDate = day.date;
+    this.selectedDate = day.date;
 
-  if (!day.isCurrentMonth) {
-    this.currentDate = new Date(
-      day.date.getFullYear(),
-      day.date.getMonth(),
-      1
-    );
+    if (!day.isCurrentMonth) {
+      this.currentDate = new Date(
+        day.date.getFullYear(),
+        day.date.getMonth(),
+        1,
+      );
+    }
+
+    setTimeout(() => {
+      this.selectedEvents.nativeElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    });
   }
 
-  setTimeout(() => {
-    this.selectedEvents.nativeElement.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start'
-    });
-  });
-}
+  async downloadCalendarImage(): Promise<void> {
+    if (!this.calendarImage?.nativeElement) {
+      console.error('No se ha encontrado el calendario exportable');
 
-async downloadCalendarImage(): Promise<void> {
+      this.showError(
+        'No se ha podido descargar el calendario',
+        'El calendario no está disponible en este momento. Recarga la página e inténtalo de nuevo.',
+      );
 
-  this.exporting = true;
+      return;
+    }
 
-  await new Promise(resolve => setTimeout(resolve, 50));
+    this.loadingService.show();
+    this.exporting = true;
 
-  const canvas = await html2canvas(this.calendarImage.nativeElement, {
-    backgroundColor: '#fff7ed',
-    scale: 2
-  });
+    await new Promise((resolve) => setTimeout(resolve, 150));
 
-  this.exporting = false;
+    try {
+      const dataUrl = await toPng(this.calendarImage.nativeElement, {
+        cacheBust: true,
+        pixelRatio: 2,
+        skipFonts: true,
+      });
 
-  const link = document.createElement('a');
+      const link = document.createElement('a');
 
-  link.download = `calendario-amamanta-${this.currentMonthName.replaceAll(' ', '-')}.png`;
-  link.href = canvas.toDataURL('image/png');
-  link.click();
-}
+      link.download = `calendario-amamanta-${this.currentMonthName.replaceAll(
+        ' ',
+        '-',
+      )}.png`;
 
+      link.href = dataUrl;
+      link.click();
+
+      this.showSuccessModal = true;
+    } catch (error) {
+      console.error('Error al descargar el calendario:', error);
+
+      this.showError(
+        'No se ha podido descargar el calendario',
+        'Ha ocurrido un error al generar la imagen. Inténtalo de nuevo.',
+      );
+    } finally {
+      this.exporting = false;
+      this.loadingService.hide();
+    }
+  }
   formatEventDate(date: string): string {
     return this.parseLocalDate(date).toLocaleDateString('es-ES', {
       day: 'numeric',
-      month: 'long'
+      month: 'long',
     });
+  }
+
+  private showError(title: string, message: string): void {
+    this.errorTitle = title;
+    this.errorMessage = message;
+    this.showErrorModal = true;
   }
 
   private createCalendarDay(date: Date, isCurrentMonth: boolean): CalendarDay {
@@ -201,15 +343,15 @@ async downloadCalendarImage(): Promise<void> {
       date,
       dayNumber: date.getDate(),
       isCurrentMonth,
-      isToday: this.isSameDate(date, new Date()),
+      isToday: this.isSameDate(date, this.today),
       isSelected: this.isSameDate(date, this.selectedDate),
-      events: this.getEventsForDate(date)
+      events: this.getEventsForDate(date),
     };
   }
 
   private getEventsForDate(date: Date): AmamantaEvent[] {
-    return this.events.filter(event =>
-      this.isSameDate(this.parseLocalDate(event.date), date)
+    return this.events.filter((event) =>
+      this.isSameDate(this.parseLocalDate(event.date), date),
     );
   }
 
@@ -220,9 +362,11 @@ async downloadCalendarImage(): Promise<void> {
   }
 
   private isSameDate(dateA: Date, dateB: Date): boolean {
-    return dateA.getFullYear() === dateB.getFullYear() &&
+    return (
+      dateA.getFullYear() === dateB.getFullYear() &&
       dateA.getMonth() === dateB.getMonth() &&
-      dateA.getDate() === dateB.getDate();
+      dateA.getDate() === dateB.getDate()
+    );
   }
 
   private convertSundayBasedDay(day: number): number {
