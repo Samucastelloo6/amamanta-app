@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { toPng } from 'html-to-image';
 import { AmamantaEvent } from '../../../../core/models/amamanta-event';
 import { EventsService } from '../../../../core/services/events.service';
@@ -28,7 +28,7 @@ interface CalendarWeek {
   templateUrl: './events.component.html',
   styleUrl: './events.component.scss',
 })
-export class EventsComponent {
+export class EventsComponent implements OnInit {
   @ViewChild('calendarImage') calendarImage!: ElementRef<HTMLElement>;
   @ViewChild('selectedEvents') selectedEvents!: ElementRef<HTMLElement>;
 
@@ -55,8 +55,10 @@ export class EventsComponent {
     private readonly eventsService: EventsService,
     private readonly router: Router,
     private readonly loadingService: LoadingService,
-  ) {
-    this.events = this.eventsService.getEvents();
+  ) {}
+
+  ngOnInit(): void {
+    this.loadEvents();
   }
 
   goToWorkshop(workshopId: string): void {
@@ -332,6 +334,26 @@ export class EventsComponent {
     });
   }
 
+  private loadEvents(): void {
+    this.loadingService.show();
+
+    this.eventsService.loadEvents().subscribe({
+      next: () => {
+        this.events = this.eventsService.getEvents();
+        this.loadingService.hide();
+      },
+      error: (error) => {
+        console.error('Error al cargar las actividades:', error);
+
+        this.loadingService.hide();
+
+        this.showError(
+          'No se han podido cargar las actividades',
+          'Ha ocurrido un error al obtener la programación. Inténtalo de nuevo más tarde.',
+        );
+      },
+    });
+  }
   private showError(title: string, message: string): void {
     this.errorTitle = title;
     this.errorMessage = message;

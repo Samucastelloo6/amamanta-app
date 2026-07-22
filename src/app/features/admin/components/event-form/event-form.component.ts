@@ -9,8 +9,15 @@ import {
 import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { AmamantaEvent } from '../../../../core/models/amamanta-event';
+import {
+  AmamantaEvent,
+  CreateEventRequest,
+} from '../../../../core/models/amamanta-event';
 import { WarningModalComponent } from '../../../../shared/components/status-modals/warning-modal/warning-modal.component';
+
+type EventFormValue = Omit<AmamantaEvent, 'id'> & {
+  id?: string;
+};
 
 @Component({
   selector: 'app-event-form',
@@ -20,7 +27,7 @@ import { WarningModalComponent } from '../../../../shared/components/status-moda
 export class EventFormComponent implements OnChanges {
   @Input() event: AmamantaEvent | null = null;
 
-  @Output() saved = new EventEmitter<AmamantaEvent>();
+  @Output() saved = new EventEmitter<AmamantaEvent | CreateEventRequest>();
   @Output() cancelled = new EventEmitter<void>();
 
   showWarningModal = false;
@@ -28,7 +35,7 @@ export class EventFormComponent implements OnChanges {
 
   fieldErrors: Partial<Record<keyof AmamantaEvent, string>> = {};
 
-  form: AmamantaEvent = this.getEmptyForm();
+  form: EventFormValue = this.getEmptyForm();
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['event']) {
@@ -49,7 +56,6 @@ export class EventFormComponent implements OnChanges {
     }
 
     this.saved.emit(cleanEvent);
-    this.resetForm();
   }
 
   cancel(): void {
@@ -74,6 +80,7 @@ export class EventFormComponent implements OnChanges {
       'date',
       'startTime',
       'location',
+      'googleMapsUrl',
       'description',
     ];
 
@@ -111,9 +118,8 @@ export class EventFormComponent implements OnChanges {
     this.showWarningModal = false;
   }
 
-  private getEmptyForm(): AmamantaEvent {
+  private getEmptyForm(): EventFormValue {
     return {
-      id: '',
       title: '',
       date: '',
       startTime: '',
@@ -125,34 +131,58 @@ export class EventFormComponent implements OnChanges {
     };
   }
 
-  private getCleanEvent(): AmamantaEvent {
+  private getCleanEvent(): AmamantaEvent | CreateEventRequest {
     const title = this.cleanText(this.form.title);
     const location = this.cleanText(this.form.location);
+    const googleMapsUrl = this.form.googleMapsUrl.trim();
     const description = this.cleanText(this.form.description);
 
-    return {
-      ...this.form,
-      id: this.form.id || this.generateId(title),
+    const payload: CreateEventRequest = {
       title,
+      date: this.form.date,
+      startTime: this.form.startTime,
       location,
+      googleMapsUrl,
       description,
       requiresRegistration: !!this.form.requiresRegistration,
       isActive: !!this.form.isActive,
     };
-  }
 
+    return this.form.id
+      ? {
+          id: this.form.id,
+          ...payload,
+        }
+      : payload;
+  }
   private getFieldErrors(
-    event: AmamantaEvent,
+    event: CreateEventRequest,
   ): Partial<Record<keyof AmamantaEvent, string>> {
     const errors: Partial<Record<keyof AmamantaEvent, string>> = {};
 
-    if (!event.title) errors.title = 'Escribe el título del evento.';
-    if (!event.date) errors.date = 'Selecciona la fecha del evento.';
-    if (!event.startTime) errors.startTime = 'Selecciona la hora del evento.';
-    if (!event.location)
+    if (!event.title) {
+      errors.title = 'Escribe el título del evento.';
+    }
+
+    if (!event.date) {
+      errors.date = 'Selecciona la fecha del evento.';
+    }
+
+    if (!event.startTime) {
+      errors.startTime = 'Selecciona la hora del evento.';
+    }
+
+    if (!event.location) {
       errors.location = 'Escribe el lugar donde se realizará el evento.';
-    if (!event.description)
+    }
+
+    if (!event.googleMapsUrl) {
+      errors.googleMapsUrl = 'Añade el enlace de Google Maps.';
+    }
+
+    if (!event.description) {
       errors.description = 'Escribe una breve descripción del evento.';
+    }
 
     return errors;
   }
@@ -162,14 +192,5 @@ export class EventFormComponent implements OnChanges {
       .trim()
       .replace(/\s+/g, ' ')
       .replace(/\s([,.])/g, '$1');
-  }
-
-  private generateId(title: string): string {
-    return title
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '');
   }
 }

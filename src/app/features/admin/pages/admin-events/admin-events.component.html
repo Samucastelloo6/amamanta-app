@@ -163,3 +163,12 @@
     (close)="closeSuccessModal()"
   />
 }
+
+@if (showErrorModal()) {
+  <app-error-modal
+    [title]="errorTitle()"
+    [message]="errorMessage()"
+    buttonText="Aceptar"
+    (close)="closeErrorModal()"
+  />
+}

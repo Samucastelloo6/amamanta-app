@@ -9,3 +9,7 @@ export interface AmamantaEvent {
   requiresRegistration?: boolean;
   isActive: boolean;
 }
+
+export type CreateEventRequest = Omit<AmamantaEvent, 'id'>;
+
+export type UpdateEventRequest = Partial<CreateEventRequest>;

@@ -1,7 +1,7 @@
 <form class="space-y-4" (ngSubmit)="save()">
   <div>
     <label class="block text-sm font-extrabold text-zinc-600">
-      Título del evento <span class="text-red-500">*</span>
+      Título de la actividad <span class="text-red-500">*</span>
     </label>
 
     <input
@@ -108,7 +108,7 @@
 
   <div>
     <label class="block text-sm font-extrabold text-zinc-600">
-      Enlace de Google Maps
+      Enlace de Google Maps <span class="text-red-500">*</span>
     </label>
 
     <input
@@ -218,7 +218,7 @@
       type="submit"
       class="rounded-full bg-gradient-to-r from-[#8f50c4] to-[#7b3fb1] px-6 py-3 text-sm font-extrabold text-white shadow-lg shadow-purple-200 transition hover:-translate-y-0.5 hover:scale-[1.02]"
     >
-      {{ event ? "Guardar cambios" : "Guardar evento" }}
+      {{ event ? "Guardar cambios" : "Guardar actividad" }}
     </button>
   </div>
 </form>

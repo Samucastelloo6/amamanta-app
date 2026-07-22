@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, throwError, delay, tap } from 'rxjs';
+import { Observable, tap, map } from 'rxjs';
 
 import { AuthResponse, AuthUser, LoginRequest } from './auth.models';
 import { TokenStorageService } from './token-storage.service';
@@ -24,28 +24,19 @@ export class AuthService {
   readonly isAuthenticated = computed(() => this.currentUser() !== null);
 
   login(payload: LoginRequest): Observable<AuthResponse> {
-    if (payload.email !== 'admin@amamanta.es' || payload.password !== '1234') {
-      return throwError(() => new Error('Credenciales incorrectas'));
-    }
-
-    const response: AuthResponse = {
-      accessToken: 'token-temporal',
-      user: {
-        id: '1',
-        name: 'Barbara',
-        email: 'admin@amamanta.es',
-        role: 'admin',
-      },
-    };
-
-    return of(response).pipe(
-      delay(600),
-      tap((res) => {
-        this.storage.setToken(res.accessToken);
-        this.storage.setUser(res.user);
-        this.currentUserSignal.set(res.user);
-      }),
-    );
+    return this.http
+      .post<{
+        success: true;
+        data: AuthResponse;
+      }>(`${this.baseUrl}/auth/login`, payload)
+      .pipe(
+        map((response) => response.data),
+        tap((response) => {
+          this.storage.setToken(response.accessToken);
+          this.storage.setUser(response.user);
+          this.currentUserSignal.set(response.user);
+        }),
+      );
   }
 
   logout(): void {
