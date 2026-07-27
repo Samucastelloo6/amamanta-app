@@ -21,7 +21,10 @@ const eventFields = {
   startTime: z
     .string()
     .trim()
-    .regex(timeRegex, 'La hora debe tener el formato HH:mm'),
+    .refine(
+      (value) => value === '' || timeRegex.test(value),
+      'La hora debe tener el formato HH:mm',
+    ),
 
   location: z
     .string()

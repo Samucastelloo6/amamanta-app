@@ -12,3 +12,15 @@ export function validate<T>(schema: ZodSchema<T>): RequestHandler {
     }
   };
 }
+
+export function validateQuery<T>(schema: ZodSchema<T>): RequestHandler {
+  return async (request, _response, next) => {
+    try {
+      await schema.parseAsync(request.query);
+
+      next();
+    } catch (error) {
+      next(error);
+    }
+  };
+}

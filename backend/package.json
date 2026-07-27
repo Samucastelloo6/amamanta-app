@@ -8,7 +8,12 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
-    "admin:create": "tsx src/scripts/create-admin.ts"
+    "admin:create": "tsx src/scripts/create-admin.ts",
+    "seed:static": "tsx src/scripts/seed-static-content.ts",
+    "seed:workshops": "tsx src/scripts/workshops.seed.ts",
+    "seed:friendly-spaces": "tsx src/scripts/friendly-spaces.seed.ts",
+    "seed:university-rooms": "tsx src/scripts/university-rooms.seed.ts",
+    "seed:events": "tsx src/scripts/events.seed.ts"
   },
   "keywords": [],
   "author": "",

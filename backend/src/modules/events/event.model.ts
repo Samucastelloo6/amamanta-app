@@ -31,10 +31,9 @@ const eventSchema = new Schema<EventDocument>(
 
     startTime: {
       type: String,
-      required: true,
       trim: true,
+      default: '',
     },
-
     location: {
       type: String,
       required: true,
