@@ -1,47 +1,38 @@
-import { Injectable, signal } from '@angular/core';
-import { FriendlySpaceCategory } from '../models/friendly-space';
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable, signal } from '@angular/core';
+import { tap } from 'rxjs';
+
+import { environment } from '../../../environments/environment';
+import {
+  CreateFriendlySpaceCategoryRequest,
+  FriendlySpaceCategory,
+  UpdateFriendlySpaceCategoryRequest,
+} from '../models/friendly-space';
+
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class FriendlySpaceCategoryService {
-  private readonly categories = signal<FriendlySpaceCategory[]>([
-    {
-      id: 'food',
-      name: 'Alimentación',
-      isActive: true,
-    },
-    {
-      id: 'fashion',
-      name: 'Moda',
-      isActive: true,
-    },
-    {
-      id: 'books_gifts',
-      name: 'Librerías y regalos',
-      isActive: true,
-    },
-    {
-      id: 'beauty',
-      name: 'Belleza',
-      isActive: true,
-    },
-    {
-      id: 'health',
-      name: 'Salud',
-      isActive: true,
-    },
-    {
-      id: 'restaurants',
-      name: 'Cafés y restaurantes',
-      isActive: true,
-    },
-    {
-      id: 'others',
-      name: 'Otros',
-      isActive: true,
-    },
-  ]);
+  private readonly http = inject(HttpClient);
+
+  private readonly apiUrl = `${environment.apiUrl}/friendly-space-categories`;
+
+  private readonly categories = signal<FriendlySpaceCategory[]>([]);
+
+  loadCategories() {
+    return this.http
+      .get<ApiResponse<FriendlySpaceCategory[]>>(this.apiUrl)
+      .pipe(
+        tap((response) => {
+          this.categories.set(response.data);
+        }),
+      );
+  }
 
   getCategories(): FriendlySpaceCategory[] {
     return this.categories().filter((category) => category.isActive);
@@ -51,41 +42,44 @@ export class FriendlySpaceCategoryService {
     return this.categories();
   }
 
-  addCategory(category: FriendlySpaceCategory): void {
-    this.categories.update((categories) => [...categories, category]);
+  addCategory(payload: CreateFriendlySpaceCategoryRequest) {
+    return this.http
+      .post<ApiResponse<FriendlySpaceCategory>>(this.apiUrl, payload)
+      .pipe(
+        tap((response) => {
+          this.categories.update((categories) => [
+            ...categories,
+            response.data,
+          ]);
+        }),
+      );
   }
 
-  updateCategory(updatedCategory: FriendlySpaceCategory): void {
-    this.categories.update((categories) =>
-      categories.map((category) =>
-        category.id === updatedCategory.id ? updatedCategory : category,
-      ),
-    );
+  updateCategory(id: string, payload: UpdateFriendlySpaceCategoryRequest) {
+    return this.http
+      .patch<
+        ApiResponse<FriendlySpaceCategory>
+      >(`${this.apiUrl}/${id}`, payload)
+      .pipe(
+        tap((response) => {
+          this.categories.update((categories) =>
+            categories.map((category) =>
+              category.id === id ? response.data : category,
+            ),
+          );
+        }),
+      );
   }
 
-  deleteCategory(categoryId: string): void {
-    this.categories.update((categories) =>
-      categories.filter((category) => category.id !== categoryId),
-    );
-  }
-
-  generateCategoryId(name: string): string {
-    const baseId = name
-      .trim()
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '');
-
-    let id = baseId;
-    let suffix = 2;
-
-    while (this.categories().some((category) => category.id === id)) {
-      id = `${baseId}-${suffix}`;
-      suffix++;
-    }
-
-    return id;
+  deleteCategory(id: string) {
+    return this.http
+      .delete<ApiResponse<FriendlySpaceCategory>>(`${this.apiUrl}/${id}`)
+      .pipe(
+        tap(() => {
+          this.categories.update((categories) =>
+            categories.filter((category) => category.id !== id),
+          );
+        }),
+      );
   }
 }

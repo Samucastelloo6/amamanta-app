@@ -11,10 +11,11 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { Experience, ExperienceType } from '../../../core/models/experiencies';
 import { ExperienceService } from '../../../core/services/experience.service';
+import { ErrorModalComponent } from '../status-modals/error-modal/error-modal.component';
 
 @Component({
   selector: 'app-experience-section',
-  imports: [DatePipe, NgClass, RouterLink],
+  imports: [DatePipe, NgClass, RouterLink, ErrorModalComponent],
   templateUrl: './experience-section.component.html',
   styleUrl: './experience-section.component.scss',
 })
@@ -25,6 +26,8 @@ export class ExperienceSectionComponent implements OnInit, OnChanges {
   private readonly experienceService = inject(ExperienceService);
 
   experiences: Experience[] = [];
+
+  showErrorModal = false;
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
@@ -42,7 +45,7 @@ export class ExperienceSectionComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['type']) {
+    if (changes['type'] && !changes['type'].firstChange) {
       this.loadExperiences();
     }
   }
@@ -111,13 +114,25 @@ export class ExperienceSectionComponent implements OnInit, OnChanges {
     }
   }
 
+  closeErrorModal(): void {
+    this.showErrorModal = false;
+  }
+
   private loadExperiences(): void {
     if (!this.type) {
       this.experiences = [];
       return;
     }
 
-    this.experiences = this.experienceService.getByType(this.type);
+    this.experienceService.loadExperiences(this.type).subscribe({
+      next: () => {
+        this.experiences = this.experienceService.getByType(this.type!);
+      },
+      error: () => {
+        this.experiences = [];
+        this.showErrorModal = true;
+      },
+    });
   }
 
   private isValidType(type: string | null): type is ExperienceType {

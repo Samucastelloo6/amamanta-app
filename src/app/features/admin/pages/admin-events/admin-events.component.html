@@ -13,12 +13,12 @@
         <h1
           class="mt-1 text-2xl font-black tracking-tight text-zinc-900 sm:text-3xl"
         >
-          Eventos
+          Actividades
         </h1>
 
         <p class="mt-2 max-w-2xl text-sm leading-6 text-zinc-500">
-          Añade, modifica o elimina los eventos que aparecerán en el calendario
-          público.
+          Añade, modifica o elimina las actividades que aparecerán en el
+          calendario público.
         </p>
       </div>
 
@@ -32,7 +32,7 @@
           class="text-xl"
         ></iconify-icon>
 
-        Añadir evento
+        Añadir actividad
       </button>
     </div>
   </header>
@@ -127,11 +127,11 @@
 </section>
 <app-modal
   [open]="showEventForm()"
-  [title]="selectedEvent() ? 'Editar evento' : 'Añadir evento'"
+  [title]="selectedEvent() ? 'Editar actividad' : 'Añadir actividad'"
   [subtitle]="
     selectedEvent()
-      ? 'Modifica los datos del evento seleccionado.'
-      : 'Completa los datos para publicar un nuevo evento.'
+      ? 'Modifica los datos de la actividad seleccionada.'
+      : 'Completa los datos para publicar una nueva actividad.'
   "
   icon="solar:calendar-add-bold"
   [closeOnBackdrop]="false"
@@ -146,7 +146,7 @@
 
 @if (showDeleteConfirm()) {
   <app-confirm-modal
-    title="Eliminar evento"
+    title="Eliminar actividad"
     [message]="'¿Seguro que quieres eliminar “' + eventToDelete()?.title + '”?'"
     confirmText="Eliminar"
     cancelText="Cancelar"

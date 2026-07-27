@@ -1,11 +1,12 @@
+import { DatePipe, DecimalPipe, NgClass } from '@angular/common';
 import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   computed,
   inject,
+  OnInit,
   signal,
 } from '@angular/core';
-import { DatePipe, DecimalPipe, NgClass } from '@angular/common';
 
 import {
   Experience,
@@ -13,6 +14,7 @@ import {
 } from '../../../../core/models/experiencies';
 import { ExperienceService } from '../../../../core/services/experience.service';
 import { ConfirmModalComponent } from '../../../../shared/components/status-modals/confirm-modal/confirm-modal.component';
+import { ErrorModalComponent } from '../../../../shared/components/status-modals/error-modal/error-modal.component';
 import { SuccessModalComponent } from '../../../../shared/components/status-modals/success-modal/success-modal.component';
 
 type ExperienceFilter = 'all' | ExperienceType;
@@ -21,16 +23,17 @@ type ExperienceFilter = 'all' | ExperienceType;
   selector: 'app-admin-experiences',
   imports: [
     DatePipe,
+    DecimalPipe,
     NgClass,
     ConfirmModalComponent,
     SuccessModalComponent,
-    DecimalPipe,
+    ErrorModalComponent,
   ],
   templateUrl: './admin-experiences.component.html',
   styleUrl: './admin-experiences.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AdminExperiencesComponent {
+export class AdminExperiencesComponent implements OnInit {
   private readonly experienceService = inject(ExperienceService);
 
   readonly selectedFilter = signal<ExperienceFilter>('all');
@@ -43,6 +46,10 @@ export class AdminExperiencesComponent {
   readonly showSuccessModal = signal(false);
   readonly successTitle = signal('');
   readonly successMessage = signal('');
+
+  readonly showErrorModal = signal(false);
+  readonly errorTitle = signal('');
+  readonly errorMessage = signal('');
 
   readonly filteredExperiences = computed(() => {
     const filter = this.selectedFilter();
@@ -71,8 +78,18 @@ export class AdminExperiencesComponent {
     return total / experiences.length;
   });
 
-  constructor() {
-    this.refreshExperiences();
+  ngOnInit(): void {
+    this.experienceService.loadExperiences().subscribe({
+      next: () => {
+        this.refreshExperiences();
+      },
+      error: () => {
+        this.showError(
+          'No se han podido cargar las experiencias',
+          'Ha ocurrido un error al obtener las experiencias. Inténtalo de nuevo más tarde.',
+        );
+      },
+    });
   }
 
   changeFilter(filter: ExperienceFilter): void {
@@ -89,6 +106,7 @@ export class AdminExperiencesComponent {
 
       case 'friendly-spaces':
         return 'Espacios amigos LM';
+
       case 'hospitals':
         return 'Voluntariado hospitalario';
     }
@@ -133,19 +151,33 @@ export class AdminExperiencesComponent {
       return;
     }
 
-    this.experienceService.deleteExperience(experience.id);
+    this.experienceService.deleteExperience(experience.id).subscribe({
+      next: () => {
+        this.refreshExperiences();
+        this.closeDeleteConfirm();
 
-    this.refreshExperiences();
-    this.closeDeleteConfirm();
+        this.showSuccess(
+          'Experiencia eliminada',
+          'La experiencia se ha eliminado correctamente.',
+        );
+      },
+      error: () => {
+        this.closeDeleteConfirm();
 
-    this.showSuccess(
-      'Experiencia eliminada',
-      'La experiencia se ha eliminado correctamente.',
-    );
+        this.showError(
+          'No se ha podido eliminar la experiencia',
+          'La experiencia no se ha eliminado. Inténtalo de nuevo.',
+        );
+      },
+    });
   }
 
   closeSuccessModal(): void {
     this.showSuccessModal.set(false);
+  }
+
+  closeErrorModal(): void {
+    this.showErrorModal.set(false);
   }
 
   private refreshExperiences(): void {
@@ -156,5 +188,11 @@ export class AdminExperiencesComponent {
     this.successTitle.set(title);
     this.successMessage.set(message);
     this.showSuccessModal.set(true);
+  }
+
+  private showError(title: string, message: string): void {
+    this.errorTitle.set(title);
+    this.errorMessage.set(message);
+    this.showErrorModal.set(true);
   }
 }

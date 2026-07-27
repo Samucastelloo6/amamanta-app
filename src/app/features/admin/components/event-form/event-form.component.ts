@@ -78,7 +78,6 @@ export class EventFormComponent implements OnChanges {
     const fieldOrder: (keyof AmamantaEvent)[] = [
       'title',
       'date',
-      'startTime',
       'location',
       'googleMapsUrl',
       'description',
@@ -133,6 +132,7 @@ export class EventFormComponent implements OnChanges {
 
   private getCleanEvent(): AmamantaEvent | CreateEventRequest {
     const title = this.cleanText(this.form.title);
+    const startTime = this.form.startTime.trim();
     const location = this.cleanText(this.form.location);
     const googleMapsUrl = this.form.googleMapsUrl.trim();
     const description = this.cleanText(this.form.description);
@@ -140,7 +140,7 @@ export class EventFormComponent implements OnChanges {
     const payload: CreateEventRequest = {
       title,
       date: this.form.date,
-      startTime: this.form.startTime,
+      startTime,
       location,
       googleMapsUrl,
       description,
@@ -161,19 +161,15 @@ export class EventFormComponent implements OnChanges {
     const errors: Partial<Record<keyof AmamantaEvent, string>> = {};
 
     if (!event.title) {
-      errors.title = 'Escribe el título del evento.';
+      errors.title = 'Escribe el título de la actividad.';
     }
 
     if (!event.date) {
-      errors.date = 'Selecciona la fecha del evento.';
-    }
-
-    if (!event.startTime) {
-      errors.startTime = 'Selecciona la hora del evento.';
+      errors.date = 'Selecciona la fecha de la actividad.';
     }
 
     if (!event.location) {
-      errors.location = 'Escribe el lugar donde se realizará el evento.';
+      errors.location = 'Escribe el lugar donde se realizará la actividad.';
     }
 
     if (!event.googleMapsUrl) {
@@ -181,7 +177,7 @@ export class EventFormComponent implements OnChanges {
     }
 
     if (!event.description) {
-      errors.description = 'Escribe una breve descripción del evento.';
+      errors.description = 'Escribe una breve descripción de la actividad.';
     }
 
     return errors;

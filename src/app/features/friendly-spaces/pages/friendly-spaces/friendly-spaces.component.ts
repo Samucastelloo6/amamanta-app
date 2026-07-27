@@ -1,4 +1,5 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { forkJoin } from 'rxjs';
 
 import {
   FriendlySpace,
@@ -20,19 +21,19 @@ import { FriendlySpaceFiltersListComponent } from '../../components/friendly-spa
   templateUrl: './friendly-spaces.component.html',
   styleUrl: './friendly-spaces.component.scss',
 })
-export class FriendlySpacesComponent {
+export class FriendlySpacesComponent implements OnInit {
   @ViewChild(ResourceMapComponent)
-  private resourceMap!: ResourceMapComponent<FriendlySpace>;
+  private resourceMap?: ResourceMapComponent<FriendlySpace>;
 
   readonly initialMapCenter: google.maps.LatLngLiteral = {
     lat: 39.1667,
     lng: -0.2525,
   };
 
-  readonly spaces: FriendlySpace[];
-  readonly categories: FriendlySpaceCategory[];
+  spaces: FriendlySpace[] = [];
+  categories: FriendlySpaceCategory[] = [];
 
-  displayedSpaces: FriendlySpace[];
+  displayedSpaces: FriendlySpace[] = [];
 
   selectedResource: FriendlySpace | null = null;
   userPosition: google.maps.LatLngLiteral | null = null;
@@ -41,10 +42,19 @@ export class FriendlySpacesComponent {
   constructor(
     private readonly friendlySpacesService: FriendlySpacesService,
     private readonly categoryService: FriendlySpaceCategoryService,
-  ) {
-    this.spaces = this.friendlySpacesService.getFriendlySpaces();
-    this.displayedSpaces = [...this.spaces];
-    this.categories = this.categoryService.getCategories();
+  ) {}
+
+  ngOnInit(): void {
+    forkJoin({
+      spaces: this.friendlySpacesService.loadFriendlySpaces(),
+      categories: this.categoryService.loadCategories(),
+    }).subscribe({
+      next: () => {
+        this.spaces = this.friendlySpacesService.getFriendlySpaces();
+        this.categories = this.categoryService.getCategories();
+        this.displayedSpaces = [...this.spaces];
+      },
+    });
   }
 
   onFilteredSpacesChanged(spaces: FriendlySpace[]): void {
@@ -73,7 +83,7 @@ export class FriendlySpacesComponent {
     });
 
     requestAnimationFrame(() => {
-      this.resourceMap.focusResource(space, 17);
+      this.resourceMap?.focusResource(space, 17);
     });
   }
 
@@ -87,7 +97,8 @@ export class FriendlySpacesComponent {
     }
 
     this.routeActive = true;
-    this.resourceMap.navigateToResource(this.selectedResource);
+
+    this.resourceMap?.navigateToResource(this.selectedResource);
   }
 
   updateUserPosition(position: google.maps.LatLngLiteral): void {

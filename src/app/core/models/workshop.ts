@@ -46,3 +46,6 @@ export interface Workshop {
 
   isActive: boolean;
 }
+export type CreateWorkshopRequest = Omit<Workshop, 'id'>;
+
+export type UpdateWorkshopRequest = Partial<CreateWorkshopRequest>;

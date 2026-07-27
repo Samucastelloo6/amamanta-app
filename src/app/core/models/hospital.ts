@@ -13,3 +13,7 @@ export interface Hospital {
 
   isActive: boolean;
 }
+
+export type CreateHospitalRequest = Omit<Hospital, 'id'>;
+
+export type UpdateHospitalRequest = Partial<CreateHospitalRequest>;

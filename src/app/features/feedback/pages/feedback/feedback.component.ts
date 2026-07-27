@@ -1,19 +1,27 @@
 import { NgClass } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import {
-  AppFeedback,
+  CreateFeedbackRequest,
   FeedbackCategory,
 } from '../../../../core/models/app-feedback';
 import { FeedbackService } from '../../../../core/services/feedback.service';
+import { ErrorModalComponent } from '../../../../shared/components/status-modals/error-modal/error-modal.component';
 import { SuccessModalComponent } from '../../../../shared/components/status-modals/success-modal/success-modal.component';
 import { WarningModalComponent } from '../../../../shared/components/status-modals/warning-modal/warning-modal.component';
 
 @Component({
   selector: 'app-feedback',
-  imports: [FormsModule, NgClass, SuccessModalComponent, WarningModalComponent],
+  imports: [
+    FormsModule,
+    NgClass,
+    SuccessModalComponent,
+    WarningModalComponent,
+    ErrorModalComponent,
+  ],
   templateUrl: './feedback.component.html',
   styleUrl: './feedback.component.scss',
 })
@@ -26,15 +34,20 @@ export class FeedbackComponent {
   positive = '';
   improvement = '';
 
+  isSubmitting = false;
+
   showSuccessModal = false;
   showWarningModal = false;
+  showErrorModal = false;
+
+  errorMessage = 'La valoración no se ha podido enviar. Inténtalo de nuevo.';
 
   readonly categories: FeedbackCategory[] = [
     'Toda la aplicación',
-    'Salas universitarias',
-    'Talleres',
-    'Espacios amigos',
-    'Eventos',
+    'Salas lactancia UV',
+    'Talleres LM',
+    'Espacios amigos LM',
+    'Actividades',
     'Facilidad de uso',
   ];
 
@@ -92,32 +105,51 @@ export class FeedbackComponent {
   }
 
   sendFeedback(): void {
-    if (this.rating === 0) {
-      this.showWarningModal = true;
+    if (this.rating === 0 || this.isSubmitting) {
+      if (this.rating === 0) {
+        this.showWarningModal = true;
+      }
+
       return;
     }
 
     const positive = this.cleanText(this.positive);
     const improvement = this.cleanText(this.improvement);
 
-    const feedback: AppFeedback = {
-      id: this.generateId(),
+    const payload: CreateFeedbackRequest = {
       rating: this.rating,
       categories: [...this.selectedCategories],
-      date: new Date().toISOString(),
-      isReviewed: false,
+
+      ...(positive
+        ? {
+            positive,
+          }
+        : {}),
+
+      ...(improvement
+        ? {
+            improvement,
+          }
+        : {}),
     };
 
-    if (positive) {
-      feedback.positive = positive;
-    }
+    this.isSubmitting = true;
 
-    if (improvement) {
-      feedback.improvement = improvement;
-    }
+    this.feedbackService.addFeedback(payload).subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.showSuccessModal = true;
+      },
+      error: (error: HttpErrorResponse) => {
+        this.isSubmitting = false;
 
-    this.feedbackService.addFeedback(feedback);
-    this.showSuccessModal = true;
+        this.errorMessage =
+          error.error?.error?.message ??
+          'La valoración no se ha podido enviar. Inténtalo de nuevo.';
+
+        this.showErrorModal = true;
+      },
+    });
   }
 
   closeWarningModal(): void {
@@ -129,6 +161,10 @@ export class FeedbackComponent {
     this.resetForm();
 
     this.router.navigate(['/']);
+  }
+
+  closeErrorModal(): void {
+    this.showErrorModal = false;
   }
 
   private resetForm(): void {
@@ -143,9 +179,5 @@ export class FeedbackComponent {
       .trim()
       .replace(/\s+/g, ' ')
       .replace(/\s([,.])/g, '$1');
-  }
-
-  private generateId(): string {
-    return `valoracion-${Date.now()}`;
   }
 }

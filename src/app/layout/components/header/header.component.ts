@@ -17,6 +17,6 @@ export class HeaderComponent {
   readonly isAuthenticated = this.authService.isAuthenticated;
 
   adminRoute(): string {
-    return this.isAuthenticated() ? '/admin/eventos' : '/admin/login';
+    return this.isAuthenticated() ? '/admin/talleres' : '/admin/login';
   }
 }

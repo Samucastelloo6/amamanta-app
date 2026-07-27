@@ -7,7 +7,6 @@ import {
   ViewChild,
   OnInit,
 } from '@angular/core';
-import { DatePipe } from '@angular/common';
 import { EventsService } from '../../../../core/services/events.service';
 import {
   AmamantaEvent,
@@ -23,7 +22,6 @@ import { ErrorModalComponent } from '../../../../shared/components/status-modals
   selector: 'app-admin-events',
   standalone: true,
   imports: [
-    DatePipe,
     AppModalComponent,
     EventFormComponent,
     ConfirmModalComponent,

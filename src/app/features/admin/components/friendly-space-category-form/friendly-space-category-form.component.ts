@@ -9,8 +9,15 @@ import {
 import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { FriendlySpaceCategory } from '../../../../core/models/friendly-space';
+import {
+  CreateFriendlySpaceCategoryRequest,
+  FriendlySpaceCategory,
+} from '../../../../core/models/friendly-space';
 import { WarningModalComponent } from '../../../../shared/components/status-modals/warning-modal/warning-modal.component';
+
+type FriendlySpaceCategoryFormValue = Omit<FriendlySpaceCategory, 'id'> & {
+  id?: string;
+};
 
 @Component({
   selector: 'app-friendly-space-category-form',
@@ -20,10 +27,13 @@ import { WarningModalComponent } from '../../../../shared/components/status-moda
 export class FriendlySpaceCategoryFormComponent implements OnChanges {
   @Input() category: FriendlySpaceCategory | null = null;
 
-  @Output() saved = new EventEmitter<FriendlySpaceCategory>();
+  @Output() saved = new EventEmitter<
+    FriendlySpaceCategory | CreateFriendlySpaceCategoryRequest
+  >();
+
   @Output() cancelled = new EventEmitter<void>();
 
-  form: FriendlySpaceCategory = this.getEmptyForm();
+  form: FriendlySpaceCategoryFormValue = this.getEmptyForm();
 
   fieldErrors: Partial<Record<keyof FriendlySpaceCategory, string>> = {};
 
@@ -44,12 +54,13 @@ export class FriendlySpaceCategoryFormComponent implements OnChanges {
     if (Object.keys(this.fieldErrors).length > 0) {
       this.warningMessage =
         'Escribe un nombre para la categoría antes de continuar.';
+
       this.showWarningModal = true;
+
       return;
     }
 
     this.saved.emit(cleanCategory);
-    this.resetForm();
   }
 
   cancel(): void {
@@ -67,10 +78,34 @@ export class FriendlySpaceCategoryFormComponent implements OnChanges {
 
   closeWarningModal(): void {
     this.showWarningModal = false;
+    this.focusFirstInvalidField();
+  }
 
-    setTimeout(() => {
-      document.querySelector<HTMLInputElement>('[name="name"]')?.focus();
-    });
+  applyServerErrors(fields: Record<string, string>): string {
+    const normalizedErrors: Partial<
+      Record<keyof FriendlySpaceCategory, string>
+    > = {};
+
+    for (const [backendField, message] of Object.entries(fields)) {
+      const rootField = backendField.split('.')[0];
+
+      if (this.isCategoryField(rootField)) {
+        normalizedErrors[rootField] = message;
+      }
+    }
+
+    this.fieldErrors = {
+      ...this.fieldErrors,
+      ...normalizedErrors,
+    };
+
+    return (
+      Object.values(normalizedErrors)[0] ?? 'Revisa los datos de la categoría.'
+    );
+  }
+
+  focusFirstError(): void {
+    this.focusFirstInvalidField();
   }
 
   private loadForm(): void {
@@ -88,27 +123,31 @@ export class FriendlySpaceCategoryFormComponent implements OnChanges {
     this.showWarningModal = false;
   }
 
-  private getEmptyForm(): FriendlySpaceCategory {
+  private getEmptyForm(): FriendlySpaceCategoryFormValue {
     return {
-      id: '',
       name: '',
       isActive: true,
     };
   }
 
-  private getCleanCategory(): FriendlySpaceCategory {
-    const name = this.cleanText(this.form.name);
-
-    return {
-      ...this.form,
-      id: this.form.id || this.generateId(name),
-      name,
+  private getCleanCategory():
+    | FriendlySpaceCategory
+    | CreateFriendlySpaceCategoryRequest {
+    const payload: CreateFriendlySpaceCategoryRequest = {
+      name: this.cleanText(this.form.name),
       isActive: !!this.form.isActive,
     };
+
+    return this.form.id
+      ? {
+          id: this.form.id,
+          ...payload,
+        }
+      : payload;
   }
 
   private getFieldErrors(
-    category: FriendlySpaceCategory,
+    category: CreateFriendlySpaceCategoryRequest,
   ): Partial<Record<keyof FriendlySpaceCategory, string>> {
     const errors: Partial<Record<keyof FriendlySpaceCategory, string>> = {};
 
@@ -119,6 +158,29 @@ export class FriendlySpaceCategoryFormComponent implements OnChanges {
     return errors;
   }
 
+  private focusFirstInvalidField(): void {
+    const firstInvalidField = (
+      ['name'] as (keyof FriendlySpaceCategory)[]
+    ).find((field) => this.fieldErrors[field]);
+
+    if (!firstInvalidField) {
+      return;
+    }
+
+    setTimeout(() => {
+      const element = document.querySelector<HTMLElement>(
+        `[name="${firstInvalidField}"]`,
+      );
+
+      element?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+
+      element?.focus();
+    });
+  }
+
   private cleanText(value: string): string {
     return value
       .trim()
@@ -126,14 +188,9 @@ export class FriendlySpaceCategoryFormComponent implements OnChanges {
       .replace(/\s([,.])/g, '$1');
   }
 
-  private generateId(name: string): string {
-    const normalizedName = name
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '');
+  private isCategoryField(value: string): value is keyof FriendlySpaceCategory {
+    const fields: (keyof FriendlySpaceCategory)[] = ['id', 'name', 'isActive'];
 
-    return `categoria-${normalizedName}-${Date.now()}`;
+    return fields.includes(value as keyof FriendlySpaceCategory);
   }
 }

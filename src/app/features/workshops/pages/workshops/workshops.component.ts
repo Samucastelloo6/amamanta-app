@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { Workshop } from '../../../../core/models/workshop';
@@ -19,7 +19,7 @@ import { WorkshopWeekCalendarComponent } from '../../components/workshop-week-ca
   templateUrl: './workshops.component.html',
   styleUrl: './workshops.component.scss',
 })
-export class WorkshopsComponent implements AfterViewInit {
+export class WorkshopsComponent implements OnInit, AfterViewInit {
   @ViewChild(ResourceMapComponent)
   private resourceMap?: ResourceMapComponent<Workshop>;
 
@@ -28,34 +28,31 @@ export class WorkshopsComponent implements AfterViewInit {
     lng: -0.3763,
   };
 
-  readonly workshops: Workshop[];
-  readonly mapWorkshops: Workshop[];
+  workshops: Workshop[] = [];
+  mapWorkshops: Workshop[] = [];
 
   selectedResource: Workshop | null = null;
   userPosition: google.maps.LatLngLiteral | null = null;
   routeActive = false;
 
+  private viewInitialized = false;
+  private workshopIdFromRoute: string | null = null;
+
   constructor(
     private readonly workshopService: WorkshopService,
     private readonly route: ActivatedRoute,
-  ) {
-    this.workshops = this.workshopService.getWorkshops();
+  ) {}
 
-    this.mapWorkshops = this.workshops.filter(
-      (workshop) => workshop.mode !== 'online',
-    );
+  ngOnInit(): void {
+    this.workshopIdFromRoute =
+      this.route.snapshot.queryParamMap.get('workshopId');
+
+    this.loadWorkshops();
   }
 
   ngAfterViewInit(): void {
-    const workshopId = this.route.snapshot.queryParamMap.get('workshopId');
-
-    if (!workshopId) {
-      return;
-    }
-
-    setTimeout(() => {
-      this.openWorkshopFromEvent(workshopId);
-    });
+    this.viewInitialized = true;
+    this.openWorkshopFromRouteWhenReady();
   }
 
   selectResource(workshop: Workshop): void {
@@ -89,6 +86,7 @@ export class WorkshopsComponent implements AfterViewInit {
       this.resourceMap?.focusResource(workshop, 16);
     });
   }
+
   closeCard(): void {
     this.selectedResource = null;
     this.routeActive = false;
@@ -114,12 +112,42 @@ export class WorkshopsComponent implements AfterViewInit {
     this.userPosition = position;
   }
 
+  private loadWorkshops(): void {
+    this.workshopService.loadWorkshops().subscribe({
+      next: () => {
+        this.workshops = this.workshopService.getWorkshops();
+
+        this.mapWorkshops = this.workshops.filter(
+          (workshop) => workshop.mode !== 'online',
+        );
+
+        this.openWorkshopFromRouteWhenReady();
+      },
+    });
+  }
+
+  private openWorkshopFromRouteWhenReady(): void {
+    if (
+      !this.viewInitialized ||
+      !this.workshopIdFromRoute ||
+      this.workshops.length === 0
+    ) {
+      return;
+    }
+
+    const workshopId = this.workshopIdFromRoute;
+
+    this.workshopIdFromRoute = null;
+
+    setTimeout(() => {
+      this.openWorkshopFromEvent(workshopId);
+    });
+  }
+
   private openWorkshopFromEvent(workshopId: string): void {
     const workshop = this.workshops.find((item) => item.id === workshopId);
 
     if (!workshop) {
-      console.warn('No se ha encontrado el taller:', workshopId);
-
       this.resourceMap?.fitMapToMarkers();
       return;
     }

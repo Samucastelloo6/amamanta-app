@@ -133,3 +133,12 @@
     </div>
   </div>
 </section>
+
+@if (showErrorModal) {
+  <app-error-modal
+    title="No se han podido cargar las experiencias"
+    message="Las experiencias no están disponibles en este momento. Inténtalo de nuevo más tarde."
+    buttonText="Aceptar"
+    (close)="closeErrorModal()"
+  />
+}

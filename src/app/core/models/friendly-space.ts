@@ -15,3 +15,15 @@ export interface FriendlySpace {
   description?: string;
   isActive: boolean;
 }
+
+export type CreateFriendlySpaceCategoryRequest = Omit<
+  FriendlySpaceCategory,
+  'id'
+>;
+
+export type UpdateFriendlySpaceCategoryRequest =
+  Partial<CreateFriendlySpaceCategoryRequest>;
+
+export type CreateFriendlySpaceRequest = Omit<FriendlySpace, 'id'>;
+
+export type UpdateFriendlySpaceRequest = Partial<CreateFriendlySpaceRequest>;

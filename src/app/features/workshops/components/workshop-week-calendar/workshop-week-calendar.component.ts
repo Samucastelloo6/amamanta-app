@@ -31,9 +31,13 @@ export class WorkshopWeekCalendarComponent {
   }
 
   getWorkshopsByDayAndTime(day: DayFilter, time: WorkshopTime): Workshop[] {
-    return this.filteredWorkshops.filter(
-      (workshop) => workshop.day === day && workshop.time === time,
-    );
+    return this.filteredWorkshops
+      .filter((workshop) => workshop.day === day && workshop.time === time)
+      .sort(
+        (a, b) =>
+          this.getScheduleMinutes(a.schedule) -
+          this.getScheduleMinutes(b.schedule),
+      );
   }
 
   selectWorkshop(workshop: Workshop): void {
@@ -71,5 +75,17 @@ export class WorkshopWeekCalendarComponent {
   }
   private toRadians(value: number): number {
     return (value * Math.PI) / 180;
+  }
+  private getScheduleMinutes(schedule: string): number {
+    const match = schedule.match(/(\d{1,2}):(\d{2})/);
+
+    if (!match) {
+      return Number.MAX_SAFE_INTEGER;
+    }
+
+    const hours = Number(match[1]);
+    const minutes = Number(match[2]);
+
+    return hours * 60 + minutes;
   }
 }

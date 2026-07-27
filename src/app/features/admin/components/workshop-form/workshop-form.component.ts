@@ -9,8 +9,16 @@ import {
 import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { Workshop, WorkshopContact } from '../../../../core/models/workshop';
+import {
+  CreateWorkshopRequest,
+  Workshop,
+  WorkshopContact,
+} from '../../../../core/models/workshop';
 import { WarningModalComponent } from '../../../../shared/components/status-modals/warning-modal/warning-modal.component';
+
+type WorkshopFormValue = Omit<Workshop, 'id'> & {
+  id?: string;
+};
 
 @Component({
   selector: 'app-workshop-form',
@@ -20,7 +28,8 @@ import { WarningModalComponent } from '../../../../shared/components/status-moda
 export class WorkshopFormComponent implements OnChanges {
   @Input() workshop: Workshop | null = null;
 
-  @Output() saved = new EventEmitter<Workshop>();
+  @Output() saved = new EventEmitter<Workshop | CreateWorkshopRequest>();
+
   @Output() cancelled = new EventEmitter<void>();
 
   showWarningModal = false;
@@ -30,7 +39,7 @@ export class WorkshopFormComponent implements OnChanges {
 
   fieldErrors: Partial<Record<keyof Workshop, string>> = {};
 
-  form: Workshop = this.getEmptyForm();
+  form: WorkshopFormValue = this.getEmptyForm();
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['workshop']) {
@@ -46,12 +55,13 @@ export class WorkshopFormComponent implements OnChanges {
     if (Object.keys(this.fieldErrors).length > 0) {
       this.warningMessage =
         'Hay campos obligatorios sin completar. Revisa los campos marcados en rojo.';
+
       this.showWarningModal = true;
+
       return;
     }
 
     this.saved.emit(cleanWorkshop);
-    this.resetForm();
   }
 
   cancel(): void {
@@ -89,6 +99,35 @@ export class WorkshopFormComponent implements OnChanges {
     delete this.fieldErrors.latitude;
     delete this.fieldErrors.longitude;
   }
+  applyServerErrors(fields: Record<string, string>): string {
+    const normalizedErrors: Partial<Record<keyof Workshop, string>> = {};
+
+    for (const [backendField, message] of Object.entries(fields)) {
+      const rootField = backendField.split('.')[0];
+
+      const formField =
+        rootField === 'longitude'
+          ? 'latitude'
+          : rootField.startsWith('contacts')
+            ? 'contacts'
+            : rootField;
+
+      if (this.isWorkshopField(formField)) {
+        normalizedErrors[formField] = message;
+      }
+    }
+
+    this.fieldErrors = {
+      ...this.fieldErrors,
+      ...normalizedErrors,
+    };
+
+    return Object.values(normalizedErrors)[0] ?? 'Revisa los datos del taller.';
+  }
+
+  focusFirstError(): void {
+    this.focusFirstInvalidField();
+  }
 
   closeWarningModal(): void {
     this.showWarningModal = false;
@@ -107,7 +146,11 @@ export class WorkshopFormComponent implements OnChanges {
 
       this.clearFieldError('address');
       this.clearCoordinatesError();
-    } else if (this.form.address === 'Online mediante Zoom') {
+
+      return;
+    }
+
+    if (this.form.address === 'Online mediante Zoom') {
       this.form.address = '';
     }
   }
@@ -117,6 +160,7 @@ export class WorkshopFormComponent implements OnChanges {
 
     if (this.form.status === 'temporarily_closed') {
       this.form.closureType ??= 'specific_days';
+
       return;
     }
 
@@ -135,12 +179,17 @@ export class WorkshopFormComponent implements OnChanges {
         ...this.workshop,
         mode: this.workshop.mode ?? 'presential',
         status: this.workshop.status ?? 'open',
+
         closureType:
           this.workshop.status === 'temporarily_closed'
             ? (this.workshop.closureType ?? 'specific_days')
             : undefined,
+
         closureMessage: this.workshop.closureMessage ?? '',
-        contacts: this.workshop.contacts.map((contact) => ({ ...contact })),
+
+        contacts: this.workshop.contacts.map((contact) => ({
+          ...contact,
+        })),
       };
 
       this.coordinates =
@@ -162,9 +211,8 @@ export class WorkshopFormComponent implements OnChanges {
     this.showWarningModal = false;
   }
 
-  private getEmptyForm(): Workshop {
+  private getEmptyForm(): WorkshopFormValue {
     return {
-      id: '',
       name: '',
       address: '',
       latitude: 0,
@@ -183,7 +231,7 @@ export class WorkshopFormComponent implements OnChanges {
     };
   }
 
-  private getCleanWorkshop(): Workshop {
+  private getCleanWorkshop(): Workshop | CreateWorkshopRequest {
     const name = this.cleanText(this.form.name);
     const mode = this.form.mode ?? 'presential';
     const status = this.form.status ?? 'open';
@@ -198,36 +246,54 @@ export class WorkshopFormComponent implements OnChanges {
       }))
       .filter((contact) => contact.name || contact.phone);
 
-    return {
-      ...this.form,
-      id: this.form.id || this.generateId(name),
+    const payload: CreateWorkshopRequest = {
       name,
+
       address:
         mode === 'online'
           ? 'Online mediante Zoom'
           : this.cleanText(this.form.address),
+
       latitude: mode === 'online' ? 0 : (parsedCoordinates?.latitude ?? 0),
+
       longitude: mode === 'online' ? 0 : (parsedCoordinates?.longitude ?? 0),
+
       googleMapsUrl: mode === 'online' ? '' : this.form.googleMapsUrl.trim(),
+
+      day: this.form.day,
+      time: this.form.time,
       schedule: this.cleanText(this.form.schedule),
+
       contacts,
+
       notes: this.cleanText(this.form.notes ?? ''),
+
       mode,
       status,
+
       closureType:
         status === 'temporarily_closed'
           ? (this.form.closureType ?? 'specific_days')
           : undefined,
+
       closureMessage:
         status === 'temporarily_closed'
           ? this.cleanText(this.form.closureMessage ?? '')
           : '',
+
       isActive: !!this.form.isActive,
     };
+
+    return this.form.id
+      ? {
+          id: this.form.id,
+          ...payload,
+        }
+      : payload;
   }
 
   private getFieldErrors(
-    workshop: Workshop,
+    workshop: CreateWorkshopRequest,
   ): Partial<Record<keyof Workshop, string>> {
     const errors: Partial<Record<keyof Workshop, string>> = {};
 
@@ -315,10 +381,11 @@ export class WorkshopFormComponent implements OnChanges {
       'schedule',
       'address',
       'latitude',
+      'googleMapsUrl',
       'contacts',
+      'closureType',
       'closureMessage',
     ];
-
     const firstInvalidField = fieldOrder.find(
       (field) => this.fieldErrors[field],
     );
@@ -348,12 +415,26 @@ export class WorkshopFormComponent implements OnChanges {
       .replace(/\s([,.])/g, '$1');
   }
 
-  private generateId(name: string): string {
-    return `taller-${name
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '')}-${Date.now()}`;
+  private isWorkshopField(value: string): value is keyof Workshop {
+    const workshopFields: (keyof Workshop)[] = [
+      'id',
+      'name',
+      'address',
+      'latitude',
+      'longitude',
+      'googleMapsUrl',
+      'day',
+      'time',
+      'schedule',
+      'contacts',
+      'notes',
+      'mode',
+      'status',
+      'closureType',
+      'closureMessage',
+      'isActive',
+    ];
+
+    return workshopFields.includes(value as keyof Workshop);
   }
 }

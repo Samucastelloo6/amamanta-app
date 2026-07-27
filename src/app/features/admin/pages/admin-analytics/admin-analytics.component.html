@@ -1,0 +1,638 @@
+<section class="space-y-5">
+  <header
+    class="rounded-[24px] border border-[#eadff5] bg-white p-4 shadow-lg shadow-purple-100/60 sm:rounded-[28px] sm:p-5"
+  >
+    <div class="flex items-start gap-4">
+      <span
+        class="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-[#f4eafa] text-[#8f50c4]"
+      >
+        <iconify-icon icon="solar:chart-2-bold" class="text-2xl"></iconify-icon>
+      </span>
+
+      <div class="min-w-0">
+        <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#8f50c4]">
+          Estadísticas de uso
+        </p>
+
+        <h1
+          class="mt-1 text-2xl font-black tracking-tight text-zinc-900 sm:text-3xl"
+        >
+          Analítica
+        </h1>
+
+        <p class="mt-2 max-w-3xl text-sm leading-6 text-zinc-500">
+          Consulta la evolución de las visitas y descubre qué apartados de la
+          aplicación utilizan más las familias.
+        </p>
+      </div>
+    </div>
+  </header>
+  <section
+    class="rounded-[24px] border border-[#eadff5] bg-white p-4 shadow-lg shadow-purple-100/50 sm:p-5"
+  >
+    <div class="flex items-start gap-3">
+      <span
+        class="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-[#f4eafa] text-[#8f50c4]"
+      >
+        <iconify-icon icon="solar:pulse-bold" class="text-xl"></iconify-icon>
+      </span>
+
+      <div>
+        <p
+          class="text-xs font-black uppercase tracking-[0.16em] text-[#8f50c4]"
+        >
+          Resumen actual
+        </p>
+
+        <h2 class="mt-1 text-xl font-black text-zinc-900">
+          Estado de la aplicación
+        </h2>
+
+        <p class="mt-1 text-sm text-zinc-500">
+          Consulta de un vistazo las visitas registradas hoy, este mes y durante
+          el año actual.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  @if (currentAnalytics(); as current) {
+    <section class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <article
+        class="relative overflow-hidden rounded-[22px] border border-[#eadff5] bg-white p-4 shadow-lg shadow-purple-100/50"
+      >
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p
+              class="text-[10px] font-black uppercase tracking-[0.14em] text-zinc-500"
+            >
+              Visitas hoy
+            </p>
+
+            <p class="mt-2 text-3xl font-black text-[#8f50c4]">
+              {{ current.today.visits }}
+            </p>
+          </div>
+
+          <span
+            class="flex size-10 items-center justify-center rounded-2xl bg-[#f4eafa] text-[#8f50c4]"
+          >
+            <iconify-icon icon="solar:eye-bold" class="text-xl"></iconify-icon>
+          </span>
+        </div>
+
+        <p class="mt-3 text-xs font-semibold text-zinc-400">
+          Entradas registradas durante el día de hoy.
+        </p>
+      </article>
+
+      <article
+        class="relative overflow-hidden rounded-[22px] border border-green-100 bg-white p-4 shadow-lg shadow-green-100/50"
+      >
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p
+              class="text-[10px] font-black uppercase tracking-[0.14em] text-zinc-500"
+            >
+              Visitas este mes
+            </p>
+
+            <p class="mt-2 text-3xl font-black text-[#4aa84f]">
+              {{ current.currentMonth.visits }}
+            </p>
+          </div>
+
+          <span
+            class="flex size-10 items-center justify-center rounded-2xl bg-green-50 text-[#4aa84f]"
+          >
+            <iconify-icon
+              icon="solar:calendar-bold"
+              class="text-xl"
+            ></iconify-icon>
+          </span>
+        </div>
+
+        <p class="mt-3 text-xs font-semibold text-zinc-400">
+          Total acumulado durante el mes actual.
+        </p>
+      </article>
+
+      <article
+        class="relative overflow-hidden rounded-[22px] border border-sky-100 bg-white p-4 shadow-lg shadow-sky-100/50"
+      >
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p
+              class="text-[10px] font-black uppercase tracking-[0.14em] text-zinc-500"
+            >
+              Visitas este año
+            </p>
+
+            <p class="mt-2 text-3xl font-black text-sky-600">
+              {{ current.currentYear.visits }}
+            </p>
+          </div>
+
+          <span
+            class="flex size-10 items-center justify-center rounded-2xl bg-sky-50 text-sky-600"
+          >
+            <iconify-icon
+              icon="solar:chart-square-bold"
+              class="text-xl"
+            ></iconify-icon>
+          </span>
+        </div>
+
+        <p class="mt-3 text-xs font-semibold text-zinc-400">
+          Total acumulado durante el año actual.
+        </p>
+      </article>
+
+      <article
+        class="relative overflow-hidden rounded-[22px] border border-amber-100 bg-white p-4 shadow-lg shadow-amber-100/50"
+      >
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p
+              class="text-[10px] font-black uppercase tracking-[0.14em] text-zinc-500"
+            >
+              Páginas vistas este mes
+            </p>
+
+            <p class="mt-2 text-3xl font-black text-amber-600">
+              {{ current.currentMonth.pageViews }}
+            </p>
+          </div>
+
+          <span
+            class="flex size-10 items-center justify-center rounded-2xl bg-amber-50 text-amber-600"
+          >
+            <iconify-icon
+              icon="solar:document-bold"
+              class="text-xl"
+            ></iconify-icon>
+          </span>
+        </div>
+
+        <p class="mt-3 text-xs font-semibold text-zinc-400">
+          Secciones públicas abiertas durante el mes actual.
+        </p>
+      </article>
+    </section>
+  }
+  @if (isLoading() && !currentAnalytics()) {
+    <section
+      class="rounded-[24px] border border-[#eadff5] bg-white p-10 text-center shadow-lg shadow-purple-100/50"
+    >
+      <span
+        class="mx-auto flex size-12 items-center justify-center rounded-2xl bg-[#f4eafa] text-[#8f50c4]"
+      >
+        <iconify-icon
+          icon="solar:refresh-circle-bold"
+          class="animate-spin text-2xl"
+        ></iconify-icon>
+      </span>
+
+      <p class="mt-4 text-sm font-bold text-zinc-500">
+        Cargando estadísticas...
+      </p>
+    </section>
+  }
+
+  <section
+    class="flex flex-col gap-4 rounded-[24px] border border-[#eadff5] bg-white p-4 shadow-lg shadow-purple-100/50 sm:flex-row sm:items-end sm:justify-between sm:p-5"
+  >
+    <div>
+      <p class="text-xs font-black uppercase tracking-[0.16em] text-[#8f50c4]">
+        Histórico
+      </p>
+
+      <h2 class="mt-1 text-lg font-black text-zinc-900">
+        Consultar otro periodo
+      </h2>
+
+      <p class="mt-1 text-sm text-zinc-500">
+        Selecciona un mes y un año para consultar las estadísticas guardadas.
+      </p>
+    </div>
+
+    <div class="grid gap-3 sm:grid-cols-2">
+      <div>
+        <label
+          for="analyticsMonth"
+          class="block text-xs font-black uppercase tracking-[0.12em] text-zinc-500"
+        >
+          Mes
+        </label>
+
+        <select
+          id="analyticsMonth"
+          class="mt-2 w-full min-w-40 rounded-2xl border border-[#eadff5] bg-[#fcfaff] px-4 py-3 text-sm font-extrabold text-zinc-700 outline-none transition focus:border-[#8f50c4] focus:bg-white"
+          [value]="selectedMonth()"
+          (change)="changeMonth($event)"
+        >
+          @for (month of months; track month.value) {
+            <option [value]="month.value">
+              {{ month.label }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <div>
+        <label
+          for="analyticsYear"
+          class="block text-xs font-black uppercase tracking-[0.12em] text-zinc-500"
+        >
+          Año
+        </label>
+
+        <select
+          id="analyticsYear"
+          class="mt-2 w-full min-w-32 rounded-2xl border border-[#eadff5] bg-[#fcfaff] px-4 py-3 text-sm font-extrabold text-zinc-700 outline-none transition focus:border-[#8f50c4] focus:bg-white"
+          [value]="selectedYear()"
+          (change)="changeYear($event)"
+        >
+          @for (year of years; track year) {
+            <option [value]="year">
+              {{ year }}
+            </option>
+          }
+        </select>
+      </div>
+    </div>
+  </section>
+
+  @if (historicalAnalytics(); as data) {
+    <section class="grid gap-3 sm:grid-cols-3">
+      <article
+        class="rounded-[22px] border border-green-100 bg-white p-4 shadow-lg shadow-green-100/50"
+      >
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p
+              class="text-[10px] font-black uppercase tracking-[0.14em] text-zinc-500"
+            >
+              Visitas del periodo
+            </p>
+
+            <p class="mt-2 text-3xl font-black text-[#4aa84f]">
+              {{ data.currentMonth.visits }}
+            </p>
+          </div>
+
+          <span
+            class="flex size-10 items-center justify-center rounded-2xl bg-green-50 text-[#4aa84f]"
+          >
+            <iconify-icon
+              icon="solar:calendar-bold"
+              class="text-xl"
+            ></iconify-icon>
+          </span>
+        </div>
+
+        <p class="mt-3 text-xs font-semibold text-zinc-400">
+          {{ getSelectedMonthLabel() }} de {{ selectedYear() }}.
+        </p>
+      </article>
+
+      <article
+        class="rounded-[22px] border border-amber-100 bg-white p-4 shadow-lg shadow-amber-100/50"
+      >
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p
+              class="text-[10px] font-black uppercase tracking-[0.14em] text-zinc-500"
+            >
+              Páginas vistas del periodo
+            </p>
+
+            <p class="mt-2 text-3xl font-black text-amber-600">
+              {{ data.currentMonth.pageViews }}
+            </p>
+          </div>
+
+          <span
+            class="flex size-10 items-center justify-center rounded-2xl bg-amber-50 text-amber-600"
+          >
+            <iconify-icon
+              icon="solar:document-bold"
+              class="text-xl"
+            ></iconify-icon>
+          </span>
+        </div>
+
+        <p class="mt-3 text-xs font-semibold text-zinc-400">
+          Secciones públicas abiertas durante el periodo.
+        </p>
+      </article>
+
+      <article
+        class="rounded-[22px] border border-sky-100 bg-white p-4 shadow-lg shadow-sky-100/50"
+      >
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p
+              class="text-[10px] font-black uppercase tracking-[0.14em] text-zinc-500"
+            >
+              Visitas en {{ selectedYear() }}
+            </p>
+
+            <p class="mt-2 text-3xl font-black text-sky-600">
+              {{ data.currentYear.visits }}
+            </p>
+          </div>
+
+          <span
+            class="flex size-10 items-center justify-center rounded-2xl bg-sky-50 text-sky-600"
+          >
+            <iconify-icon
+              icon="solar:chart-square-bold"
+              class="text-xl"
+            ></iconify-icon>
+          </span>
+        </div>
+
+        <p class="mt-3 text-xs font-semibold text-zinc-400">
+          Total acumulado durante el año seleccionado.
+        </p>
+      </article>
+    </section>
+    @if (mostVisitedSection(); as section) {
+      <section
+        class="rounded-[24px] border border-[#eadff5] bg-gradient-to-r from-[#faf5ff] to-white p-4 shadow-lg shadow-purple-100/50 sm:p-5"
+      >
+        <div
+          class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div class="flex items-center gap-4">
+            <span
+              class="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-[#8f50c4] text-white"
+            >
+              <iconify-icon
+                icon="solar:cup-star-bold"
+                class="text-2xl"
+              ></iconify-icon>
+            </span>
+
+            <div>
+              <p
+                class="text-[10px] font-black uppercase tracking-[0.14em] text-[#8f50c4]"
+              >
+                Sección destacada · {{ getSelectedMonthLabel() }}
+                {{ selectedYear() }}
+              </p>
+
+              <h2 class="mt-1 text-xl font-black text-zinc-900">
+                {{ getSectionLabel(section.section) }}
+              </h2>
+
+              <p class="mt-1 text-sm font-semibold text-zinc-500">
+                Es el apartado más consultado durante el periodo.
+              </p>
+            </div>
+          </div>
+
+          <div class="rounded-2xl bg-white px-5 py-3 text-center shadow-sm">
+            <p class="text-2xl font-black text-[#8f50c4]">
+              {{ section.visits }}
+            </p>
+
+            <p class="text-xs font-bold text-zinc-400">páginas vistas</p>
+          </div>
+        </div>
+      </section>
+    }
+
+    <section class="grid gap-5 xl:grid-cols-2">
+      <article
+        class="rounded-[24px] border border-[#eadff5] bg-white p-4 shadow-lg shadow-purple-100/50 sm:p-5"
+      >
+        <div class="flex items-start gap-3">
+          <span
+            class="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-[#f4eafa] text-[#8f50c4]"
+          >
+            <iconify-icon
+              icon="solar:graph-up-bold"
+              class="text-xl"
+            ></iconify-icon>
+          </span>
+
+          <div>
+            <p
+              class="text-xs font-black uppercase tracking-[0.16em] text-[#8f50c4]"
+            >
+              {{ getSelectedMonthLabel() }} {{ selectedYear() }}
+            </p>
+
+            <h2 class="mt-1 text-xl font-black text-zinc-900">
+              Evolución diaria
+            </h2>
+
+            <p class="mt-1 text-sm text-zinc-500">
+              Número de visitas registradas cada día.
+            </p>
+          </div>
+        </div>
+
+        @if (data.dailyHistory.length > 0) {
+          <div class="mt-6 overflow-x-auto pb-2">
+            <div
+              class="flex h-[280px] min-w-[650px] items-end gap-2 rounded-2xl bg-[#fcfaff] px-4 pt-5"
+            >
+              @for (item of data.dailyHistory; track item.date) {
+                <div
+                  class="flex h-full min-w-0 flex-1 flex-col items-center justify-end"
+                >
+                  <span class="mb-2 text-[10px] font-black text-[#8f50c4]">
+                    {{ item.visits }}
+                  </span>
+
+                  <div
+                    class="w-full max-w-8 rounded-t-xl bg-gradient-to-t from-[#7b3fb1] to-[#a96dd5] transition-all duration-300"
+                    [style.height.%]="getDailyBarHeight(item.visits)"
+                  ></div>
+
+                  <span class="mt-2 pb-3 text-[10px] font-bold text-zinc-400">
+                    {{ getDayLabel(item.date) }}
+                  </span>
+                </div>
+              }
+            </div>
+          </div>
+        } @else {
+          <div
+            class="mt-5 rounded-2xl bg-[#faf5ff] px-4 py-8 text-center text-sm font-semibold text-zinc-500"
+          >
+            No hay visitas registradas para este periodo.
+          </div>
+        }
+      </article>
+
+      <article
+        class="rounded-[24px] border border-green-100 bg-white p-4 shadow-lg shadow-green-100/50 sm:p-5"
+      >
+        <div class="flex items-start gap-3">
+          <span
+            class="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-green-50 text-[#4aa84f]"
+          >
+            <iconify-icon
+              icon="solar:chart-bold"
+              class="text-xl"
+            ></iconify-icon>
+          </span>
+
+          <div>
+            <p
+              class="text-xs font-black uppercase tracking-[0.16em] text-[#4aa84f]"
+            >
+              Año {{ selectedYear() }}
+            </p>
+
+            <h2 class="mt-1 text-xl font-black text-zinc-900">
+              Evolución mensual
+            </h2>
+
+            <p class="mt-1 text-sm text-zinc-500">
+              Comparación de visitas entre los meses del año.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-6 overflow-x-auto pb-2">
+          <div
+            class="flex h-[280px] min-w-[650px] items-end gap-3 rounded-2xl bg-[#f8fcf6] px-4 pt-5"
+          >
+            @for (item of data.monthlyHistory; track item.month) {
+              <div
+                class="flex h-full min-w-0 flex-1 flex-col items-center justify-end"
+              >
+                <span class="mb-2 text-[10px] font-black text-[#4aa84f]">
+                  {{ item.visits }}
+                </span>
+
+                <div
+                  class="w-full max-w-9 rounded-t-xl bg-gradient-to-t from-[#3d9142] to-[#72c878] transition-all duration-300"
+                  [style.height.%]="getMonthlyBarHeight(item.visits)"
+                ></div>
+
+                <span class="mt-2 pb-3 text-[10px] font-bold text-zinc-400">
+                  {{ getMonthLabel(item.month) }}
+                </span>
+              </div>
+            }
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section
+      class="rounded-[24px] border border-[#eadff5] bg-white p-4 shadow-lg shadow-purple-100/50 sm:p-5"
+    >
+      <div class="flex items-start gap-3">
+        <span
+          class="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-[#f4eafa] text-[#8f50c4]"
+        >
+          <iconify-icon
+            icon="solar:ranking-bold"
+            class="text-xl"
+          ></iconify-icon>
+        </span>
+
+        <div>
+          <p
+            class="text-xs font-black uppercase tracking-[0.16em] text-[#8f50c4]"
+          >
+            {{ getSelectedMonthLabel() }} {{ selectedYear() }}
+          </p>
+
+          <h2 class="mt-1 text-xl font-black text-zinc-900">
+            Secciones más visitadas
+          </h2>
+
+          <p class="mt-1 text-sm text-zinc-500">
+            Ranking de uso de los apartados públicos, sin incluir la página de
+            inicio.
+          </p>
+        </div>
+      </div>
+
+      @if (data.sectionRanking.length > 0) {
+        <div class="mt-5 grid gap-3 lg:grid-cols-2">
+          @for (
+            item of data.sectionRanking;
+            track item.section;
+            let index = $index
+          ) {
+            <article
+              class="rounded-2xl border border-[#eadff5] bg-[#fcfaff] px-4 py-4 transition hover:border-[#d8c4ea] hover:bg-white"
+            >
+              <div class="flex items-center justify-between gap-4">
+                <div class="flex min-w-0 items-center gap-3">
+                  <span
+                    class="flex size-10 shrink-0 items-center justify-center rounded-2xl"
+                    [class.bg-[#8f50c4]]="index === 0"
+                    [class.text-white]="index === 0"
+                    [class.bg-[#f4eafa]]="index !== 0"
+                    [class.text-[#8f50c4]]="index !== 0"
+                  >
+                    <iconify-icon
+                      [icon]="getRankingIcon(index)"
+                      class="text-xl"
+                    ></iconify-icon>
+                  </span>
+
+                  <span
+                    class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-white text-[#8f50c4] shadow-sm"
+                  >
+                    <iconify-icon
+                      [icon]="getSectionIcon(item.section)"
+                      class="text-lg"
+                    ></iconify-icon>
+                  </span>
+
+                  <div class="min-w-0">
+                    <h3 class="truncate text-sm font-black text-zinc-800">
+                      {{ getSectionLabel(item.section) }}
+                    </h3>
+
+                    <p class="mt-0.5 text-xs font-semibold text-zinc-500">
+                      {{ item.visits }}
+                      {{ item.visits === 1 ? "visita" : "visitas" }}
+                    </p>
+                  </div>
+                </div>
+
+                <span class="shrink-0 text-sm font-black text-[#8f50c4]">
+                  {{ item.percentage | number: "1.0-1" }} %
+                </span>
+              </div>
+
+              <div class="mt-4 h-2.5 overflow-hidden rounded-full bg-[#eadff5]">
+                <div
+                  class="h-full rounded-full bg-gradient-to-r from-[#8f50c4] to-[#a96dd5] transition-all duration-300"
+                  [style.width.%]="item.percentage"
+                ></div>
+              </div>
+            </article>
+          }
+        </div>
+      } @else {
+        <div
+          class="mt-5 rounded-2xl bg-[#faf5ff] px-4 py-8 text-center text-sm font-semibold text-zinc-500"
+        >
+          No hay secciones visitadas durante este periodo.
+        </div>
+      }
+    </section>
+  }
+</section>
+
+@if (showErrorModal()) {
+  <app-error-modal
+    [title]="errorTitle()"
+    [message]="errorMessage()"
+    buttonText="Aceptar"
+    (close)="closeErrorModal()"
+  />
+}

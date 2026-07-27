@@ -10,10 +10,15 @@ import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import {
+  CreateFriendlySpaceRequest,
   FriendlySpace,
   FriendlySpaceCategory,
 } from '../../../../core/models/friendly-space';
 import { WarningModalComponent } from '../../../../shared/components/status-modals/warning-modal/warning-modal.component';
+
+type FriendlySpaceFormValue = Omit<FriendlySpace, 'id'> & {
+  id?: string;
+};
 
 @Component({
   selector: 'app-friendly-space-form',
@@ -24,10 +29,13 @@ export class FriendlySpaceFormComponent implements OnChanges {
   @Input() space: FriendlySpace | null = null;
   @Input() categories: FriendlySpaceCategory[] = [];
 
-  @Output() saved = new EventEmitter<FriendlySpace>();
+  @Output() saved = new EventEmitter<
+    FriendlySpace | CreateFriendlySpaceRequest
+  >();
+
   @Output() cancelled = new EventEmitter<void>();
 
-  form: FriendlySpace = this.getEmptyForm();
+  form: FriendlySpaceFormValue = this.getEmptyForm();
 
   coordinates = '';
 
@@ -54,12 +62,13 @@ export class FriendlySpaceFormComponent implements OnChanges {
     if (Object.keys(this.fieldErrors).length > 0) {
       this.warningMessage =
         'Hay campos obligatorios sin completar. Revisa los campos marcados en rojo.';
+
       this.showWarningModal = true;
+
       return;
     }
 
     this.saved.emit(cleanSpace);
-    this.resetForm();
   }
 
   cancel(): void {
@@ -82,6 +91,34 @@ export class FriendlySpaceFormComponent implements OnChanges {
 
   closeWarningModal(): void {
     this.showWarningModal = false;
+    this.focusFirstInvalidField();
+  }
+
+  applyServerErrors(fields: Record<string, string>): string {
+    const normalizedErrors: Partial<Record<keyof FriendlySpace, string>> = {};
+
+    for (const [backendField, message] of Object.entries(fields)) {
+      const rootField = backendField.split('.')[0];
+
+      const formField = rootField === 'longitude' ? 'latitude' : rootField;
+
+      if (this.isFriendlySpaceField(formField)) {
+        normalizedErrors[formField] = message;
+      }
+    }
+
+    this.fieldErrors = {
+      ...this.fieldErrors,
+      ...normalizedErrors,
+    };
+
+    return (
+      Object.values(normalizedErrors)[0] ??
+      'Revisa los datos del espacio amigo.'
+    );
+  }
+
+  focusFirstError(): void {
     this.focusFirstInvalidField();
   }
 
@@ -110,9 +147,8 @@ export class FriendlySpaceFormComponent implements OnChanges {
     this.showWarningModal = false;
   }
 
-  private getEmptyForm(): FriendlySpace {
+  private getEmptyForm(): FriendlySpaceFormValue {
     return {
-      id: '',
       name: '',
       categoryId: this.getFirstAvailableCategoryId(),
       address: '',
@@ -132,26 +168,34 @@ export class FriendlySpaceFormComponent implements OnChanges {
     );
   }
 
-  private getCleanSpace(): FriendlySpace {
-    const name = this.cleanText(this.form.name);
+  private getCleanSpace(): FriendlySpace | CreateFriendlySpaceRequest {
     const coordinates = this.parseCoordinates();
 
-    return {
-      ...this.form,
-      id: this.form.id || this.generateId(name),
-      name,
+    const payload: CreateFriendlySpaceRequest = {
+      name: this.cleanText(this.form.name),
       categoryId: this.form.categoryId,
       address: this.cleanText(this.form.address),
+
       latitude: coordinates?.latitude ?? 0,
       longitude: coordinates?.longitude ?? 0,
+
       googleMapsUrl: this.form.googleMapsUrl.trim(),
+
       description: this.cleanText(this.form.description ?? ''),
+
       isActive: !!this.form.isActive,
     };
+
+    return this.form.id
+      ? {
+          id: this.form.id,
+          ...payload,
+        }
+      : payload;
   }
 
   private getFieldErrors(
-    space: FriendlySpace,
+    space: CreateFriendlySpaceRequest,
   ): Partial<Record<keyof FriendlySpace, string>> {
     const errors: Partial<Record<keyof FriendlySpace, string>> = {};
 
@@ -246,14 +290,19 @@ export class FriendlySpaceFormComponent implements OnChanges {
       .replace(/\s([,.])/g, '$1');
   }
 
-  private generateId(name: string): string {
-    const normalizedName = name
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '');
+  private isFriendlySpaceField(value: string): value is keyof FriendlySpace {
+    const fields: (keyof FriendlySpace)[] = [
+      'id',
+      'name',
+      'categoryId',
+      'address',
+      'latitude',
+      'longitude',
+      'googleMapsUrl',
+      'description',
+      'isActive',
+    ];
 
-    return `espacio-${normalizedName}-${Date.now()}`;
+    return fields.includes(value as keyof FriendlySpace);
   }
 }

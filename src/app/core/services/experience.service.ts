@@ -1,68 +1,72 @@
-import { Injectable, signal } from '@angular/core';
-import { Experience, ExperienceType } from '../models/experiencies';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { inject, Injectable, signal } from '@angular/core';
+import { tap } from 'rxjs';
+
+import { environment } from '../../../environments/environment';
+import {
+  CreateExperienceRequest,
+  Experience,
+  ExperienceType,
+} from '../models/experiencies';
+
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class ExperienceService {
-  private readonly experiences = signal<Experience[]>([
-    {
-      id: 'workshop-1',
-      type: 'workshops',
-      rating: 5,
-      text: 'Me sentí muy acompañada y pude resolver dudas que llevaba tiempo arrastrando.',
-      improvement: '',
-      date: '2026-06-12',
-    },
-    {
-      id: 'room-1',
-      type: 'rooms',
-      rating: 4,
-      text: 'La sala me permitió dar el pecho con tranquilidad en un momento en el que lo necesitaba.',
-      improvement: '',
-      date: '2026-06-15',
-    },
-    {
-      id: 'friendly-space-1',
-      type: 'friendly-spaces',
-      rating: 5,
-      text: 'Me atendieron con mucha naturalidad y me sentí cómoda lactando allí.',
-      improvement: '',
-      date: '2026-06-18',
-    },
-  ]);
+  private readonly http = inject(HttpClient);
+
+  private readonly apiUrl = `${environment.apiUrl}/experiences`;
+
+  private readonly experiences = signal<Experience[]>([]);
+
+  loadExperiences(type?: ExperienceType) {
+    let params = new HttpParams();
+
+    if (type) {
+      params = params.set('type', type);
+    }
+
+    return this.http
+      .get<ApiResponse<Experience[]>>(this.apiUrl, {
+        params,
+      })
+      .pipe(
+        tap((response) => {
+          this.experiences.set(response.data);
+        }),
+      );
+  }
 
   getByType(type: ExperienceType): Experience[] {
     return this.experiences()
       .filter((experience) => experience.type === type)
-      .sort((a, b) => b.date.localeCompare(a.date));
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }
 
   getAdminExperiences(): Experience[] {
-    return [...this.experiences()].sort((a, b) => b.date.localeCompare(a.date));
-  }
-
-  getExperienceById(experienceId: string): Experience | undefined {
-    return this.experiences().find(
-      (experience) => experience.id === experienceId,
+    return [...this.experiences()].sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
     );
   }
 
-  addExperience(experience: Experience): void {
-    this.experiences.update((experiences) => [experience, ...experiences]);
+  addExperience(payload: CreateExperienceRequest) {
+    return this.http.post<ApiResponse<Experience>>(this.apiUrl, payload);
   }
 
-  updateExperience(updatedExperience: Experience): void {
-    this.experiences.update((experiences) =>
-      experiences.map((experience) =>
-        experience.id === updatedExperience.id ? updatedExperience : experience,
-      ),
-    );
-  }
-
-  deleteExperience(experienceId: string): void {
-    this.experiences.update((experiences) =>
-      experiences.filter((experience) => experience.id !== experienceId),
-    );
+  deleteExperience(experienceId: string) {
+    return this.http
+      .delete<ApiResponse<Experience>>(`${this.apiUrl}/${experienceId}`)
+      .pipe(
+        tap(() => {
+          this.experiences.update((experiences) =>
+            experiences.filter((experience) => experience.id !== experienceId),
+          );
+        }),
+      );
   }
 }

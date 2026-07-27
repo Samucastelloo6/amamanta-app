@@ -12,3 +12,10 @@ export interface Experience {
   improvement?: string;
   date: string;
 }
+
+export interface CreateExperienceRequest {
+  type: ExperienceType;
+  rating: number;
+  text?: string;
+  improvement?: string;
+}

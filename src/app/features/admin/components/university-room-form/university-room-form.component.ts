@@ -9,8 +9,15 @@ import {
 import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { UniversityRoom } from '../../../../core/models/university-room';
+import {
+  CreateUniversityRoomRequest,
+  UniversityRoom,
+} from '../../../../core/models/university-room';
 import { WarningModalComponent } from '../../../../shared/components/status-modals/warning-modal/warning-modal.component';
+
+type UniversityRoomFormValue = Omit<UniversityRoom, 'id'> & {
+  id?: string;
+};
 
 @Component({
   selector: 'app-university-room-form',
@@ -20,10 +27,13 @@ import { WarningModalComponent } from '../../../../shared/components/status-moda
 export class UniversityRoomFormComponent implements OnChanges {
   @Input() room: UniversityRoom | null = null;
 
-  @Output() saved = new EventEmitter<UniversityRoom>();
+  @Output() saved = new EventEmitter<
+    UniversityRoom | CreateUniversityRoomRequest
+  >();
+
   @Output() cancelled = new EventEmitter<void>();
 
-  form: UniversityRoom = this.getEmptyForm();
+  form: UniversityRoomFormValue = this.getEmptyForm();
 
   coordinates = '';
 
@@ -46,12 +56,13 @@ export class UniversityRoomFormComponent implements OnChanges {
     if (Object.keys(this.fieldErrors).length > 0) {
       this.warningMessage =
         'Hay campos obligatorios sin completar. Revisa los campos marcados en rojo.';
+
       this.showWarningModal = true;
+
       return;
     }
 
     this.saved.emit(cleanRoom);
-    this.resetForm();
   }
 
   cancel(): void {
@@ -74,6 +85,34 @@ export class UniversityRoomFormComponent implements OnChanges {
 
   closeWarningModal(): void {
     this.showWarningModal = false;
+    this.focusFirstInvalidField();
+  }
+
+  applyServerErrors(fields: Record<string, string>): string {
+    const normalizedErrors: Partial<Record<keyof UniversityRoom, string>> = {};
+
+    for (const [backendField, message] of Object.entries(fields)) {
+      const rootField = backendField.split('.')[0];
+
+      const formField = rootField === 'longitude' ? 'latitude' : rootField;
+
+      if (this.isUniversityRoomField(formField)) {
+        normalizedErrors[formField] = message;
+      }
+    }
+
+    this.fieldErrors = {
+      ...this.fieldErrors,
+      ...normalizedErrors,
+    };
+
+    return (
+      Object.values(normalizedErrors)[0] ??
+      'Revisa los datos de la sala universitaria.'
+    );
+  }
+
+  focusFirstError(): void {
     this.focusFirstInvalidField();
   }
 
@@ -102,9 +141,8 @@ export class UniversityRoomFormComponent implements OnChanges {
     this.showWarningModal = false;
   }
 
-  private getEmptyForm(): UniversityRoom {
+  private getEmptyForm(): UniversityRoomFormValue {
     return {
-      id: '',
       name: '',
       address: '',
       latitude: 0,
@@ -115,25 +153,33 @@ export class UniversityRoomFormComponent implements OnChanges {
     };
   }
 
-  private getCleanRoom(): UniversityRoom {
-    const name = this.cleanText(this.form.name);
+  private getCleanRoom(): UniversityRoom | CreateUniversityRoomRequest {
     const coordinates = this.parseCoordinates();
 
-    return {
-      ...this.form,
-      id: this.form.id || this.generateId(name),
-      name,
+    const payload: CreateUniversityRoomRequest = {
+      name: this.cleanText(this.form.name),
       address: this.cleanText(this.form.address),
+
       latitude: coordinates?.latitude ?? 0,
       longitude: coordinates?.longitude ?? 0,
+
       googleMapsUrl: this.form.googleMapsUrl.trim(),
+
       description: this.cleanText(this.form.description ?? ''),
+
       isActive: !!this.form.isActive,
     };
+
+    return this.form.id
+      ? {
+          id: this.form.id,
+          ...payload,
+        }
+      : payload;
   }
 
   private getFieldErrors(
-    room: UniversityRoom,
+    room: CreateUniversityRoomRequest,
   ): Partial<Record<keyof UniversityRoom, string>> {
     const errors: Partial<Record<keyof UniversityRoom, string>> = {};
 
@@ -228,14 +274,18 @@ export class UniversityRoomFormComponent implements OnChanges {
       .replace(/\s([,.])/g, '$1');
   }
 
-  private generateId(name: string): string {
-    const normalizedName = name
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '');
+  private isUniversityRoomField(value: string): value is keyof UniversityRoom {
+    const fields: (keyof UniversityRoom)[] = [
+      'id',
+      'name',
+      'address',
+      'latitude',
+      'longitude',
+      'googleMapsUrl',
+      'description',
+      'isActive',
+    ];
 
-    return `sala-${normalizedName}-${Date.now()}`;
+    return fields.includes(value as keyof UniversityRoom);
   }
 }

@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { Hospital } from '../../../../core/models/hospital';
 import { HospitalService } from '../../../../core/services/hospital.service';
@@ -16,23 +16,29 @@ import { HospitalListComponent } from '../../components/hospital-list/hospital-l
   templateUrl: './hospitals.component.html',
   styleUrl: './hospitals.component.scss',
 })
-export class HospitalsComponent {
+export class HospitalsComponent implements OnInit {
   @ViewChild(ResourceMapComponent)
-  private resourceMap!: ResourceMapComponent<Hospital>;
+  private resourceMap?: ResourceMapComponent<Hospital>;
 
   readonly initialMapCenter: google.maps.LatLngLiteral = {
     lat: 39.4699,
     lng: -0.3763,
   };
 
-  readonly hospitals: Hospital[];
+  hospitals: Hospital[] = [];
 
   selectedResource: Hospital | null = null;
   userPosition: google.maps.LatLngLiteral | null = null;
   routeActive = false;
 
-  constructor(private readonly hospitalService: HospitalService) {
-    this.hospitals = this.hospitalService.getHospitals();
+  constructor(private readonly hospitalService: HospitalService) {}
+
+  ngOnInit(): void {
+    this.hospitalService.loadHospitals().subscribe({
+      next: () => {
+        this.hospitals = this.hospitalService.getHospitals();
+      },
+    });
   }
 
   selectResource(hospital: Hospital): void {
@@ -50,7 +56,7 @@ export class HospitalsComponent {
     });
 
     requestAnimationFrame(() => {
-      this.resourceMap.focusResource(hospital, 17);
+      this.resourceMap?.focusResource(hospital, 17);
     });
   }
 
@@ -58,7 +64,7 @@ export class HospitalsComponent {
     this.selectedResource = null;
     this.routeActive = false;
 
-    this.resourceMap.clearRoute();
+    this.resourceMap?.clearRoute();
   }
 
   navigateToResource(): void {
@@ -67,7 +73,8 @@ export class HospitalsComponent {
     }
 
     this.routeActive = true;
-    this.resourceMap.navigateToResource(this.selectedResource);
+
+    this.resourceMap?.navigateToResource(this.selectedResource);
   }
 
   updateUserPosition(position: google.maps.LatLngLiteral): void {

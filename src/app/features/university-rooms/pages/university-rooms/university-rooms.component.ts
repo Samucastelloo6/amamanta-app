@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { UniversityRoom } from '../../../../core/models/university-room';
 import { UniversityRoomService } from '../../../../core/services/universityRoom.service';
@@ -16,23 +16,29 @@ import { UniversityRoomListComponent } from '../../components/university-room-li
   templateUrl: './university-rooms.component.html',
   styleUrl: './university-rooms.component.scss',
 })
-export class UniversityRoomsComponent {
+export class UniversityRoomsComponent implements OnInit {
   @ViewChild(ResourceMapComponent)
-  private resourceMap!: ResourceMapComponent<UniversityRoom>;
+  private resourceMap?: ResourceMapComponent<UniversityRoom>;
 
   readonly initialMapCenter: google.maps.LatLngLiteral = {
     lat: 39.4699,
     lng: -0.3763,
   };
 
-  readonly rooms: UniversityRoom[];
+  rooms: UniversityRoom[] = [];
 
   selectedResource: UniversityRoom | null = null;
   userPosition: google.maps.LatLngLiteral | null = null;
   routeActive = false;
 
-  constructor(private readonly universityRoomsService: UniversityRoomService) {
-    this.rooms = this.universityRoomsService.getUniversityRooms();
+  constructor(private readonly universityRoomsService: UniversityRoomService) {}
+
+  ngOnInit(): void {
+    this.universityRoomsService.loadUniversityRooms().subscribe({
+      next: () => {
+        this.rooms = this.universityRoomsService.getUniversityRooms();
+      },
+    });
   }
 
   selectResource(room: UniversityRoom): void {
@@ -50,7 +56,7 @@ export class UniversityRoomsComponent {
     });
 
     requestAnimationFrame(() => {
-      this.resourceMap.focusResource(room, 17);
+      this.resourceMap?.focusResource(room, 17);
     });
   }
 
@@ -58,7 +64,7 @@ export class UniversityRoomsComponent {
     this.selectedResource = null;
     this.routeActive = false;
 
-    this.resourceMap.clearRoute();
+    this.resourceMap?.clearRoute();
   }
 
   navigateToResource(): void {
@@ -67,7 +73,8 @@ export class UniversityRoomsComponent {
     }
 
     this.routeActive = true;
-    this.resourceMap.navigateToResource(this.selectedResource);
+
+    this.resourceMap?.navigateToResource(this.selectedResource);
   }
 
   updateUserPosition(position: google.maps.LatLngLiteral): void {

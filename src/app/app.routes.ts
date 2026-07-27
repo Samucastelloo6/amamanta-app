@@ -74,6 +74,13 @@ export const routes: Routes = [
             (m) => m.AdminHospitalsComponent,
           ),
       },
+      {
+        path: 'analitica',
+        loadComponent: () =>
+          import('./features/admin/pages/admin-analytics/admin-analytics.component').then(
+            (component) => component.AdminAnalyticsComponent,
+          ),
+      },
     ],
   },
 

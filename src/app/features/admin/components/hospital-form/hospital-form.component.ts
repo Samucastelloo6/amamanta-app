@@ -9,8 +9,15 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { Hospital } from '../../../../core/models/hospital';
+import {
+  CreateHospitalRequest,
+  Hospital,
+} from '../../../../core/models/hospital';
 import { WarningModalComponent } from '../../../../shared/components/status-modals/warning-modal/warning-modal.component';
+
+type HospitalFormValue = Omit<Hospital, 'id'> & {
+  id?: string;
+};
 
 @Component({
   selector: 'app-hospital-form',
@@ -20,10 +27,11 @@ import { WarningModalComponent } from '../../../../shared/components/status-moda
 export class HospitalFormComponent implements OnChanges {
   @Input() hospital: Hospital | null = null;
 
-  @Output() saved = new EventEmitter<Hospital>();
+  @Output() saved = new EventEmitter<Hospital | CreateHospitalRequest>();
+
   @Output() cancelled = new EventEmitter<void>();
 
-  form: Hospital = this.getEmptyForm();
+  form: HospitalFormValue = this.getEmptyForm();
 
   coordinates = '';
 
@@ -48,11 +56,11 @@ export class HospitalFormComponent implements OnChanges {
         'Hay campos obligatorios sin completar. Revisa los campos marcados en rojo.';
 
       this.showWarningModal = true;
+
       return;
     }
 
     this.saved.emit(cleanHospital);
-    this.resetForm();
   }
 
   cancel(): void {
@@ -75,6 +83,33 @@ export class HospitalFormComponent implements OnChanges {
 
   closeWarningModal(): void {
     this.showWarningModal = false;
+    this.focusFirstInvalidField();
+  }
+
+  applyServerErrors(fields: Record<string, string>): string {
+    const normalizedErrors: Partial<Record<keyof Hospital, string>> = {};
+
+    for (const [backendField, message] of Object.entries(fields)) {
+      const rootField = backendField.split('.')[0];
+
+      const formField = rootField === 'longitude' ? 'latitude' : rootField;
+
+      if (this.isHospitalField(formField)) {
+        normalizedErrors[formField] = message;
+      }
+    }
+
+    this.fieldErrors = {
+      ...this.fieldErrors,
+      ...normalizedErrors,
+    };
+
+    return (
+      Object.values(normalizedErrors)[0] ?? 'Revisa los datos del hospital.'
+    );
+  }
+
+  focusFirstError(): void {
     this.focusFirstInvalidField();
   }
 
@@ -103,9 +138,8 @@ export class HospitalFormComponent implements OnChanges {
     this.showWarningModal = false;
   }
 
-  private getEmptyForm(): Hospital {
+  private getEmptyForm(): HospitalFormValue {
     return {
-      id: '',
       name: '',
       address: '',
       latitude: 0,
@@ -117,26 +151,35 @@ export class HospitalFormComponent implements OnChanges {
     };
   }
 
-  private getCleanHospital(): Hospital {
-    const name = this.cleanText(this.form.name);
+  private getCleanHospital(): Hospital | CreateHospitalRequest {
     const coordinates = this.parseCoordinates();
 
-    return {
-      ...this.form,
-      id: this.form.id || this.generateId(name),
-      name,
+    const payload: CreateHospitalRequest = {
+      name: this.cleanText(this.form.name),
       address: this.cleanText(this.form.address),
+
       latitude: coordinates?.latitude ?? 0,
       longitude: coordinates?.longitude ?? 0,
+
       googleMapsUrl: this.form.googleMapsUrl.trim(),
+
       schedule: this.cleanText(this.form.schedule),
+
       description: this.cleanText(this.form.description ?? ''),
+
       isActive: !!this.form.isActive,
     };
+
+    return this.form.id
+      ? {
+          id: this.form.id,
+          ...payload,
+        }
+      : payload;
   }
 
   private getFieldErrors(
-    hospital: Hospital,
+    hospital: CreateHospitalRequest,
   ): Partial<Record<keyof Hospital, string>> {
     const errors: Partial<Record<keyof Hospital, string>> = {};
 
@@ -237,14 +280,19 @@ export class HospitalFormComponent implements OnChanges {
       .replace(/\s([,.])/g, '$1');
   }
 
-  private generateId(name: string): string {
-    const normalizedName = name
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '');
+  private isHospitalField(value: string): value is keyof Hospital {
+    const fields: (keyof Hospital)[] = [
+      'id',
+      'name',
+      'address',
+      'latitude',
+      'longitude',
+      'googleMapsUrl',
+      'schedule',
+      'description',
+      'isActive',
+    ];
 
-    return `hospital-${normalizedName}-${Date.now()}`;
+    return fields.includes(value as keyof Hospital);
   }
 }

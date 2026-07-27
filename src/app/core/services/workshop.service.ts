@@ -1,523 +1,35 @@
-// services/workshops.service.ts
-import { Injectable, signal } from '@angular/core';
-import { Workshop } from '../models/workshop';
+import { Injectable, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { tap } from 'rxjs';
+
+import { environment } from '../../../environments/environment';
+
+import {
+  Workshop,
+  CreateWorkshopRequest,
+  UpdateWorkshopRequest,
+} from '../models/workshop';
+
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class WorkshopService {
-  private readonly workshops = signal<Workshop[]>([
-    {
-      id: 'taller-serra',
-      name: 'Torre de Porta Coeli',
-      address: 'Urb. Torre de Porta Coeli, oficina Ayuntamiento de Serra',
-      latitude: 39.64879914351661,
-      longitude: -0.5102815264406624,
-      googleMapsUrl: 'https://maps.app.goo.gl/kV7q7gw78SbNHMt86',
-      day: 'lunes',
-      time: 'morning',
-      schedule: '10:30h',
-      contacts: [{ name: 'María', phone: '615265650' }],
-      notes: '',
-      isActive: true,
-    },
-    {
-      id: 'taller-quart-poblet',
-      name: 'Quart de Poblet',
-      address: 'Centro de Salud de Quart de Poblet',
-      latitude: 39.4832469667412,
-      longitude: -0.4484905710044219,
-      googleMapsUrl: 'https://maps.app.goo.gl/h751B4sYBjN3Sf7r9',
-      day: 'lunes',
-      time: 'morning',
-      schedule: '11:00h',
-      contacts: [{ name: 'Zoraida', phone: '670577576' }],
-      notes: '',
-      isActive: true,
-    },
-    {
-      id: 'taller-paiporta',
-      name: 'Paiporta',
-      address: 'Centro de Salud de Paiporta',
-      latitude: 39.42453482080201,
-      longitude: -0.41624515595820427,
-      googleMapsUrl: 'https://maps.app.goo.gl/dMCFuvgXjtE1JrqD9',
-      day: 'lunes',
-      time: 'morning',
-      schedule: '11:00h',
-      contacts: [{ name: 'Esther', phone: '651912692' }],
-      notes: '',
-      isActive: true,
-    },
-    {
-      id: 'taller-leliana',
-      name: 'L’Eliana',
-      address: 'Centro Sociocultural, Aula de Yoga, L’Eliana',
-      latitude: 39.56591860235202,
-      longitude: -0.5341534929608396,
-      googleMapsUrl: 'https://maps.app.goo.gl/cxeQ7Sr1hYvrtv4VA',
-      day: 'lunes',
-      time: 'morning',
-      schedule: '11:00h',
-      contacts: [{ name: 'Abi', phone: '654584209' }],
-      notes: 'Aula de Yoga del Centro Sociocultural.',
-      isActive: true,
-    },
-    {
-      id: 'taller-chiva',
-      name: 'Chiva',
-      address: 'Centro de Salud de Chiva',
-      latitude: 39.469324032455866,
-      longitude: -0.7125622336976339,
-      googleMapsUrl: 'https://maps.app.goo.gl/c9S5dt5sW3663QSWA',
-      day: 'lunes',
-      time: 'morning',
-      schedule: '12:00h',
-      contacts: [{ name: 'Ava', phone: '626397846' }],
-      notes: '',
-      isActive: true,
-    },
-    {
-      id: 'taller-carcaixent',
-      name: 'Carcaixent',
-      address: 'Centro de Salud de Carcaixent',
-      latitude: 39.124323451815734,
-      longitude: -0.4509421322543281,
-      googleMapsUrl: 'https://maps.app.goo.gl/BGrdnr1mfxcdWLvt6',
-      day: 'lunes',
-      time: 'afternoon',
-      schedule: '16:30h',
-      contacts: [
-        { name: 'Fátima', phone: '635325243' },
-        { name: 'Cristina', phone: '667208069' },
-      ],
-      notes: '',
-      isActive: true,
-    },
-    {
-      id: 'taller-san-marcelino',
-      name: 'San Marcelino',
-      address: 'Centro de Salud de San Marcelino, Valencia',
-      latitude: 39.44310412160362,
-      longitude: -0.390158539991758,
-      googleMapsUrl: 'https://maps.app.goo.gl/Vx7FGxsUPgVxvkez8',
-      day: 'lunes',
-      time: 'afternoon',
-      schedule: '18:00h',
-      contacts: [{ name: 'Agustina', phone: '644309128' }],
-      notes: '',
-      isActive: true,
-    },
-    {
-      id: 'taller-valterna',
-      name: 'Valterna',
-      address: 'Centro Cívico de Valterna',
-      latitude: 39.51330563064957,
-      longitude: -0.4343889002456898,
-      googleMapsUrl: 'https://maps.app.goo.gl/78rKfeDXwXLh3exe8',
-      day: 'martes',
-      time: 'morning',
-      schedule: '11:30h',
-      contacts: [{ name: 'Laura', phone: '617809876' }],
-      notes: '',
-      isActive: true,
-    },
-    {
-      id: 'taller-torrent-1',
-      name: 'Torrent 1',
-      address: 'Centro de Salud de Torrent',
-      latitude: 39.43501407954694,
-      longitude: -0.4750763145218355,
-      googleMapsUrl: 'https://maps.app.goo.gl/GkMajHT5FugeF6937',
-      day: 'martes',
-      time: 'morning',
-      schedule: '12:00h',
-      contacts: [{ name: 'Toya', phone: '625752683' }],
-      notes: 'Biblioteca del Centro de Salud.',
-      isActive: true,
-    },
-    {
-      id: 'taller-juan-llorens',
-      name: 'Juan Llorens',
-      address: 'Centro de Salud Juan Llorens, Valencia',
-      latitude: 39.47376057950258,
-      longitude: -0.39169577919183163,
-      googleMapsUrl: 'https://maps.app.goo.gl/bo2BMF6JsWgZVFWcA',
-      day: 'martes',
-      time: 'morning',
-      schedule: '12:00h',
-      contacts: [{ name: 'Candela', phone: '661051513' }],
-      notes: '4º piso del Centro de Salud.',
-      isActive: true,
-    },
-    {
-      id: 'taller-vilamarxant',
-      name: 'Vilamarxant',
-      address: 'Centro de Convivencia de Vilamarxant',
-      latitude: 39.570682675047316,
-      longitude: -0.6201966569471754,
-      googleMapsUrl: 'https://maps.app.goo.gl/MgEYT5vByN3apAVj8',
-      day: 'martes',
-      time: 'afternoon',
-      schedule: '17:30h',
-      contacts: [{ name: 'Bárbara', phone: '699420414' }],
-      notes: '',
-      isActive: true,
-    },
-    {
-      id: 'taller-cullera',
-      name: 'Cullera',
-      address: 'Centro de Salud El Raval, Cullera',
-      latitude: 39.17052234931397,
-      longitude: -0.2592187250259818,
-      googleMapsUrl: 'https://maps.app.goo.gl/dZQYYhWyQm5oqyDn9',
-      day: 'miércoles',
-      time: 'morning',
-      schedule: '10:30h',
-      contacts: [{ name: 'Carmen Mª', phone: '654559534' }],
-      notes: '2ª planta del Centro de Salud El Raval.',
-      isActive: true,
-    },
-    {
-      id: 'taller-torrent-3',
-      name: 'Torrent 3',
-      address: 'Centro de Salud de Torrent',
-      latitude: 39.424050656199086,
-      longitude: -0.46762060397516414,
-      googleMapsUrl: 'https://maps.app.goo.gl/fYFJFz4nQ7G1fm5Q9',
-      day: 'miércoles',
-      time: 'morning',
-      schedule: '11:00h',
-      contacts: [{ name: 'Toya', phone: '625752683' }],
-      notes: '',
-      isActive: true,
-    },
-    {
-      id: 'taller-campanar',
-      name: 'Campanar 1',
-      address: 'Centro de Salud de Campanar, Valencia',
-      latitude: 39.477562863141465,
-      longitude: -0.4005340006529366,
-      googleMapsUrl: 'https://maps.app.goo.gl/FFKDaF2MR54GGLyp9',
-      day: 'miércoles',
-      time: 'morning',
-      schedule: '11:30h',
-      contacts: [{ name: 'Luisa', phone: '699133501' }],
-      notes: '',
-      isActive: true,
-    },
-    {
-      id: 'taller-pobla-vallbona',
-      name: 'La Pobla de Vallbona',
-      address: 'Espai Jove de La Pobla de Vallbona',
-      latitude: 39.595776944638835,
-      longitude: -0.5500870296279469,
-      googleMapsUrl: 'https://maps.app.goo.gl/ZGhFPgGBTqmobxAh8',
-      day: 'miércoles',
-      time: 'afternoon',
-      schedule: '17:00h',
-      contacts: [
-        { name: 'Yaiza', phone: '615596123' },
-        { name: 'Verónica', phone: '679313704' },
-      ],
-      notes: '',
-      isActive: true,
-    },
-    {
-      id: 'taller-enguera',
-      name: 'Enguera',
-      address: 'Centro de Salud de Enguera',
-      latitude: 38.980711974223475,
-      longitude: -0.6890699972026841,
-      googleMapsUrl: 'https://maps.app.goo.gl/mQGNzyb3uXAe6q129',
-      day: 'miércoles',
-      time: 'afternoon',
-      schedule: '17:00h',
-      contacts: [{ name: 'Gloria', phone: '680955441' }],
-      notes: '',
-      isActive: true,
-    },
-    {
-      id: 'taller-paterna-alborgi',
-      name: 'Paterna',
-      address: 'Centro Polivalente Alborgí, Paterna',
-      latitude: 39.50562894881844,
-      longitude: -0.439981932840129,
-      googleMapsUrl: 'https://maps.app.goo.gl/mejn2nPmZaNBHowh8',
-      day: 'jueves',
-      time: 'morning',
-      schedule: '09:30h',
-      contacts: [{ name: 'Elisa', phone: '634604601' }],
-      notes: 'Centro Polivalente Alborgí.',
-      isActive: true,
-    },
-    {
-      id: 'taller-alboraya',
-      name: 'Alboraya',
-      address: 'Centro de Salud de Alboraya',
-      latitude: 39.49378829395264,
-      longitude: -0.34971569189572865,
-      googleMapsUrl: 'https://maps.app.goo.gl/Eq1ERgUtdiuPVf1n9',
-      day: 'jueves',
-      time: 'morning',
-      schedule: '10:00h',
-      contacts: [{ name: 'Eva', phone: '646900772' }],
-      notes: '',
-      isActive: true,
-    },
-    {
-      id: 'taller-meliana',
-      name: 'Meliana',
-      address: 'Centro de Salud de Meliana',
-      latitude: 39.5290646697453,
-      longitude: -0.34750816732838286,
-      googleMapsUrl: 'https://maps.app.goo.gl/yKqgVSZPDP9GxwQ7A',
-      day: 'jueves',
-      time: 'morning',
-      schedule: '11:00h',
-      contacts: [{ name: 'Claus', phone: '618323645' }],
-      notes: '2ª planta del Centro de Salud.',
-      isActive: true,
-    },
-    {
-      id: 'taller-juan-xxiii',
-      name: 'Juan XXIII',
-      address: 'Centro de Salud Juan XXIII, Valencia',
-      latitude: 39.49350057124096,
-      longitude: -0.38387675892568524,
-      googleMapsUrl: 'https://maps.app.goo.gl/AUS124y9qbqj93YRA',
-      day: 'jueves',
-      time: 'morning',
-      schedule: '11:30h',
-      contacts: [
-        { name: 'Marta', phone: '611561315' },
-        { name: 'Eliana', phone: '635413211' },
-      ],
-      notes: '',
-      isActive: true,
-    },
-    {
-      id: 'taller-nou-moles',
-      name: 'Nou Moles',
-      address:
-        'Unidad de Salud Sexual y Reproductiva, C/ Pintor Stolz 35, Valencia',
-      latitude: 39.46963143369986,
-      longitude: -0.40061732914792264,
-      googleMapsUrl: 'https://maps.app.goo.gl/zK9AWd3LqEDDf8La7',
-      day: 'jueves',
-      time: 'morning',
-      schedule: '11:30h',
-      contacts: [{ name: 'Luisa', phone: '699133501' }],
-      notes: '',
-      status: 'temporarily_closed',
-      closureMessage: 'Cerrado el 25 y el 29 de junio',
-      isActive: true,
-    },
-    {
-      id: 'taller-la-canada',
-      name: 'La Cañada',
-      address: 'Centro Social de La Cañada',
-      latitude: 39.52820280342294,
-      longitude: -0.48868661363446486,
-      googleMapsUrl: 'https://maps.app.goo.gl/dD8rkovSntg4B62J8',
-      day: 'jueves',
-      time: 'morning',
-      schedule: '11:30h',
-      contacts: [{ name: 'Bene', phone: '654176569' }],
-      notes: 'Salón de Actos del Centro Social.',
-      isActive: true,
-    },
-    {
-      id: 'taller-barrio-cristo',
-      name: 'Barrio del Cristo',
-      address: 'Polideportivo El Perdiguer, Barrio del Cristo',
-      latitude: 39.474557181710374,
-      longitude: -0.4673014639645459,
-      googleMapsUrl: 'https://maps.app.goo.gl/2uj9T3ymCLBh1TSc8',
-      day: 'jueves',
-      time: 'morning',
-      schedule: '12:00h',
-      contacts: [{ name: 'Ester', phone: '637048268' }],
-      notes: 'Polideportivo El Perdiguer.',
-      isActive: true,
-    },
-    {
-      id: 'taller-mislata',
-      name: 'Mislata',
-      address: 'Casa de la Dona, Mislata',
-      latitude: 39.47423205494747,
-      longitude: -0.41641151529657666,
-      googleMapsUrl: 'https://maps.app.goo.gl/FqKiEXoB5949daRu5',
-      day: 'jueves',
-      time: 'afternoon',
-      schedule: '17:30h',
-      contacts: [
-        { name: 'Elisa', phone: '634604601' },
-        { name: 'Candela', phone: '661051513' },
-      ],
-      notes: 'Casa de la Dona.',
-      isActive: true,
-    },
-    {
-      id: 'taller-riba-roja-turia',
-      name: 'Riba-roja de Túria',
-      address: 'Espai de la Dona, C/ Arrosals 42, Riba-roja de Túria',
-      latitude: 39.546060809419004,
-      longitude: -0.5768165366902168,
-      googleMapsUrl: 'https://maps.app.goo.gl/t9L9rNDLJejni7Sk7',
-      day: 'viernes',
-      time: 'morning',
-      schedule: '09:30h',
-      contacts: [{ name: 'Nathalie', phone: '693797371' }],
-      notes: 'Espai de la Dona.',
-      isActive: true,
-    },
-    {
-      id: 'taller-benimamet',
-      name: 'Benimàmet',
-      address: 'Centro de Salud de Benimàmet, Valencia',
-      latitude: 39.499763027574026,
-      longitude: -0.421231085166461,
-      googleMapsUrl: 'https://maps.app.goo.gl/Rv7cGJU6cXuT8Rkb6',
-      day: 'viernes',
-      time: 'morning',
-      schedule: '10:30h',
-      contacts: [{ name: 'Silvia', phone: '699992428' }],
-      notes: '',
-      isActive: true,
-    },
-    {
-      id: 'taller-lliria',
-      name: 'Llíria',
-      address: 'Centro de Salud de Llíria',
-      latitude: 39.63323539392256,
-      longitude: -0.5909430213311747,
-      googleMapsUrl: 'https://maps.app.goo.gl/zZ9ZKMUrudNVFN5y5',
-      day: 'viernes',
-      time: 'morning',
-      schedule: '11:00h',
-      contacts: [{ name: 'Isabel', phone: '647347731' }],
-      notes: '',
-      isActive: true,
-    },
-    {
-      id: 'taller-campanar-ii',
-      name: 'Campanar II',
-      address: 'Centro de Salud de Campanar II, Valencia',
-      latitude: 39.484444476538414,
-      longitude: -0.3913937628796042,
-      googleMapsUrl: 'https://maps.app.goo.gl/KHUdRck92g3s7ffw9',
-      day: 'viernes',
-      time: 'morning',
-      schedule: '11:30h',
-      contacts: [{ name: 'Patricia', phone: '636177593' }],
-      notes: '',
-      isActive: true,
-    },
-    {
-      id: 'taller-fuente-san-luis',
-      name: 'Fuente San Luis',
-      address: 'Centro de Salud Fuente San Luis, Valencia',
-      latitude: 39.456811027861356,
-      longitude: -0.3602305406362371,
-      googleMapsUrl: 'https://maps.app.goo.gl/WtXGZoDR5weQcfQG7',
-      day: 'viernes',
-      time: 'morning',
-      schedule: '11:30h',
-      contacts: [{ name: 'Gema', phone: '679467533' }],
-      notes: 'Gimnasio del 3er piso.',
-      isActive: true,
-    },
-    {
-      id: 'taller-pobla-vallbona-viernes',
-      name: 'La Pobla de Vallbona',
-      address: 'Espai Jove de La Pobla de Vallbona',
-      latitude: 39.59577892004099,
-      longitude: -0.5500974406648345,
-      googleMapsUrl: 'https://maps.app.goo.gl/ToXhLsbUwzGpVLJ67',
-      day: 'viernes',
-      time: 'morning',
-      schedule: '11:30h',
-      contacts: [
-        { name: 'Yaiza', phone: '615596123' },
-        { name: 'Verónica', phone: '679313704' },
-      ],
-      notes: '',
-      isActive: true,
-    },
-    {
-      id: 'taller-picanya',
-      name: 'Picanya',
-      address: 'Centro de Salud de Picanya, C/ Senyera 2',
-      latitude: 39.4358701673933,
-      longitude: -0.4340321426022026,
-      googleMapsUrl: 'https://maps.app.goo.gl/XfCLiVYLdGpFwBqU8',
-      day: 'viernes',
-      time: 'afternoon',
-      schedule: '16:00h',
-      contacts: [
-        { name: 'Mirella', phone: '679480470' },
-        { name: 'Inés', phone: '692157900' },
-      ],
-      notes: 'Acceso por la puerta trasera del centro. 1er piso, gimnasio.',
-      status: 'temporarily_closed',
-      closureType: 'specific_days',
-      closureMessage: 'Cerrado los días 25 y 29 de julio.',
-      isActive: true,
-    },
-    {
-      id: 'taller-vall-albaida',
-      name: 'Vall d’Albaida',
-      address: 'Espacio Municipal, C/ Papa Joan XXIII, 15, Atzeneta d’Albaida',
-      latitude: 38.831343742788256,
-      longitude: -0.4974337436968808,
-      googleMapsUrl: 'https://maps.app.goo.gl/FecRMgiH3o2Gx2qMA',
-      day: 'viernes',
-      time: 'afternoon',
-      schedule: '17:30h',
-      contacts: [
-        { name: 'Loli', phone: '649633817' },
-        { name: 'Venus', phone: '610795475' },
-      ],
-      notes:
-        'Actualmente programado para el 5 de junio. Se comunicarán nuevas fechas.',
-      isActive: true,
-    },
-    {
-      id: 'taller-virtual-lunes',
-      name: 'TALLER VIRTUAL',
-      address: 'Online mediante Zoom',
-      latitude: 0,
-      longitude: 0,
-      googleMapsUrl: '',
-      day: 'lunes',
-      time: 'afternoon',
-      schedule: '17:30h',
-      contacts: [],
-      notes:
-        'Taller gratuito online mediante Zoom. Para participar por primera vez, escribe a inscripciones@amamanta.es',
-      mode: 'online',
-      status: 'open',
-      isActive: true,
-    },
-    {
-      id: 'taller-virtual-jueves',
-      name: 'TALLER VIRTUAL',
-      address: 'Online mediante Zoom',
-      latitude: 0,
-      longitude: 0,
-      googleMapsUrl: '',
-      day: 'jueves',
-      time: 'morning',
-      schedule: '10:00h',
-      contacts: [],
-      notes:
-        'Taller gratuito online mediante Zoom. Para participar por primera vez, escribe a inscripciones@amamanta.es',
-      mode: 'online',
-      status: 'open',
-      isActive: true,
-    },
-  ]);
+  private readonly http = inject(HttpClient);
+
+  private readonly apiUrl = `${environment.apiUrl}/workshops`;
+
+  private readonly workshops = signal<Workshop[]>([]);
+
+  loadWorkshops() {
+    return this.http
+      .get<ApiResponse<Workshop[]>>(this.apiUrl)
+      .pipe(tap((response) => this.workshops.set(response.data)));
+  }
 
   getWorkshops(): Workshop[] {
     return this.workshops().filter((workshop) => workshop.isActive);
@@ -527,21 +39,39 @@ export class WorkshopService {
     return this.workshops();
   }
 
-  addWorkshop(workshop: Workshop): void {
-    this.workshops.update((workshops) => [...workshops, workshop]);
+  addWorkshop(workshop: CreateWorkshopRequest) {
+    return this.http
+      .post<ApiResponse<Workshop>>(this.apiUrl, workshop)
+      .pipe(
+        tap((response) =>
+          this.workshops.update((workshops) => [...workshops, response.data]),
+        ),
+      );
   }
 
-  updateWorkshop(updatedWorkshop: Workshop): void {
-    this.workshops.update((workshops) =>
-      workshops.map((workshop) =>
-        workshop.id === updatedWorkshop.id ? updatedWorkshop : workshop,
-      ),
-    );
+  updateWorkshop(id: string, payload: UpdateWorkshopRequest) {
+    return this.http
+      .patch<ApiResponse<Workshop>>(`${this.apiUrl}/${id}`, payload)
+      .pipe(
+        tap((response) =>
+          this.workshops.update((workshops) =>
+            workshops.map((workshop) =>
+              workshop.id === id ? response.data : workshop,
+            ),
+          ),
+        ),
+      );
   }
 
-  deleteWorkshop(workshopId: string): void {
-    this.workshops.update((workshops) =>
-      workshops.filter((workshop) => workshop.id !== workshopId),
-    );
+  deleteWorkshop(id: string) {
+    return this.http
+      .delete<ApiResponse<Workshop>>(`${this.apiUrl}/${id}`)
+      .pipe(
+        tap(() =>
+          this.workshops.update((workshops) =>
+            workshops.filter((workshop) => workshop.id !== id),
+          ),
+        ),
+      );
   }
 }

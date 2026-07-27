@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { CollaborateOption } from '../../../../core/models/collaborate';
 import { CollaborateService } from '../../../../core/services/collaborate.service';
@@ -11,14 +11,23 @@ import { SuccessModalComponent } from '../../../../shared/components/status-moda
   templateUrl: './collaborate.component.html',
   styleUrl: './collaborate.component.scss',
 })
-export class CollaborateComponent {
+export class CollaborateComponent implements OnInit {
   options: CollaborateOption[] = [];
 
   showSuccessModal = false;
   showErrorModal = false;
 
-  constructor(private readonly collaborateService: CollaborateService) {
-    this.options = this.collaborateService.getOptions();
+  constructor(private readonly collaborateService: CollaborateService) {}
+
+  ngOnInit(): void {
+    this.collaborateService.getCollaborateInformation().subscribe({
+      next: (response) => {
+        this.options = response.data.options;
+      },
+      error: () => {
+        this.showErrorModal = true;
+      },
+    });
   }
 
   openOption(option: CollaborateOption): void {
@@ -37,11 +46,8 @@ export class CollaborateComponent {
   async copyToClipboard(text: string): Promise<void> {
     try {
       await navigator.clipboard.writeText(text);
-
       this.showSuccessModal = true;
-    } catch (error) {
-      console.error('No se ha podido copiar al portapapeles:', error);
-
+    } catch {
       this.showErrorModal = true;
     }
   }

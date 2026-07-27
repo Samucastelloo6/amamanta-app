@@ -36,11 +36,22 @@
         name="mode"
         [(ngModel)]="form.mode"
         (change)="onModeChange()"
-        class="mt-2 w-full rounded-2xl border border-[#eadff5] bg-[#fcfaff] px-4 py-3 text-sm font-semibold text-zinc-700 outline-none transition focus:border-[#8f50c4] focus:bg-white"
+        [ngClass]="
+          fieldErrors.mode
+            ? 'border-red-300 bg-red-50 focus:border-red-500'
+            : 'border-[#eadff5] bg-[#fcfaff] focus:border-[#8f50c4] focus:bg-white'
+        "
+        class="mt-2 w-full rounded-2xl border px-4 py-3 text-sm font-semibold text-zinc-700 outline-none transition"
       >
         <option value="presential">Presencial</option>
         <option value="online">Online</option>
       </select>
+
+      @if (fieldErrors.mode) {
+        <p class="mt-1 text-xs font-bold text-red-600">
+          {{ fieldErrors.mode }}
+        </p>
+      }
     </div>
 
     <div>
@@ -52,11 +63,22 @@
         name="status"
         [(ngModel)]="form.status"
         (change)="onStatusChange()"
-        class="mt-2 w-full rounded-2xl border border-[#eadff5] bg-[#fcfaff] px-4 py-3 text-sm font-semibold text-zinc-700 outline-none transition focus:border-[#8f50c4] focus:bg-white"
+        [ngClass]="
+          fieldErrors.status
+            ? 'border-red-300 bg-red-50 focus:border-red-500'
+            : 'border-[#eadff5] bg-[#fcfaff] focus:border-[#8f50c4] focus:bg-white'
+        "
+        class="mt-2 w-full rounded-2xl border px-4 py-3 text-sm font-semibold text-zinc-700 outline-none transition"
       >
         <option value="open">Abierto</option>
         <option value="temporarily_closed">Cerrado</option>
       </select>
+
+      @if (fieldErrors.status) {
+        <p class="mt-1 text-xs font-bold text-red-600">
+          {{ fieldErrors.status }}
+        </p>
+      }
     </div>
   </div>
 
@@ -191,6 +213,11 @@
         name="day"
         [(ngModel)]="form.day"
         (change)="clearFieldError('day')"
+        [ngClass]="
+          fieldErrors.day
+            ? 'border-red-300 bg-red-50 focus:border-red-500'
+            : 'border-[#eadff5] bg-[#fcfaff] focus:border-[#8f50c4]'
+        "
         class="mt-2 w-full rounded-2xl border border-[#eadff5] bg-[#fcfaff] px-4 py-3 text-sm font-semibold text-zinc-700 outline-none transition focus:border-[#8f50c4]"
       >
         <option value="lunes">Lunes</option>
@@ -199,6 +226,11 @@
         <option value="jueves">Jueves</option>
         <option value="viernes">Viernes</option>
       </select>
+      @if (fieldErrors.day) {
+        <p class="mt-1 text-xs font-bold text-red-600">
+          {{ fieldErrors.day }}
+        </p>
+      }
     </div>
 
     <div>
@@ -210,11 +242,21 @@
         name="time"
         [(ngModel)]="form.time"
         (change)="clearFieldError('time')"
+        [ngClass]="
+          fieldErrors.time
+            ? 'border-red-300 bg-red-50 focus:border-red-500'
+            : 'border-[#eadff5] bg-[#fcfaff] focus:border-[#8f50c4]'
+        "
         class="mt-2 w-full rounded-2xl border border-[#eadff5] bg-[#fcfaff] px-4 py-3 text-sm font-semibold text-zinc-700 outline-none transition focus:border-[#8f50c4]"
       >
         <option value="morning">Mañana</option>
         <option value="afternoon">Tarde</option>
       </select>
+      @if (fieldErrors.time) {
+        <p class="mt-1 text-xs font-bold text-red-600">
+          {{ fieldErrors.time }}
+        </p>
+      }
     </div>
 
     <div>
@@ -312,9 +354,21 @@
         type="url"
         name="googleMapsUrl"
         [(ngModel)]="form.googleMapsUrl"
-        class="mt-2 w-full rounded-2xl border border-[#eadff5] bg-[#fcfaff] px-4 py-3 text-sm font-semibold text-zinc-700 outline-none transition focus:border-[#8f50c4]"
+        (input)="clearFieldError('googleMapsUrl')"
+        [ngClass]="
+          fieldErrors.googleMapsUrl
+            ? 'border-red-300 bg-red-50 focus:border-red-500'
+            : 'border-[#eadff5] bg-[#fcfaff] focus:border-[#8f50c4] focus:bg-white'
+        "
+        class="mt-2 w-full rounded-2xl border px-4 py-3 text-sm font-semibold text-zinc-700 outline-none transition"
         placeholder="https://maps.app.goo.gl/..."
       />
+
+      @if (fieldErrors.googleMapsUrl) {
+        <p class="mt-1 text-xs font-bold text-red-600">
+          {{ fieldErrors.googleMapsUrl }}
+        </p>
+      }
     </div>
   } @else {
     <div class="rounded-2xl border border-[#eadff5] bg-[#faf5ff] px-4 py-3">
@@ -364,7 +418,12 @@
             [name]="'contactName' + contactIndex"
             [(ngModel)]="contact.name"
             (input)="clearFieldError('contacts')"
-            class="rounded-xl border border-[#eadff5] px-3 py-2.5 text-sm font-semibold outline-none transition focus:border-[#8f50c4]"
+            [ngClass]="
+              fieldErrors.contacts
+                ? 'border-red-300 bg-red-50 focus:border-red-500'
+                : 'border-[#eadff5] bg-white focus:border-[#8f50c4]'
+            "
+            class="rounded-xl border px-3 py-2.5 text-sm font-semibold outline-none transition"
             placeholder="Nombre"
           />
 
@@ -373,7 +432,12 @@
             [name]="'contactPhone' + contactIndex"
             [(ngModel)]="contact.phone"
             (input)="clearFieldError('contacts')"
-            class="rounded-xl border border-[#eadff5] px-3 py-2.5 text-sm font-semibold outline-none transition focus:border-[#8f50c4]"
+            [ngClass]="
+              fieldErrors.contacts
+                ? 'border-red-300 bg-red-50 focus:border-red-500'
+                : 'border-[#eadff5] bg-white focus:border-[#8f50c4]'
+            "
+            class="rounded-xl border px-3 py-2.5 text-sm font-semibold outline-none transition"
             placeholder="Teléfono"
           />
 

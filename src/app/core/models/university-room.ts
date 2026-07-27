@@ -14,3 +14,7 @@ export interface UniversityRoom {
 
   isActive: boolean;
 }
+
+export type CreateUniversityRoomRequest = Omit<UniversityRoom, 'id'>;
+
+export type UpdateUniversityRoomRequest = Partial<CreateUniversityRoomRequest>;

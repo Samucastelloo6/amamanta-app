@@ -1,16 +1,27 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { NgClass } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { Experience, ExperienceType } from '../../../core/models/experiencies';
+import {
+  CreateExperienceRequest,
+  ExperienceType,
+} from '../../../core/models/experiencies';
 import { ExperienceService } from '../../../core/services/experience.service';
+import { ErrorModalComponent } from '../status-modals/error-modal/error-modal.component';
 import { SuccessModalComponent } from '../status-modals/success-modal/success-modal.component';
 import { WarningModalComponent } from '../status-modals/warning-modal/warning-modal.component';
 
 @Component({
   selector: 'app-experience-form',
-  imports: [FormsModule, NgClass, SuccessModalComponent, WarningModalComponent],
+  imports: [
+    FormsModule,
+    NgClass,
+    SuccessModalComponent,
+    WarningModalComponent,
+    ErrorModalComponent,
+  ],
   templateUrl: './experience-form.component.html',
   styleUrl: './experience-form.component.scss',
 })
@@ -25,8 +36,13 @@ export class ExperienceFormComponent implements OnInit {
   experienceText = '';
   improvement = '';
 
+  isSubmitting = false;
+
   showSuccessModal = false;
   showWarningModal = false;
+  showErrorModal = false;
+
+  errorMessage = 'La experiencia no se ha podido enviar. Inténtalo de nuevo.';
 
   ngOnInit(): void {
     const routeType = this.route.snapshot.paramMap.get('type');
@@ -112,31 +128,51 @@ export class ExperienceFormComponent implements OnInit {
   }
 
   sendExperience(): void {
-    if (this.rating === 0) {
-      this.showWarningModal = true;
+    if (this.rating === 0 || this.isSubmitting) {
+      if (this.rating === 0) {
+        this.showWarningModal = true;
+      }
+
       return;
     }
 
     const text = this.cleanText(this.experienceText);
     const improvement = this.cleanText(this.improvement);
 
-    const experience: Experience = {
-      id: this.generateId(),
+    const payload: CreateExperienceRequest = {
       type: this.type,
       rating: this.rating,
-      date: new Date().toISOString(),
+
+      ...(text
+        ? {
+            text,
+          }
+        : {}),
+
+      ...(improvement
+        ? {
+            improvement,
+          }
+        : {}),
     };
 
-    if (text) {
-      experience.text = text;
-    }
+    this.isSubmitting = true;
 
-    if (improvement) {
-      experience.improvement = improvement;
-    }
+    this.experienceService.addExperience(payload).subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.showSuccessModal = true;
+      },
+      error: (error: HttpErrorResponse) => {
+        this.isSubmitting = false;
 
-    this.experienceService.addExperience(experience);
-    this.showSuccessModal = true;
+        this.errorMessage =
+          error.error?.error?.message ??
+          'La experiencia no se ha podido enviar. Inténtalo de nuevo.';
+
+        this.showErrorModal = true;
+      },
+    });
   }
 
   closeWarningModal(): void {
@@ -150,6 +186,10 @@ export class ExperienceFormComponent implements OnInit {
     this.router.navigate([this.getReturnRoute()]);
   }
 
+  closeErrorModal(): void {
+    this.showErrorModal = false;
+  }
+
   private resetForm(): void {
     this.rating = 0;
     this.experienceText = '';
@@ -161,10 +201,6 @@ export class ExperienceFormComponent implements OnInit {
       .trim()
       .replace(/\s+/g, ' ')
       .replace(/\s([,.])/g, '$1');
-  }
-
-  private generateId(): string {
-    return `experiencia-${this.type}-${Date.now()}`;
   }
 
   private isValidType(type: string | null): type is ExperienceType {

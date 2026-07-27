@@ -1,26 +1,34 @@
+import { DatePipe, DecimalPipe, NgClass } from '@angular/common';
 import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   computed,
   inject,
+  OnInit,
   signal,
 } from '@angular/core';
-import { DatePipe, DecimalPipe, NgClass } from '@angular/common';
 
 import { AppFeedback } from '../../../../core/models/app-feedback';
 import { FeedbackService } from '../../../../core/services/feedback.service';
+import { ErrorModalComponent } from '../../../../shared/components/status-modals/error-modal/error-modal.component';
 import { SuccessModalComponent } from '../../../../shared/components/status-modals/success-modal/success-modal.component';
 
 type FeedbackFilter = 'all' | 'pending' | 'reviewed';
 
 @Component({
   selector: 'app-admin-feedback',
-  imports: [DatePipe, DecimalPipe, NgClass, SuccessModalComponent],
+  imports: [
+    DatePipe,
+    DecimalPipe,
+    NgClass,
+    SuccessModalComponent,
+    ErrorModalComponent,
+  ],
   templateUrl: './admin-feedback.component.html',
   styleUrl: './admin-feedback.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AdminFeedbackComponent {
+export class AdminFeedbackComponent implements OnInit {
   private readonly feedbackService = inject(FeedbackService);
 
   readonly selectedFilter = signal<FeedbackFilter>('all');
@@ -30,6 +38,10 @@ export class AdminFeedbackComponent {
   readonly showSuccessModal = signal(false);
   readonly successTitle = signal('');
   readonly successMessage = signal('');
+
+  readonly showErrorModal = signal(false);
+  readonly errorTitle = signal('');
+  readonly errorMessage = signal('');
 
   readonly filteredFeedback = computed(() => {
     switch (this.selectedFilter()) {
@@ -60,8 +72,18 @@ export class AdminFeedbackComponent {
     () => this.feedback().filter((item) => !item.isReviewed).length,
   );
 
-  constructor() {
-    this.refreshFeedback();
+  ngOnInit(): void {
+    this.feedbackService.loadAdminFeedback().subscribe({
+      next: () => {
+        this.refreshFeedback();
+      },
+      error: () => {
+        this.showError(
+          'No se han podido cargar las valoraciones',
+          'Ha ocurrido un error al obtener las valoraciones. Inténtalo de nuevo más tarde.',
+        );
+      },
+    });
   }
 
   changeFilter(filter: FeedbackFilter): void {
@@ -91,23 +113,41 @@ export class AdminFeedbackComponent {
   }
 
   markAsReviewed(feedback: AppFeedback): void {
-    this.feedbackService.markAsReviewed(feedback.id);
+    this.feedbackService.markAsReviewed(feedback.id).subscribe({
+      next: () => {
+        this.refreshFeedback();
 
-    this.refreshFeedback();
+        this.successTitle.set('Valoración revisada');
+        this.successMessage.set(
+          'La valoración se ha marcado como revisada correctamente.',
+        );
 
-    this.successTitle.set('Valoración revisada');
-    this.successMessage.set(
-      'La valoración se ha marcado como revisada correctamente.',
-    );
-
-    this.showSuccessModal.set(true);
+        this.showSuccessModal.set(true);
+      },
+      error: () => {
+        this.showError(
+          'No se ha podido actualizar la valoración',
+          'La valoración no se ha marcado como revisada. Inténtalo de nuevo.',
+        );
+      },
+    });
   }
 
   closeSuccessModal(): void {
     this.showSuccessModal.set(false);
   }
 
+  closeErrorModal(): void {
+    this.showErrorModal.set(false);
+  }
+
   private refreshFeedback(): void {
     this.feedback.set(this.feedbackService.getAdminFeedback());
+  }
+
+  private showError(title: string, message: string): void {
+    this.errorTitle.set(title);
+    this.errorMessage.set(message);
+    this.showErrorModal.set(true);
   }
 }
