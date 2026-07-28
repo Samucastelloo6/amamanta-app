@@ -285,10 +285,14 @@ export class EventsComponent implements OnInit {
       console.error('No se ha encontrado el calendario exportable');
 
       this.showError(
-        'No se ha podido descargar el calendario',
+        'No se ha podido guardar el calendario',
         'El calendario no está disponible en este momento. Recarga la página e inténtalo de nuevo.',
       );
 
+      return;
+    }
+
+    if (this.exporting) {
       return;
     }
 
@@ -302,24 +306,48 @@ export class EventsComponent implements OnInit {
         cacheBust: true,
         pixelRatio: 2,
         skipFonts: true,
+        backgroundColor: '#ffffff',
       });
 
-      const link = document.createElement('a');
+      const response = await fetch(dataUrl);
+      const blob = await response.blob();
 
-      link.download = `calendario-amamanta-${this.currentMonthName.replaceAll(
-        ' ',
-        '-',
-      )}.png`;
+      const fileName = `calendario-amamanta-${this.currentMonthName
+        .replaceAll(' ', '-')
+        .toLowerCase()}.png`;
 
-      link.href = dataUrl;
-      link.click();
+      const file = new File([blob], fileName, {
+        type: 'image/png',
+      });
 
+      const canShareFile =
+        typeof navigator.share === 'function' &&
+        typeof navigator.canShare === 'function' &&
+        navigator.canShare({
+          files: [file],
+        });
+
+      if (canShareFile) {
+        await navigator.share({
+          files: [file],
+          title: 'Calendario de actividades de Amamanta',
+          text: `Calendario de actividades de ${this.currentMonthName.toLowerCase()}.`,
+        });
+
+        return;
+      }
+
+      this.downloadImage(blob, fileName);
       this.showSuccessModal = true;
     } catch (error) {
-      console.error('Error al descargar el calendario:', error);
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        return;
+      }
+
+      console.error('Error al guardar el calendario:', error);
 
       this.showError(
-        'No se ha podido descargar el calendario',
+        'No se ha podido guardar el calendario',
         'Ha ocurrido un error al generar la imagen. Inténtalo de nuevo.',
       );
     } finally {
@@ -327,6 +355,24 @@ export class EventsComponent implements OnInit {
       this.loadingService.hide();
     }
   }
+
+  private downloadImage(blob: Blob, fileName: string): void {
+    const objectUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = objectUrl;
+    link.download = fileName;
+    link.style.display = 'none';
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setTimeout(() => {
+      URL.revokeObjectURL(objectUrl);
+    }, 1000);
+  }
+
   formatEventDate(date: string): string {
     return this.parseLocalDate(date).toLocaleDateString('es-ES', {
       day: 'numeric',
