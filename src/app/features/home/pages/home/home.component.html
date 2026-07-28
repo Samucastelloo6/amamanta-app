@@ -18,10 +18,52 @@
       >
         Apoyo y recursos cerca de ti
       </h1>
+      <p class="text-center text-xs text-zinc-400">Versión de prueba 28/07</p>
     </header>
 
+    @if (updateAvailable()) {
+      <section
+        class="mx-auto mb-4 flex max-w-3xl items-center gap-3 rounded-[20px] border border-[#d9c3eb] bg-[#faf5ff] p-3 shadow-md shadow-purple-100/60 sm:p-4"
+        aria-live="polite"
+      >
+        <span
+          class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#8f50c4] text-white"
+        >
+          <span class="text-xl">↻</span>
+        </span>
+
+        <div class="min-w-0 flex-1">
+          <p class="text-sm font-black text-zinc-800">
+            Nueva versión disponible
+          </p>
+
+          <p
+            class="mt-0.5 text-xs font-semibold leading-5 text-zinc-500 sm:text-sm"
+          >
+            Actualiza la aplicación para ver las últimas mejoras.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          (click)="updateApplication()"
+          [disabled]="updating()"
+          class="flex shrink-0 items-center justify-center gap-2 rounded-full bg-[#8f50c4] px-4 py-2 text-xs font-extrabold text-white shadow-md shadow-purple-200 transition hover:bg-[#7b3fb1] disabled:cursor-not-allowed disabled:opacity-70 sm:text-sm"
+        >
+          @if (updating()) {
+            <span
+              class="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"
+            ></span>
+
+            <span class="hidden sm:inline">Actualizando...</span>
+          } @else {
+            <span>Actualizar</span>
+          }
+        </button>
+      </section>
+    }
+
     <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-5">
-      <!-- Talleres -->
       <a
         routerLink="/talleres"
         class="group flex min-h-36 flex-col items-center justify-center rounded-[20px] border border-[#eadff5] bg-white/95 px-3 py-4 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl sm:min-h-44 sm:rounded-[22px] sm:p-4"
@@ -39,7 +81,6 @@
         </span>
       </a>
 
-      <!-- Espacios -->
       <a
         routerLink="/espacios-amigos"
         class="group flex min-h-36 flex-col items-center justify-center rounded-[20px] border border-[#eadff5] bg-white/95 px-3 py-4 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl sm:min-h-44 sm:rounded-[22px] sm:p-4"
@@ -57,7 +98,6 @@
         </span>
       </a>
 
-      <!-- Actividades -->
       <a
         routerLink="/eventos"
         class="group flex min-h-36 flex-col items-center justify-center rounded-[20px] border border-[#eadff5] bg-white/95 px-3 py-4 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl sm:min-h-44 sm:rounded-[22px] sm:p-4"
@@ -75,7 +115,6 @@
         </span>
       </a>
 
-      <!-- Salas -->
       <a
         routerLink="/salas-universitarias"
         class="group flex min-h-36 flex-col items-center justify-center rounded-[20px] border border-[#eadff5] bg-white/95 px-3 py-4 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl sm:min-h-44 sm:rounded-[22px] sm:p-4"
@@ -93,7 +132,6 @@
         </span>
       </a>
 
-      <!-- Hospitales -->
       <a
         routerLink="/hospitales"
         class="group flex min-h-36 flex-col items-center justify-center rounded-[20px] border border-[#eadff5] bg-white/95 px-3 py-4 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl sm:min-h-44 sm:rounded-[22px] sm:p-4"
@@ -111,7 +149,6 @@
         </span>
       </a>
 
-      <!-- Contacta -->
       <a
         routerLink="/contacto"
         class="group flex min-h-36 flex-col items-center justify-center rounded-[20px] border border-[#eadff5] bg-white/95 px-3 py-4 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl sm:min-h-44 sm:rounded-[22px] sm:p-4"
@@ -129,7 +166,6 @@
         </span>
       </a>
 
-      <!-- Colabora -->
       <a
         routerLink="/colabora"
         class="group flex min-h-36 flex-col items-center justify-center rounded-[20px] border border-[#eadff5] bg-white/95 px-3 py-4 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl sm:min-h-44 sm:rounded-[22px] sm:p-4"
@@ -147,7 +183,6 @@
         </span>
       </a>
 
-      <!-- Valora -->
       <a
         routerLink="/valora"
         class="group flex min-h-36 flex-col items-center justify-center rounded-[20px] border border-[#eadff5] bg-white/95 px-3 py-4 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl sm:min-h-44 sm:rounded-[22px] sm:p-4"
