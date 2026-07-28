@@ -76,7 +76,7 @@
         </div>
       }
 
-      <app-login-form (login)="login($event)" />
+      <app-login-form [isLoading]="isLoading()" (login)="login($event)" />
 
       <p class="mt-6 text-center text-xs leading-5 text-zinc-400">
         Acceso exclusivo para personas autorizadas por Amamanta.

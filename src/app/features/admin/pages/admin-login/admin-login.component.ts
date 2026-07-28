@@ -41,6 +41,10 @@ export class AdminLoginComponent implements OnInit {
   }
 
   login(credentials: LoginCredentials): void {
+    if (this.isLoading()) {
+      return;
+    }
+
     this.isLoading.set(true);
     this.errorMessage.set(null);
     this.sessionMessage.set(null);
@@ -51,7 +55,6 @@ export class AdminLoginComponent implements OnInit {
       },
       error: () => {
         this.errorMessage.set('El correo o la contraseña no son correctos.');
-
         this.isLoading.set(false);
       },
     });

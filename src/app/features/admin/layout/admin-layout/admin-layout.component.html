@@ -1,4 +1,4 @@
-<section class="min-h-screen bg-[#fbf7ff]">
+<section class="min-h-screen overflow-x-hidden bg-[#fbf7ff]">
   <!-- Sidebar escritorio -->
   <aside
     class="fixed inset-y-0 left-0 z-50 hidden w-72 border-r border-[#eadff5] bg-white/95 p-4 shadow-xl shadow-purple-100/60 lg:block"
@@ -20,7 +20,7 @@
       <a
         routerLink="/admin/talleres"
         routerLinkActive="bg-[#f4eafa] text-[#8f50c4]"
-        class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600 hover:bg-[#faf5ff]"
+        class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600 transition hover:bg-[#faf5ff]"
       >
         <iconify-icon
           icon="solar:users-group-rounded-bold"
@@ -28,48 +28,50 @@
         ></iconify-icon>
         Talleres LM
       </a>
+
       <a
         routerLink="/admin/espacios-amigos"
         routerLinkActive="bg-[#f4eafa] text-[#8f50c4]"
-        class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600 hover:bg-[#faf5ff]"
+        class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600 transition hover:bg-[#faf5ff]"
       >
         <iconify-icon icon="solar:shop-bold" class="text-xl"></iconify-icon>
         Espacios amigos LM
       </a>
+
       <a
         routerLink="/admin/eventos"
         routerLinkActive="bg-[#f4eafa] text-[#8f50c4]"
-        class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600 hover:bg-[#faf5ff]"
+        class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600 transition hover:bg-[#faf5ff]"
       >
         <iconify-icon icon="solar:calendar-bold" class="text-xl"></iconify-icon>
         Actividades
       </a>
+
       <a
         routerLink="/admin/salas-universitarias"
         routerLinkActive="bg-[#f4eafa] text-[#8f50c4]"
-        class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600 hover:bg-[#faf5ff]"
+        class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600 transition hover:bg-[#faf5ff]"
       >
         <iconify-icon
           icon="solar:buildings-2-bold"
           class="text-xl"
         ></iconify-icon>
-
         Salas lactancia UV
       </a>
+
       <a
         routerLink="/admin/hospitales"
         routerLinkActive="bg-[#f4eafa] text-[#8f50c4]"
-        class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600 transition hover:bg-[#faf5ff] hover:text-[#8f50c4]"
+        class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600 transition hover:bg-[#faf5ff]"
       >
         <iconify-icon icon="solar:hospital-bold" class="text-xl"></iconify-icon>
-
         Hospitales
       </a>
 
       <a
         routerLink="/admin/experiencias"
         routerLinkActive="bg-[#f4eafa] text-[#8f50c4]"
-        class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600 hover:bg-[#faf5ff]"
+        class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600 transition hover:bg-[#faf5ff]"
       >
         <iconify-icon icon="solar:heart-bold" class="text-xl"></iconify-icon>
         Experiencias
@@ -78,7 +80,7 @@
       <a
         routerLink="/admin/valoraciones"
         routerLinkActive="bg-[#f4eafa] text-[#8f50c4]"
-        class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600 hover:bg-[#faf5ff]"
+        class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600 transition hover:bg-[#faf5ff]"
       >
         <iconify-icon icon="solar:star-bold" class="text-xl"></iconify-icon>
         Valoraciones
@@ -87,7 +89,7 @@
       <a
         routerLink="/admin/analitica"
         routerLinkActive="bg-[#f4eafa] text-[#8f50c4]"
-        class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600 hover:bg-[#faf5ff]"
+        class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600 transition hover:bg-[#faf5ff]"
       >
         <iconify-icon icon="solar:chart-2-bold" class="text-xl"></iconify-icon>
         Analítica
@@ -97,8 +99,9 @@
     <button
       type="button"
       (click)="logout()"
-      class="absolute bottom-4 left-4 right-4 rounded-2xl border border-[#eadff5] bg-white px-4 py-3 text-sm font-extrabold text-zinc-600 transition hover:bg-[#faf5ff] hover:text-[#8f50c4]"
+      class="absolute bottom-4 left-4 right-4 flex items-center justify-center gap-2 rounded-2xl border border-[#eadff5] bg-white px-4 py-3 text-sm font-extrabold text-zinc-600 transition hover:bg-[#faf5ff] hover:text-[#8f50c4]"
     >
+      <iconify-icon icon="solar:logout-2-bold" class="text-lg"></iconify-icon>
       Cerrar sesión
     </button>
   </aside>
@@ -108,31 +111,37 @@
     <div class="fixed inset-0 z-50 lg:hidden">
       <button
         type="button"
-        class="absolute inset-0 bg-zinc-900/40"
+        aria-label="Cerrar menú"
+        class="absolute inset-0 bg-zinc-900/40 backdrop-blur-[2px]"
         (click)="sidebarOpen.set(false)"
       ></button>
 
       <aside
-        class="absolute left-0 top-0 flex h-full w-[80vw] max-w-[320px] flex-col border-r border-[#eadff5] bg-white p-4 shadow-2xl shadow-purple-200"
+        class="absolute inset-y-0 left-0 flex w-[86vw] max-w-[320px] flex-col border-r border-[#eadff5] bg-white px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-[calc(1rem+env(safe-area-inset-top))] shadow-2xl shadow-purple-200"
       >
-        <div class="mb-6 flex items-center justify-between">
-          <div class="flex items-center gap-3 rounded-3xl bg-[#faf5ff] p-3">
+        <div class="mb-4 flex items-center justify-between gap-3">
+          <div
+            class="flex min-w-0 flex-1 items-center gap-3 rounded-3xl bg-[#faf5ff] p-3"
+          >
             <img
               src="/logo-amamanta.png"
               alt="Amamanta"
-              class="h-12 w-12 object-contain"
+              class="h-11 w-11 shrink-0 object-contain"
             />
 
-            <div>
-              <p class="text-lg font-black text-[#8f50c4]">Amamanta</p>
-              <p class="text-xs font-semibold text-zinc-500">Panel privado</p>
+            <div class="min-w-0">
+              <p class="truncate text-lg font-black text-[#8f50c4]">Amamanta</p>
+              <p class="truncate text-xs font-semibold text-zinc-500">
+                Panel privado
+              </p>
             </div>
           </div>
 
           <button
             type="button"
+            aria-label="Cerrar menú"
             (click)="sidebarOpen.set(false)"
-            class="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#eadff5] text-[#8f50c4]"
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-[#eadff5] text-[#8f50c4]"
           >
             <iconify-icon
               icon="solar:close-circle-bold"
@@ -141,38 +150,74 @@
           </button>
         </div>
 
-        <nav class="space-y-1">
-          <a
-            routerLink="/admin/eventos"
-            routerLinkActive="bg-[#f4eafa] text-[#8f50c4]"
-            (click)="sidebarOpen.set(false)"
-            class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600 hover:bg-[#faf5ff]"
-          >
-            <iconify-icon
-              icon="solar:calendar-bold"
-              class="text-xl"
-            ></iconify-icon>
-            Eventos
-          </a>
-
+        <nav class="min-h-0 flex-1 space-y-1 overflow-y-auto pr-1">
           <a
             routerLink="/admin/talleres"
             routerLinkActive="bg-[#f4eafa] text-[#8f50c4]"
             (click)="sidebarOpen.set(false)"
-            class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600 hover:bg-[#faf5ff]"
+            class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600"
           >
             <iconify-icon
               icon="solar:users-group-rounded-bold"
               class="text-xl"
             ></iconify-icon>
-            Talleres
+            Talleres LM
+          </a>
+
+          <a
+            routerLink="/admin/espacios-amigos"
+            routerLinkActive="bg-[#f4eafa] text-[#8f50c4]"
+            (click)="sidebarOpen.set(false)"
+            class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600"
+          >
+            <iconify-icon icon="solar:shop-bold" class="text-xl"></iconify-icon>
+            Espacios amigos LM
+          </a>
+
+          <a
+            routerLink="/admin/eventos"
+            routerLinkActive="bg-[#f4eafa] text-[#8f50c4]"
+            (click)="sidebarOpen.set(false)"
+            class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600"
+          >
+            <iconify-icon
+              icon="solar:calendar-bold"
+              class="text-xl"
+            ></iconify-icon>
+            Actividades
+          </a>
+
+          <a
+            routerLink="/admin/salas-universitarias"
+            routerLinkActive="bg-[#f4eafa] text-[#8f50c4]"
+            (click)="sidebarOpen.set(false)"
+            class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600"
+          >
+            <iconify-icon
+              icon="solar:buildings-2-bold"
+              class="text-xl"
+            ></iconify-icon>
+            Salas lactancia UV
+          </a>
+
+          <a
+            routerLink="/admin/hospitales"
+            routerLinkActive="bg-[#f4eafa] text-[#8f50c4]"
+            (click)="sidebarOpen.set(false)"
+            class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600"
+          >
+            <iconify-icon
+              icon="solar:hospital-bold"
+              class="text-xl"
+            ></iconify-icon>
+            Hospitales
           </a>
 
           <a
             routerLink="/admin/experiencias"
             routerLinkActive="bg-[#f4eafa] text-[#8f50c4]"
             (click)="sidebarOpen.set(false)"
-            class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600 hover:bg-[#faf5ff]"
+            class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600"
           >
             <iconify-icon
               icon="solar:heart-bold"
@@ -185,7 +230,7 @@
             routerLink="/admin/valoraciones"
             routerLinkActive="bg-[#f4eafa] text-[#8f50c4]"
             (click)="sidebarOpen.set(false)"
-            class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600 hover:bg-[#faf5ff]"
+            class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600"
           >
             <iconify-icon icon="solar:star-bold" class="text-xl"></iconify-icon>
             Valoraciones
@@ -195,7 +240,7 @@
             routerLink="/admin/analitica"
             routerLinkActive="bg-[#f4eafa] text-[#8f50c4]"
             (click)="sidebarOpen.set(false)"
-            class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600 hover:bg-[#faf5ff]"
+            class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-extrabold text-zinc-600"
           >
             <iconify-icon
               icon="solar:chart-2-bold"
@@ -208,7 +253,7 @@
         <button
           type="button"
           (click)="logout()"
-          class="mt-auto flex items-center justify-center gap-2 rounded-2xl border border-[#eadff5] bg-white px-4 py-3 text-sm font-extrabold text-zinc-600 hover:bg-[#faf5ff] hover:text-[#8f50c4]"
+          class="mt-4 flex shrink-0 items-center justify-center gap-2 rounded-2xl border border-[#eadff5] bg-white px-4 py-3 text-sm font-extrabold text-zinc-600"
         >
           <iconify-icon
             icon="solar:logout-2-bold"
@@ -221,40 +266,50 @@
   }
 
   <!-- Contenido -->
-  <main class="lg:pl-72">
+  <main class="min-w-0 lg:pl-72">
     <header
-      class="sticky top-0 z-40 flex items-center justify-between border-b border-[#eadff5] bg-white/90 px-4 py-3 backdrop-blur-xl lg:px-8"
+      class="sticky top-0 z-40 border-b border-[#eadff5] bg-white/95 px-3 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] backdrop-blur-xl sm:px-5 lg:px-8 lg:py-4"
     >
-      <button
-        type="button"
-        (click)="sidebarOpen.set(true)"
-        class="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#eadff5] text-[#8f50c4] lg:hidden"
-      >
-        <iconify-icon
-          icon="solar:hamburger-menu-bold"
-          class="text-2xl"
-        ></iconify-icon>
-      </button>
+      <div class="mx-auto flex w-full max-w-[1600px] min-w-0 items-start gap-3">
+        <button
+          type="button"
+          aria-label="Abrir menú"
+          (click)="sidebarOpen.set(true)"
+          class="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-[#eadff5] bg-white text-[#8f50c4] lg:hidden"
+        >
+          <iconify-icon
+            icon="solar:hamburger-menu-bold"
+            class="text-2xl"
+          ></iconify-icon>
+        </button>
 
-      <div>
-        <h1 class="text-2xl font-black text-zinc-900">
-          Hola, {{ user()?.name || "Bárbara" }}
-        </h1>
+        <div class="min-w-0 flex-1">
+          <h1
+            class="truncate text-xl font-black leading-tight text-zinc-900 sm:text-2xl"
+          >
+            Hola, {{ user()?.name || "Bárbara" }}
+          </h1>
 
-        <p class="mt-1 text-sm font-medium text-zinc-500">
-          Gestiona el contenido de la aplicación desde un único panel.
-        </p>
+          <p
+            class="mt-1 max-w-2xl text-xs font-medium leading-5 text-zinc-500 sm:text-sm"
+          >
+            Gestiona el contenido de la aplicación desde un único panel.
+          </p>
+        </div>
+
+        <a
+          routerLink="/talleres"
+          class="shrink-0 rounded-full border border-[#eadff5] bg-white px-3 py-2 text-center text-xs font-extrabold leading-4 text-[#8f50c4] shadow-sm transition hover:bg-[#faf5ff] sm:px-4 sm:text-sm"
+        >
+          <span class="sm:hidden">Volver</span>
+          <span class="hidden sm:inline">Volver a la app</span>
+        </a>
       </div>
-
-      <a
-        routerLink="/talleres"
-        class="rounded-full border border-[#eadff5] bg-white px-4 py-2 text-sm font-extrabold text-[#8f50c4] shadow-sm transition hover:bg-[#faf5ff]"
-      >
-        Volver a la app
-      </a>
     </header>
 
-    <div class="p-4 lg:p-8">
+    <div
+      class="mx-auto w-full max-w-[1600px] min-w-0 overflow-x-hidden p-3 sm:p-5 lg:p-8"
+    >
       <router-outlet />
     </div>
   </main>

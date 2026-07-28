@@ -1,4 +1,12 @@
-import { Component, EventEmitter, Output, signal, inject } from '@angular/core';
+import {
+  CUSTOM_ELEMENTS_SCHEMA,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  inject,
+  signal,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 export interface LoginCredentials {
@@ -12,8 +20,12 @@ export interface LoginCredentials {
   imports: [ReactiveFormsModule],
   templateUrl: './login-form.component.html',
   styleUrl: './login-form.component.scss',
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class LoginFormComponent {
+  @Input()
+  isLoading = false;
+
   @Output()
   login = new EventEmitter<LoginCredentials>();
 
@@ -27,10 +39,18 @@ export class LoginFormComponent {
   });
 
   togglePassword(): void {
+    if (this.isLoading) {
+      return;
+    }
+
     this.showPassword.update((value) => !value);
   }
 
   submit(): void {
+    if (this.isLoading) {
+      return;
+    }
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;

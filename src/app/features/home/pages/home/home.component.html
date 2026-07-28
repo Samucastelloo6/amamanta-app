@@ -1,15 +1,15 @@
 <section
-  class="min-h-screen bg-gradient-to-b from-[#fbf7fd] via-white to-[#f6fbf3] px-4 py-5 sm:px-6 lg:px-8"
+  class="min-h-screen bg-gradient-to-b from-[#fbf7fd] via-white to-[#f6fbf3] px-3 pb-6 pt-[calc(1rem+env(safe-area-inset-top))] sm:px-6 sm:py-6 lg:px-8"
 >
   <div class="mx-auto max-w-6xl">
-    <header class="mb-6 text-center">
+    <header class="mb-6 text-center sm:mb-8">
       <img
-        class="mx-auto mb-3 w-20 sm:w-28 lg:w-32"
+        class="mx-auto mb-3 w-16 sm:w-28 lg:w-32"
         src="/logo-amamanta.png"
         alt="Amamanta"
       />
 
-      <p class="mb-2 text-sm font-bold text-[#8f50c4] sm:text-base">
+      <p class="mb-2 text-xs font-bold text-[#8f50c4] sm:text-base">
         Grupo de apoyo a la lactancia materna
       </p>
 
@@ -20,104 +20,147 @@
       </h1>
     </header>
 
-    <div class="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-5">
+    <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-5">
+      <!-- Talleres -->
       <a
         routerLink="/talleres"
-        class="group flex flex-col items-center justify-center rounded-[22px] border border-[#eadff5] bg-white/95 p-3 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl"
+        class="group flex min-h-36 flex-col items-center justify-center rounded-[20px] border border-[#eadff5] bg-white/95 px-3 py-4 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl sm:min-h-44 sm:rounded-[22px] sm:p-4"
       >
         <img
           src="/logo-taller.png"
           alt=""
-          class="mb-2 h-16 w-16 object-contain transition duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
+          class="mb-2 h-14 w-14 object-contain transition duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
         />
-        <span class="text-base font-bold text-zinc-800">Talleres LM</span>
+
+        <span
+          class="flex min-h-10 items-center justify-center text-sm font-bold leading-tight text-zinc-800 sm:text-base"
+        >
+          Talleres LM
+        </span>
       </a>
+
+      <!-- Espacios -->
       <a
         routerLink="/espacios-amigos"
-        class="group flex flex-col items-center justify-center rounded-[22px] border border-[#eadff5] bg-white/95 p-3 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl"
+        class="group flex min-h-36 flex-col items-center justify-center rounded-[20px] border border-[#eadff5] bg-white/95 px-3 py-4 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl sm:min-h-44 sm:rounded-[22px] sm:p-4"
       >
         <img
           src="/logo-espacio.png"
           alt=""
-          class="mb-2 h-16 w-16 object-contain transition duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
+          class="mb-2 h-14 w-14 object-contain transition duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
         />
-        <span class="text-base font-bold text-zinc-800"
-          >Espacios amigos LM</span
+
+        <span
+          class="flex min-h-10 items-center justify-center text-sm font-bold leading-tight text-zinc-800 sm:text-base"
         >
+          Espacios amigos LM
+        </span>
       </a>
 
+      <!-- Actividades -->
       <a
         routerLink="/actividades"
-        class="group flex flex-col items-center justify-center rounded-[22px] border border-[#eadff5] bg-white/95 p-3 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl"
+        class="group flex min-h-36 flex-col items-center justify-center rounded-[20px] border border-[#eadff5] bg-white/95 px-3 py-4 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl sm:min-h-44 sm:rounded-[22px] sm:p-4"
       >
         <img
           src="/logo-evento.png"
           alt=""
-          class="mb-2 h-16 w-16 object-contain transition duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
+          class="mb-2 h-14 w-14 object-contain transition duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
         />
-        <span class="text-base font-bold text-zinc-800">Actividades</span>
+
+        <span
+          class="flex min-h-10 items-center justify-center text-sm font-bold leading-tight text-zinc-800 sm:text-base"
+        >
+          Actividades
+        </span>
       </a>
 
+      <!-- Salas -->
       <a
         routerLink="/salas-universitarias"
-        class="group flex flex-col items-center justify-center rounded-[22px] border border-[#eadff5] bg-white/95 p-3 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl"
+        class="group flex min-h-36 flex-col items-center justify-center rounded-[20px] border border-[#eadff5] bg-white/95 px-3 py-4 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl sm:min-h-44 sm:rounded-[22px] sm:p-4"
       >
         <img
           src="/espacio-universidad.png"
           alt=""
-          class="mb-2 h-16 w-16 object-contain transition duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
+          class="mb-2 h-14 w-14 object-contain transition duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
         />
-        <span class="text-base font-bold text-zinc-800">
+
+        <span
+          class="flex min-h-10 items-center justify-center text-sm font-bold leading-tight text-zinc-800 sm:text-base"
+        >
           Salas lactancia UV
         </span>
       </a>
 
+      <!-- Hospitales -->
       <a
         routerLink="/hospitales"
-        class="group flex flex-col items-center justify-center rounded-[22px] border border-[#eadff5] bg-white/95 p-3 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl"
+        class="group flex min-h-36 flex-col items-center justify-center rounded-[20px] border border-[#eadff5] bg-white/95 px-3 py-4 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl sm:min-h-44 sm:rounded-[22px] sm:p-4"
       >
         <img
           src="/hospitales.png"
           alt=""
-          class="mb-2 h-16 w-16 object-contain transition duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
+          class="mb-2 h-14 w-14 object-contain transition duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
         />
-        <span class="text-base font-bold text-zinc-800">Hospitales</span>
+
+        <span
+          class="flex min-h-10 items-center justify-center text-sm font-bold leading-tight text-zinc-800 sm:text-base"
+        >
+          Hospitales
+        </span>
       </a>
 
+      <!-- Contacta -->
       <a
         routerLink="/contacto"
-        class="group flex flex-col items-center justify-center rounded-[22px] border border-[#eadff5] bg-white/95 p-3 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl"
+        class="group flex min-h-36 flex-col items-center justify-center rounded-[20px] border border-[#eadff5] bg-white/95 px-3 py-4 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl sm:min-h-44 sm:rounded-[22px] sm:p-4"
       >
         <img
           src="/logo-contacta.png"
           alt=""
-          class="mb-2 h-16 w-16 object-contain transition duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
+          class="mb-2 h-14 w-14 object-contain transition duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
         />
-        <span class="text-base font-bold text-zinc-800">Contacta</span>
+
+        <span
+          class="flex min-h-10 items-center justify-center text-sm font-bold leading-tight text-zinc-800 sm:text-base"
+        >
+          Contacta
+        </span>
       </a>
 
+      <!-- Colabora -->
       <a
         routerLink="/colabora"
-        class="group flex flex-col items-center justify-center rounded-[22px] border border-[#eadff5] bg-white/95 p-3 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl"
+        class="group flex min-h-36 flex-col items-center justify-center rounded-[20px] border border-[#eadff5] bg-white/95 px-3 py-4 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl sm:min-h-44 sm:rounded-[22px] sm:p-4"
       >
         <img
           src="/logo-colabora.png"
           alt=""
-          class="mb-2 h-16 w-16 object-contain transition duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
+          class="mb-2 h-14 w-14 object-contain transition duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
         />
-        <span class="text-base font-bold text-zinc-800">Colabora</span>
+
+        <span
+          class="flex min-h-10 items-center justify-center text-sm font-bold leading-tight text-zinc-800 sm:text-base"
+        >
+          Colabora
+        </span>
       </a>
 
+      <!-- Valora -->
       <a
         routerLink="/valora"
-        class="group col-span-2 flex flex-col items-center justify-center rounded-[22px] border border-[#eadff5] bg-white/95 p-3 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl lg:col-span-1"
+        class="group flex min-h-36 flex-col items-center justify-center rounded-[20px] border border-[#eadff5] bg-white/95 px-3 py-4 text-center shadow-md shadow-purple-100/60 transition duration-300 hover:-translate-y-1 hover:border-[#8f50c4] hover:shadow-xl sm:min-h-44 sm:rounded-[22px] sm:p-4"
       >
         <img
           src="/logo-valora.png"
           alt=""
-          class="mb-2 h-16 w-16 object-contain transition duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
+          class="mb-2 h-14 w-14 object-contain transition duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
         />
-        <span class="text-base font-bold text-zinc-800">
+
+        <span
+          class="flex min-h-10 items-center justify-center text-sm font-bold leading-tight text-zinc-800 sm:text-base"
+        >
           Valora la aplicación
         </span>
       </a>
