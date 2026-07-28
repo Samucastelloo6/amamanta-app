@@ -31,6 +31,7 @@ interface CalendarWeek {
 export class EventsComponent implements OnInit {
   @ViewChild('calendarImage') calendarImage!: ElementRef<HTMLElement>;
   @ViewChild('selectedEvents') selectedEvents!: ElementRef<HTMLElement>;
+  @ViewChild('exportLogo') exportLogo!: ElementRef<HTMLImageElement>;
 
   today = new Date();
 
@@ -299,7 +300,26 @@ export class EventsComponent implements OnInit {
     this.loadingService.show();
     this.exporting = true;
 
-    await new Promise((resolve) => setTimeout(resolve, 150));
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => resolve());
+      });
+    });
+
+    const logo = this.exportLogo?.nativeElement;
+
+    if (logo && !logo.complete) {
+      await new Promise<void>((resolve) => {
+        logo.onload = () => resolve();
+        logo.onerror = () => resolve();
+      });
+    }
+
+    if (logo?.decode) {
+      try {
+        await logo.decode();
+      } catch {}
+    }
 
     try {
       const dataUrl = await toPng(this.calendarImage.nativeElement, {

@@ -376,18 +376,23 @@
           }
         </div>
 
-        @if (exporting) {
-          <div
-            class="mt-1 flex items-center justify-center gap-2 border-t border-[#eadff5] pt-1 text-center text-xs font-extrabold leading-tight text-[#8f50c4]"
-          >
-            <img
-              src="/logo-amamanta.png"
-              alt="Amamanta"
-              class="h-6 w-6 object-contain"
-            />
-            <span>Amamanta · Grupo de apoyo a lactancia materna</span>
-          </div>
-        }
+        <div
+          class="flex items-center justify-center gap-2 overflow-hidden text-center text-xs font-extrabold leading-tight text-[#8f50c4]"
+          [ngClass]="{
+            'mt-1 max-h-12 border-t border-[#eadff5] pt-1 opacity-100':
+              exporting,
+            'max-h-0 border-0 pt-0 opacity-0': !exporting,
+          }"
+        >
+          <img
+            #exportLogo
+            src="/logo-amamanta.png"
+            alt="Amamanta"
+            class="h-6 w-6 shrink-0 object-contain"
+          />
+
+          <span>Amamanta · Grupo de apoyo a la lactancia materna</span>
+        </div>
       </div>
     </div>
 
