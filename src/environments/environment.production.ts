@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://api.amamanta.es/api',
+  apiUrl: 'https://p01--amamanta-api--wxsj766vh22r.code.run/api',
 };
