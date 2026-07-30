@@ -26,12 +26,15 @@ export class InstallPwaModalComponent implements OnDestroy {
   @Input()
   isSamsungInternet = false;
 
+  @Input()
+  isIosChrome = false;
+
   @Output()
   readonly close = new EventEmitter<void>();
 
   readonly applicationUrl = 'https://app.amamanta.es';
 
-  readonly installationSteps: InstallationStep[] = [
+  readonly safariInstallationSteps: InstallationStep[] = [
     {
       number: 1,
       title: 'Abre el menú del navegador',
@@ -60,6 +63,40 @@ export class InstallPwaModalComponent implements OnDestroy {
       description: 'Pulsa «Añadir» para terminar.',
       image: '/install-ios/paso-4.webp',
       alt: 'Botón Añadir señalado en la pantalla de confirmación',
+    },
+  ];
+
+  readonly chromeIosInstallationSteps: InstallationStep[] = [
+    {
+      number: 1,
+      title: 'Pulsa «Compartir»',
+      description:
+        'Pulsa el botón Compartir situado a la derecha de la barra de direcciones.',
+      image: '/install-ios-chrome/paso-1.webp',
+      alt: 'Botón Compartir de Google Chrome en iPhone señalado',
+    },
+    {
+      number: 2,
+      title: 'Pulsa «Ver más»',
+      description:
+        'En el menú de compartir, pulsa «Ver más» para mostrar todas las opciones.',
+      image: '/install-ios-chrome/paso-2.webp',
+      alt: 'Opción Ver más del menú de compartir de Google Chrome señalada',
+    },
+    {
+      number: 3,
+      title: 'Añádela a la pantalla de inicio',
+      description: 'Busca y pulsa «Añadir a pantalla de inicio».',
+      image: '/install-ios-chrome/paso-3.webp',
+      alt: 'Opción Añadir a pantalla de inicio de Google Chrome señalada',
+    },
+    {
+      number: 4,
+      title: 'Confirma la instalación',
+      description:
+        'Mantén activada la opción «Abrir como app web» y pulsa «Añadir».',
+      image: '/install-ios-chrome/paso-4.webp',
+      alt: 'Botón Añadir y opción Abrir como app web señalados',
     },
   ];
 

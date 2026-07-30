@@ -18,6 +18,7 @@ export class PwaInstallService {
   readonly canInstall = signal(false);
   readonly isInstalled = signal(false);
   readonly isIos = signal(false);
+  readonly isIosChrome = signal(false);
   readonly isSamsungInternet = signal(false);
 
   constructor() {
@@ -53,6 +54,8 @@ export class PwaInstallService {
       /iphone|ipad|ipod/.test(userAgent) ||
       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
+    const isIosChrome = isIosDevice && /crios/.test(userAgent);
+
     const isSamsungBrowser = /samsungbrowser/.test(userAgent);
 
     const isStandalone =
@@ -62,6 +65,7 @@ export class PwaInstallService {
           true);
 
     this.isIos.set(isIosDevice);
+    this.isIosChrome.set(isIosChrome);
     this.isSamsungInternet.set(isSamsungBrowser);
     this.isInstalled.set(isStandalone);
   }

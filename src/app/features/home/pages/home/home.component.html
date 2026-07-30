@@ -249,9 +249,8 @@
   </div>
 </section>
 
-@if (showInstallInstructions()) {
-  <app-install-pwa-modal
-    [isSamsungInternet]="pwaInstallService.isSamsungInternet()"
-    (close)="closeInstallInstructions()"
-  />
-}
+<app-install-pwa-modal
+  [isSamsungInternet]="pwaInstallService.isSamsungInternet()"
+  [isIosChrome]="pwaInstallService.isIosChrome()"
+  (close)="closeInstallInstructions()"
+/>
