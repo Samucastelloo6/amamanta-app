@@ -17,11 +17,17 @@ import { MapMarker } from '../../../core/models/map-marker';
 import { MapResource } from '../../../core/models/map-resource';
 import { ErrorModalComponent } from '../status-modals/error-modal/error-modal.component';
 import { WarningModalComponent } from '../status-modals/warning-modal/warning-modal.component';
+import { LocationHelpModalComponent } from '../location-help-modal/location-help-modal.component';
 
 @Component({
   selector: 'app-resource-map',
   standalone: true,
-  imports: [GoogleMapsModule, WarningModalComponent, ErrorModalComponent],
+  imports: [
+    GoogleMapsModule,
+    WarningModalComponent,
+    ErrorModalComponent,
+    LocationHelpModalComponent,
+  ],
   templateUrl: './resource-map.component.html',
   styleUrl: './resource-map.component.scss',
 })
@@ -86,12 +92,18 @@ export class ResourceMapComponent<T extends MapResource>
   errorTitle = '';
   errorMessage = '';
 
+  showLocationHelpModal = false;
+
   closeWarningModal(): void {
     this.showWarningModal = false;
   }
 
   closeErrorModal(): void {
     this.showErrorModal = false;
+  }
+
+  closeLocationHelpModal(): void {
+    this.showLocationHelpModal = false;
   }
 
   private showWarning(title: string, message: string): void {
@@ -451,17 +463,7 @@ export class ResourceMapComponent<T extends MapResource>
         console.error('Error obteniendo la ubicación:', error);
 
         this.ngZone.run(() => {
-          const permissionDenied =
-            error.code === GeolocationPositionError.PERMISSION_DENIED;
-
-          this.showWarning(
-            permissionDenied
-              ? 'Permiso de ubicación denegado'
-              : 'No se ha podido obtener tu ubicación',
-            permissionDenied
-              ? 'Activa el permiso de ubicación para esta página desde la configuración del navegador e inténtalo de nuevo.'
-              : 'Comprueba que la ubicación esté activada e inténtalo de nuevo.',
-          );
+          this.showLocationHelpModal = true;
         });
       },
       {
@@ -471,7 +473,6 @@ export class ResourceMapComponent<T extends MapResource>
       },
     );
   }
-
   private calculateRoute(
     origin: google.maps.LatLngLiteral,
     destination: google.maps.LatLngLiteral,

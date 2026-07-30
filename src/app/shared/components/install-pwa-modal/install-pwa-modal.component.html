@@ -1,0 +1,107 @@
+<div
+  class="fixed inset-0 z-[100] flex items-end justify-center bg-zinc-900/45 p-3 backdrop-blur-sm sm:items-center sm:p-6"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="iosInstallTitle"
+>
+  <button
+    type="button"
+    class="absolute inset-0"
+    aria-label="Cerrar instrucciones"
+    (click)="closeModal()"
+  ></button>
+
+  <section
+    class="relative z-10 w-full max-w-md rounded-[28px] border border-[#eadff5] bg-white p-5 shadow-2xl shadow-purple-200/70 sm:p-6"
+  >
+    <button
+      type="button"
+      (click)="closeModal()"
+      aria-label="Cerrar"
+      class="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-[#faf5ff] text-xl font-black text-[#8f50c4]"
+    >
+      ×
+    </button>
+
+    <div
+      class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f4eafa] text-[#8f50c4]"
+    >
+      <svg
+        class="h-7 w-7"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        aria-hidden="true"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M12 16V3m0 0-4 4m4-4 4 4M5 13v7h14v-7"
+        />
+      </svg>
+    </div>
+
+    <div class="mt-4 text-center">
+      <h2 id="iosInstallTitle" class="text-xl font-black text-zinc-900">
+        Instalar Amamanta en iPhone
+      </h2>
+
+      <p class="mt-2 text-sm leading-6 text-zinc-500">
+        Sigue estos pasos para añadir la aplicación a tu pantalla de inicio.
+      </p>
+    </div>
+
+    <ol class="mt-5 space-y-3">
+      <li class="flex items-center gap-3 rounded-2xl bg-[#faf5ff] p-3">
+        <span
+          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#8f50c4] text-sm font-black text-white"
+        >
+          1
+        </span>
+
+        <p class="text-sm font-bold leading-5 text-zinc-700">
+          Pulsa el botón <strong>Compartir</strong> de Safari.
+        </p>
+      </li>
+
+      <li class="flex items-center gap-3 rounded-2xl bg-[#faf5ff] p-3">
+        <span
+          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#8f50c4] text-sm font-black text-white"
+        >
+          2
+        </span>
+
+        <p class="text-sm font-bold leading-5 text-zinc-700">
+          Selecciona <strong>Añadir a pantalla de inicio</strong>.
+        </p>
+      </li>
+
+      <li class="flex items-center gap-3 rounded-2xl bg-[#faf5ff] p-3">
+        <span
+          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#8f50c4] text-sm font-black text-white"
+        >
+          3
+        </span>
+
+        <p class="text-sm font-bold leading-5 text-zinc-700">
+          Pulsa <strong>Añadir</strong> para terminar.
+        </p>
+      </li>
+    </ol>
+
+    <p
+      class="mt-4 rounded-2xl bg-green-50 px-4 py-3 text-center text-xs font-bold leading-5 text-green-700"
+    >
+      En iPhone debes abrir la aplicación desde Safari para poder instalarla.
+    </p>
+
+    <button
+      type="button"
+      (click)="closeModal()"
+      class="mt-5 w-full rounded-2xl bg-[#8f50c4] px-5 py-3 text-sm font-extrabold text-white shadow-lg shadow-purple-200 transition hover:bg-[#7b3fb1]"
+    >
+      Entendido
+    </button>
+  </section>
+</div>

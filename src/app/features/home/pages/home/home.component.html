@@ -28,7 +28,10 @@
         <span
           class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#8f50c4] text-white"
         >
-          <span class="text-xl">↻</span>
+          <iconify-icon
+            icon="solar:refresh-circle-bold"
+            class="text-2xl"
+          ></iconify-icon>
         </span>
 
         <div class="min-w-0 flex-1">
@@ -57,6 +60,44 @@
             <span class="hidden sm:inline">Actualizando...</span>
           } @else {
             <span>Actualizar</span>
+          }
+        </button>
+      </section>
+    }
+    @if (shouldShowInstallCard) {
+      <section
+        class="mx-auto mb-4 flex max-w-3xl items-center gap-3 rounded-[20px] border border-green-200 bg-[#f7fff2] p-3 shadow-md shadow-green-100/60 sm:p-4"
+      >
+        <span
+          class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#4aa84f] text-white"
+        >
+          <iconify-icon
+            icon="solar:download-minimalistic-bold"
+            class="text-2xl"
+          ></iconify-icon>
+        </span>
+
+        <div class="min-w-0 flex-1">
+          <p class="text-sm font-black text-zinc-800">Instala Amamanta</p>
+
+          <p
+            class="mt-0.5 text-xs font-semibold leading-5 text-zinc-500 sm:text-sm"
+          >
+            Accede más rápido desde la pantalla de inicio de tu móvil o
+            ordenador.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          (click)="installApplication()"
+          [disabled]="installing()"
+          class="rounded-full bg-[#4aa84f] px-4 py-2 text-xs font-extrabold text-white shadow-md transition hover:bg-[#3d9142] disabled:opacity-70 sm:text-sm"
+        >
+          @if (installing()) {
+            Instalando...
+          } @else {
+            Instalar
           }
         </button>
       </section>
@@ -201,3 +242,7 @@
     </div>
   </div>
 </section>
+
+@if (showIosInstallInstructions()) {
+  <app-install-pwa-modal (close)="closeIosInstallInstructions()" />
+}

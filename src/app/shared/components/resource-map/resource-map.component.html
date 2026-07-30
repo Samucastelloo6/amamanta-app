@@ -42,3 +42,7 @@
     (close)="closeErrorModal()"
   />
 }
+
+@if (showLocationHelpModal) {
+  <app-location-help-modal (close)="closeLocationHelpModal()" />
+}
