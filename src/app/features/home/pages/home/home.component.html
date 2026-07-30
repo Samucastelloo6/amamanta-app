@@ -72,7 +72,7 @@
           class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#4aa84f] text-white"
         >
           <iconify-icon
-            icon="solar:download-minimalistic-bold"
+            icon="solar:download-square-bold"
             class="text-2xl"
           ></iconify-icon>
         </span>
@@ -83,8 +83,13 @@
           <p
             class="mt-0.5 text-xs font-semibold leading-5 text-zinc-500 sm:text-sm"
           >
-            Accede más rápido desde la pantalla de inicio de tu móvil o
-            ordenador.
+            @if (pwaInstallService.isSamsungInternet()) {
+              Samsung Internet está dando un error. Pulsa el botón para ver cómo
+              instalar Amamanta desde Google Chrome.
+            } @else {
+              Accede más rápido desde la pantalla de inicio de tu móvil o
+              ordenador.
+            }
           </p>
         </div>
 
@@ -92,17 +97,18 @@
           type="button"
           (click)="installApplication()"
           [disabled]="installing()"
-          class="rounded-full bg-[#4aa84f] px-4 py-2 text-xs font-extrabold text-white shadow-md transition hover:bg-[#3d9142] disabled:opacity-70 sm:text-sm"
+          class="shrink-0 rounded-full bg-[#4aa84f] px-4 py-2 text-xs font-extrabold text-white shadow-md transition hover:bg-[#3d9142] disabled:cursor-not-allowed disabled:opacity-70 sm:text-sm"
         >
           @if (installing()) {
             Instalando...
+          } @else if (pwaInstallService.isSamsungInternet()) {
+            Ver cómo
           } @else {
             Instalar
           }
         </button>
       </section>
     }
-
     <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-5">
       <a
         routerLink="/talleres"
@@ -243,6 +249,9 @@
   </div>
 </section>
 
-@if (showIosInstallInstructions()) {
-  <app-install-pwa-modal (close)="closeIosInstallInstructions()" />
+@if (showInstallInstructions()) {
+  <app-install-pwa-modal
+    [isSamsungInternet]="pwaInstallService.isSamsungInternet()"
+    (close)="closeInstallInstructions()"
+  />
 }

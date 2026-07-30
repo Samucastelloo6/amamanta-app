@@ -24,7 +24,7 @@ export class HomeComponent implements OnInit {
 
   readonly updateAvailable = signal(false);
   readonly updating = signal(false);
-  readonly showIosInstallInstructions = signal(false);
+  readonly showInstallInstructions = signal(false);
   readonly installing = signal(false);
 
   ngOnInit(): void {
@@ -38,7 +38,9 @@ export class HomeComponent implements OnInit {
     }
 
     return (
-      this.pwaInstallService.canInstall() || this.pwaInstallService.isIos()
+      this.pwaInstallService.canInstall() ||
+      this.pwaInstallService.isIos() ||
+      this.pwaInstallService.isSamsungInternet()
     );
   }
 
@@ -56,8 +58,15 @@ export class HomeComponent implements OnInit {
       return;
     }
 
-    if (this.pwaInstallService.isIos()) {
-      this.showIosInstallInstructions.set(true);
+    if (
+      this.pwaInstallService.isIos() ||
+      this.pwaInstallService.isSamsungInternet()
+    ) {
+      this.showInstallInstructions.set(true);
+      return;
+    }
+
+    if (!this.pwaInstallService.canInstall()) {
       return;
     }
 
@@ -70,8 +79,8 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  closeIosInstallInstructions(): void {
-    this.showIosInstallInstructions.set(false);
+  closeInstallInstructions(): void {
+    this.showInstallInstructions.set(false);
   }
 
   private listenForUpdates(): void {
