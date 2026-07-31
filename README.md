@@ -1,59 +1,113 @@
-# AmamantaApp
+# App Amamanta
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.19.
+App Amamanta is a Progressive Web App (PWA) developed for the Amamanta association to provide easy access to information and services related to breastfeeding support.
 
-## Development server
+The application allows users to browse workshops, events, accredited hospitals, university nursing rooms and breastfeeding-friendly places. It also includes a private administration panel for managing the application's content.
 
-To start a local development server, run:
+## Preview
 
-```bash
-ng serve
-```
+<table>
+  <tr>
+    <td><img src="docs/home.png" alt="Home"></td>
+    <td><img src="docs/workshops.png" alt="Workshops"></td>
+  </tr>
+  <tr>
+    <td><img src="docs/activities.png" alt="Activities"></td>
+    <td><img src="docs/admin-dashboard.png" alt="Administration panel"></td>
+  </tr>
+</table>
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Features
 
-## Code scaffolding
+- Browse breastfeeding workshops with a weekly calendar and interactive map.
+- View upcoming activities in a monthly calendar.
+- Find accredited hospitals and university nursing rooms.
+- Discover breastfeeding-friendly places.
+- Contact the association directly from the application.
+- Submit feedback and ratings.
+- Install the application as a Progressive Web App (PWA).
+- Private administration panel for content management.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Technologies
 
-```bash
-ng generate component component-name
-```
+- Angular 19
+- TypeScript
+- Tailwind CSS
+- Angular Router
+- Angular Service Worker (PWA)
+- Google Maps JavaScript API
+- html-to-image
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Installation
 
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+Clone the repository:
 
 ```bash
-ng e2e
+git clone https://github.com/Samucastelloo6/amamanta-app.git
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Go to the project directory:
 
-## Additional Resources
+```bash
+cd amamanta-app
+```
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Install the dependencies:
+
+```bash
+npm install
+```
+
+Start the development server:
+
+```bash
+npm start
+```
+
+The application will be available at:
+
+```text
+http://localhost:4200
+```
+
+## Available Scripts
+
+| Command         | Description                            |
+| --------------- | -------------------------------------- |
+| `npm start`     | Starts the development server.         |
+| `npm run build` | Builds the application for production. |
+| `npm run watch` | Builds the application in watch mode.  |
+| `npm test`      | Runs the unit tests.                   |
+
+## Deployment
+
+The frontend is deployed on Vercel and communicates with a REST API developed with Node.js and Express.
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── admin/
+│   ├── core/
+│   ├── features/
+│   └── shared/
+├── environments/
+└── styles/
+```
+
+## Live Demo
+
+The application is available at:
+
+<https://app.amamanta.es>
+
+## Related Repository
+
+Backend API:
+
+<https://github.com/Samucastelloo6/amamanta-app/tree/main/backend>
+
+## Author
+
+Developed by **Samuel Castelló Felipe**.
