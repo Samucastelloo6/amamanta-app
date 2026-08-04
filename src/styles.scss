@@ -7,7 +7,7 @@
 html {
   width: 100%;
   min-height: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
   background-color: #ffffff;
   overscroll-behavior-x: none;
   -webkit-text-size-adjust: 100%;
@@ -19,7 +19,7 @@ body {
   min-height: 100%;
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
+  overflow-x: clip;
   color-scheme: light;
   background-color: #ffffff;
   font-family: "Quicksand", sans-serif;
@@ -29,7 +29,7 @@ app-root {
   display: block;
   width: 100%;
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 @theme {

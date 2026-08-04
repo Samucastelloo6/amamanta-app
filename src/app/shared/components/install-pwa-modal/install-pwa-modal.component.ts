@@ -39,14 +39,15 @@ export class InstallPwaModalComponent implements OnDestroy {
       number: 1,
       title: 'Abre el menú del navegador',
       description:
-        'Pulsa el botón de los tres puntos situado en la parte inferior.',
+        'Pulsa el botón de los tres puntos situado en la parte inferior. En algunas versiones de Safari no aparecen los tres puntos y se muestra directamente el icono de Compartir del paso 2.',
       image: '/install-ios/paso-1.webp',
       alt: 'Menú de Safari con el botón de tres puntos señalado',
     },
     {
       number: 2,
       title: 'Pulsa «Compartir»',
-      description: 'Selecciona la opción Compartir dentro del menú.',
+      description:
+        'Selecciona la opción Compartir dentro del menú. Si en tu Safari aparece directamente este icono, pulsa sobre él y continúa con el paso 3.',
       image: '/install-ios/paso-2.webp',
       alt: 'Opción Compartir de Safari señalada',
     },
