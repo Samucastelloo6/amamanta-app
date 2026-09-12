@@ -12,6 +12,9 @@ export interface ExperienceResponse {
   text?: string;
   improvement?: string;
 
+  workshopId?: string;
+  workshopName?: string;
+
   date: string;
 }
 
@@ -33,6 +36,18 @@ export function mapExperienceToResponse(
     ...(experience.improvement
       ? {
           improvement: experience.improvement,
+        }
+      : {}),
+
+    ...(experience.workshopId
+      ? {
+          workshopId: experience.workshopId.toString(),
+        }
+      : {}),
+
+    ...(experience.workshopName
+      ? {
+          workshopName: experience.workshopName,
         }
       : {}),
 

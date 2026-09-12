@@ -76,6 +76,42 @@ export class AdminAnalyticsComponent implements OnInit {
     return this.historicalAnalytics()?.sectionRanking[0] ?? null;
   });
 
+  /*
+   * Primer día contado con el método de visitantes únicos. Antes de esa fecha
+   * las visitas incluían cada pestaña abierta y los rastreadores, así que son
+   * cifras más altas y no comparables.
+   */
+  readonly reliableFrom = computed(
+    () =>
+      this.historicalAnalytics()?.reliableFrom ??
+      this.currentAnalytics()?.reliableFrom ??
+      null,
+  );
+
+  readonly showReliabilityNote = computed(() => {
+    const from = this.reliableFrom();
+
+    if (!from) {
+      return false;
+    }
+
+    const monthStart = `${this.selectedYear()}-${String(
+      this.selectedMonth(),
+    ).padStart(2, '0')}-01`;
+
+    return monthStart < from;
+  });
+
+  getReliableFromLabel(): string {
+    const from = this.reliableFrom();
+
+    if (!from) {
+      return '';
+    }
+
+    return `${from.slice(8, 10)}/${from.slice(5, 7)}/${from.slice(0, 4)}`;
+  }
+
   ngOnInit(): void {
     this.loadCurrentAnalytics();
     this.loadHistoricalAnalytics();

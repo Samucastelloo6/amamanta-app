@@ -15,8 +15,6 @@ export class AnalyticsTrackerService {
   private readonly visitStorageKey = 'amamanta_analytics_visit';
 
   startTracking(): void {
-    this.registerVisitOnce();
-
     this.router.events
       .pipe(
         filter(
@@ -24,7 +22,18 @@ export class AnalyticsTrackerService {
         ),
       )
       .subscribe((event) => {
-        const section = this.getSectionFromUrl(event.urlAfterRedirects);
+        const url = event.urlAfterRedirects;
+
+        /*
+         * La visita se registra en la primera página pública que se abre, no
+         * al arrancar la aplicación, para que navegar por el panel de
+         * administración no cuente como visita de una familia.
+         */
+        if (!url.startsWith('/admin')) {
+          this.registerVisitOnce();
+        }
+
+        const section = this.getSectionFromUrl(url);
 
         if (!section) {
           return;

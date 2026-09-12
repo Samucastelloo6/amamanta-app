@@ -23,11 +23,39 @@ const app = express();
 
 app.disable('x-powered-by');
 
+/*
+ * Detrás del proxy de Northflank, req.ip es la dirección del proxy salvo que
+ * se confíe en su cabecera. Sin esto, todas las visitas parecerían venir de la
+ * misma IP y el límite de peticiones afectaría a todo el mundo a la vez.
+ */
+app.set('trust proxy', 1);
+
 app.use(helmet());
+
+/*
+ * Se acepta el cliente configurado en CLIENT_URL y, además, cualquier origen
+ * local, para que el desarrollo no se rompa cada vez que Angular arranca en un
+ * puerto distinto al esperado.
+ *
+ * Esto no debilita la producción: la API no usa cookies de sesión —el token
+ * viaja en la cabecera Authorization— así que una página servida desde el
+ * localhost de otra persona no puede aprovechar la sesión de nadie.
+ */
+const localhostOrigin = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
 
 app.use(
   cors({
-    origin: env.CLIENT_URL,
+    origin(origin, callback) {
+      const isAllowed =
+        !origin || origin === env.CLIENT_URL || localhostOrigin.test(origin);
+
+      if (isAllowed) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error('Origen no permitido por CORS'));
+    },
     credentials: true,
   }),
 );

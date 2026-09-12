@@ -5,7 +5,16 @@ import {
   type EventDocument,
 } from '../modules/events/event.model.js';
 
-type EventSeed = Omit<EventDocument, 'createdAt' | 'updatedAt'>;
+/*
+ * Los eventos de ejemplo son todos presenciales. Se omiten los campos de la
+ * modalidad online porque el esquema ya les da valor por defecto
+ * (mode: 'presential', onlineUrl: '', onlineCode: ''), así que no hace falta
+ * repetirlos en cada literal.
+ */
+type EventSeed = Omit<
+  EventDocument,
+  'createdAt' | 'updatedAt' | 'mode' | 'onlinePlatform' | 'onlineUrl' | 'onlineCode'
+>;
 
 const events: EventSeed[] = [
 {

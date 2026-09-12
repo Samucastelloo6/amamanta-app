@@ -11,6 +11,7 @@ import { EventsService } from '../../../../core/services/events.service';
 import {
   AmamantaEvent,
   CreateEventRequest,
+  getEventPlatformLabel,
 } from '../../../../core/models/amamanta-event';
 import { AppModalComponent } from '../../../../shared/components/app-modal/app-modal.component';
 import { EventFormComponent } from '../../components/event-form/event-form.component';
@@ -79,6 +80,12 @@ export class AdminEventsComponent implements OnInit {
         `${a.date} ${a.startTime}`.localeCompare(`${b.date} ${b.startTime}`),
       );
   });
+
+  getModeLabel(event: AmamantaEvent): string {
+    return event.mode === 'online'
+      ? `Online · ${getEventPlatformLabel(event.onlinePlatform)}`
+      : event.location;
+  }
 
   ngOnInit(): void {
     this.eventsService.loadEvents().subscribe();

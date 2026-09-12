@@ -49,3 +49,23 @@ export interface Workshop {
 export type CreateWorkshopRequest = Omit<Workshop, 'id'>;
 
 export type UpdateWorkshopRequest = Partial<CreateWorkshopRequest>;
+
+const WORKSHOP_DAY_LABELS: Record<WorkshopDay, string> = {
+  lunes: 'Lunes',
+  martes: 'Martes',
+  miércoles: 'Miércoles',
+  jueves: 'Jueves',
+  viernes: 'Viernes',
+};
+
+/*
+ * Etiqueta con la que se identifica un taller en desplegables y listados.
+ * El nombre por sí solo no basta: puede haber varios talleres en el mismo
+ * sitio en días u horarios distintos.
+ */
+export function getWorkshopLabel(workshop: Workshop): string {
+  const day = WORKSHOP_DAY_LABELS[workshop.day] ?? '';
+  const mode = workshop.mode === 'online' ? ' · Online' : '';
+
+  return `${workshop.name} — ${day} ${workshop.schedule}${mode}`;
+}

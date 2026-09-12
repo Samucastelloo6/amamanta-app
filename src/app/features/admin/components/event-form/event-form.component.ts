@@ -12,6 +12,10 @@ import { FormsModule } from '@angular/forms';
 import {
   AmamantaEvent,
   CreateEventRequest,
+  EventMode,
+  eventOnlinePlatforms,
+  EventOnlinePlatform,
+  getEventPlatformLabel,
 } from '../../../../core/models/amamanta-event';
 import { WarningModalComponent } from '../../../../shared/components/status-modals/warning-modal/warning-modal.component';
 
@@ -30,6 +34,8 @@ export class EventFormComponent implements OnChanges {
   @Output() saved = new EventEmitter<AmamantaEvent | CreateEventRequest>();
   @Output() cancelled = new EventEmitter<void>();
 
+  readonly platforms = eventOnlinePlatforms;
+
   showWarningModal = false;
   warningMessage = '';
 
@@ -41,6 +47,23 @@ export class EventFormComponent implements OnChanges {
     if (changes['event']) {
       this.loadForm();
     }
+  }
+
+  get isOnline(): boolean {
+    return this.form.mode === 'online';
+  }
+
+  setMode(mode: EventMode): void {
+    if (this.form.mode === mode) {
+      return;
+    }
+
+    this.form.mode = mode;
+    this.fieldErrors = {};
+  }
+
+  getPlatformLabel(platform: EventOnlinePlatform): string {
+    return getEventPlatformLabel(platform);
   }
 
   save(): void {
@@ -80,6 +103,8 @@ export class EventFormComponent implements OnChanges {
       'date',
       'location',
       'googleMapsUrl',
+      'onlinePlatform',
+      'onlineUrl',
       'description',
     ];
 
@@ -122,8 +147,12 @@ export class EventFormComponent implements OnChanges {
       title: '',
       date: '',
       startTime: '',
+      mode: 'presential',
       location: '',
       googleMapsUrl: '',
+      onlinePlatform: 'zoom',
+      onlineUrl: '',
+      onlineCode: '',
       description: '',
       requiresRegistration: false,
       isActive: true,
@@ -133,16 +162,28 @@ export class EventFormComponent implements OnChanges {
   private getCleanEvent(): AmamantaEvent | CreateEventRequest {
     const title = this.cleanText(this.form.title);
     const startTime = this.form.startTime.trim();
-    const location = this.cleanText(this.form.location);
-    const googleMapsUrl = this.form.googleMapsUrl.trim();
     const description = this.cleanText(this.form.description);
+
+    const isOnline = this.form.mode === 'online';
 
     const payload: CreateEventRequest = {
       title,
       date: this.form.date,
       startTime,
-      location,
-      googleMapsUrl,
+      mode: this.form.mode,
+
+      location: isOnline ? '' : this.cleanText(this.form.location),
+      googleMapsUrl: isOnline ? '' : this.form.googleMapsUrl.trim(),
+
+      onlineUrl: isOnline ? this.form.onlineUrl.trim() : '',
+      onlineCode: isOnline ? this.cleanText(this.form.onlineCode) : '',
+
+      ...(isOnline && this.form.onlinePlatform
+        ? {
+            onlinePlatform: this.form.onlinePlatform,
+          }
+        : {}),
+
       description,
       requiresRegistration: !!this.form.requiresRegistration,
       isActive: !!this.form.isActive,
@@ -168,12 +209,26 @@ export class EventFormComponent implements OnChanges {
       errors.date = 'Selecciona la fecha de la actividad.';
     }
 
-    if (!event.location) {
-      errors.location = 'Escribe el lugar donde se realizará la actividad.';
-    }
+    if (event.mode === 'online') {
+      if (!event.onlinePlatform) {
+        errors.onlinePlatform = 'Selecciona la plataforma de la reunión.';
+      }
 
-    if (!event.googleMapsUrl) {
-      errors.googleMapsUrl = 'Añade el enlace de Google Maps.';
+      if (!event.onlineUrl) {
+        errors.onlineUrl = 'Añade el enlace de la reunión.';
+      } else if (!this.isHttpUrl(event.onlineUrl)) {
+        errors.onlineUrl = 'El enlace debe empezar por http:// o https://';
+      }
+    } else {
+      if (!event.location) {
+        errors.location = 'Escribe el lugar donde se realizará la actividad.';
+      }
+
+      if (!event.googleMapsUrl) {
+        errors.googleMapsUrl = 'Añade el enlace de Google Maps.';
+      } else if (!this.isHttpUrl(event.googleMapsUrl)) {
+        errors.googleMapsUrl = 'El enlace debe empezar por http:// o https://';
+      }
     }
 
     if (!event.description) {
@@ -181,6 +236,16 @@ export class EventFormComponent implements OnChanges {
     }
 
     return errors;
+  }
+
+  private isHttpUrl(value: string): boolean {
+    try {
+      const url = new URL(value);
+
+      return url.protocol === 'http:' || url.protocol === 'https:';
+    } catch {
+      return false;
+    }
   }
 
   private cleanText(value: string): string {

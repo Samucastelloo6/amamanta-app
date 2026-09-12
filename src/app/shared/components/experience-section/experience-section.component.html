@@ -33,63 +33,88 @@
       </div>
 
       @if (experiences.length > 0) {
-        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          @for (experience of experiences; track experience.id) {
-            <article
-              class="flex min-h-[220px] flex-col rounded-[22px] border border-[#eadff5] bg-[#fcfaff] p-5 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-100"
+        @if (isGroupedByWorkshop) {
+          <div
+            class="mb-6 flex flex-col gap-2 border-b border-[#eadff5] pb-5 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
+          >
+            <label
+              for="workshopFilter"
+              class="text-sm font-extrabold text-zinc-600"
             >
-              <div class="mb-4 flex items-start justify-between gap-3">
-                <div>
-                  <div class="flex gap-0.5">
-                    @for (star of [1, 2, 3, 4, 5]; track star) {
-                      <span
-                        class="text-lg"
-                        [ngClass]="{
-                          'text-[#4aa84f]': star <= experience.rating,
-                          'text-[#d8cde8]': star > experience.rating,
-                        }"
-                      >
-                        ★
-                      </span>
-                    }
-                  </div>
+              Filtrar por taller
+            </label>
 
-                  <p class="mt-1 text-xs font-extrabold text-[#8f50c4]">
-                    {{ getRatingText(experience.rating) }}
-                  </p>
-                </div>
+            <select
+              id="workshopFilter"
+              name="workshopFilter"
+              [(ngModel)]="selectedGroupKey"
+              class="w-full rounded-2xl border border-[#eadff5] bg-[#fcfaff] p-3 text-sm font-semibold text-zinc-700 outline-none transition focus:border-[#8f50c4] focus:bg-white sm:w-auto sm:min-w-[340px]"
+            >
+              <option value="all">
+                Todos los talleres ({{ experiences.length }})
+              </option>
 
-                <span
-                  class="shrink-0 rounded-full bg-[#f5effb] px-3 py-1 text-xs font-bold text-[#8f50c4]"
-                >
-                  {{ experience.date | date: "MMM yyyy" : "" : "es" }}
-                </span>
-              </div>
-
-              @if (experience.text) {
-                <p class="flex-1 text-sm leading-7 text-zinc-600">
-                  “{{ experience.text }}”
-                </p>
+              @for (group of groups; track group.key) {
+                <option [value]="group.key">
+                  {{ group.name }} ({{ group.experiences.length }})
+                </option>
               }
+            </select>
+          </div>
 
-              @if (experience.improvement) {
+          <div class="space-y-10">
+            @for (group of visibleGroups; track group.key) {
+              <section>
                 <div
-                  class="mt-4 rounded-2xl border border-[#eadff5] bg-white px-4 py-3"
+                  class="mb-4 flex flex-wrap items-center justify-between gap-3"
                 >
-                  <p
-                    class="text-[10px] font-black uppercase tracking-[0.14em] text-[#4aa84f]"
+                  <h2
+                    class="text-lg font-extrabold text-[#8f50c4] sm:text-xl"
                   >
-                    Propuesta de mejora
-                  </p>
+                    {{ group.name }}
+                  </h2>
 
-                  <p class="mt-1 text-sm leading-6 text-zinc-600">
-                    {{ experience.improvement }}
-                  </p>
+                  <div class="flex items-center gap-2">
+                    <span
+                      class="rounded-full bg-[#f6fbf3] px-3 py-1 text-xs font-extrabold text-[#4aa84f]"
+                    >
+                      {{ group.average | number: "1.1-1" }} ★
+                    </span>
+
+                    <span
+                      class="rounded-full bg-[#f5effb] px-3 py-1 text-xs font-bold text-[#8f50c4]"
+                    >
+                      {{ group.experiences.length }}
+                      {{
+                        group.experiences.length === 1
+                          ? "experiencia"
+                          : "experiencias"
+                      }}
+                    </span>
+                  </div>
                 </div>
-              }
-            </article>
-          }
-        </div>
+
+                <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                  @for (experience of group.experiences; track experience.id) {
+                    <ng-container
+                      [ngTemplateOutlet]="experienceCard"
+                      [ngTemplateOutletContext]="{ $implicit: experience }"
+                    ></ng-container>
+                  }
+                </div>
+              </section>
+            }
+          </div>
+        } @else {
+          <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            @for (experience of experiences; track experience.id) {
+              <ng-container
+                [ngTemplateOutlet]="experienceCard"
+                [ngTemplateOutletContext]="{ $implicit: experience }"
+              ></ng-container>
+            }
+          </div>
+        }
       } @else {
         <div
           class="rounded-[22px] border border-dashed border-[#d8c4ec] bg-[#faf5ff] px-6 py-8 text-center"
@@ -133,6 +158,60 @@
     </div>
   </div>
 </section>
+
+<ng-template #experienceCard let-experience>
+  <article
+    class="flex min-h-[220px] flex-col rounded-[22px] border border-[#eadff5] bg-[#fcfaff] p-5 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-100"
+  >
+    <div class="mb-4 flex items-start justify-between gap-3">
+      <div>
+        <div class="flex gap-0.5">
+          @for (star of [1, 2, 3, 4, 5]; track star) {
+            <span
+              class="text-lg"
+              [ngClass]="{
+                'text-[#4aa84f]': star <= experience.rating,
+                'text-[#d8cde8]': star > experience.rating,
+              }"
+            >
+              ★
+            </span>
+          }
+        </div>
+
+        <p class="mt-1 text-xs font-extrabold text-[#8f50c4]">
+          {{ getRatingText(experience.rating) }}
+        </p>
+      </div>
+
+      <span
+        class="shrink-0 rounded-full bg-[#f5effb] px-3 py-1 text-xs font-bold text-[#8f50c4]"
+      >
+        {{ experience.date | date: "MMM yyyy" : "" : "es" }}
+      </span>
+    </div>
+
+    @if (experience.text) {
+      <p class="flex-1 text-sm leading-7 text-zinc-600">
+        “{{ experience.text }}”
+      </p>
+    }
+
+    @if (experience.improvement) {
+      <div class="mt-4 rounded-2xl border border-[#eadff5] bg-white px-4 py-3">
+        <p
+          class="text-[10px] font-black uppercase tracking-[0.14em] text-[#4aa84f]"
+        >
+          Propuesta de mejora
+        </p>
+
+        <p class="mt-1 text-sm leading-6 text-zinc-600">
+          {{ experience.improvement }}
+        </p>
+      </div>
+    }
+  </article>
+</ng-template>
 
 @if (showErrorModal) {
   <app-error-modal

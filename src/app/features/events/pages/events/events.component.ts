@@ -1,6 +1,9 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { toPng } from 'html-to-image';
-import { AmamantaEvent } from '../../../../core/models/amamanta-event';
+import {
+  AmamantaEvent,
+  getEventPlatformLabel,
+} from '../../../../core/models/amamanta-event';
 import { EventsService } from '../../../../core/services/events.service';
 import { Router, RouterLink } from '@angular/router';
 import { DatePipe, NgClass } from '@angular/common';
@@ -179,7 +182,19 @@ export class EventsComponent implements OnInit {
         ),
       );
   }
+  /*
+   * Texto con el que se identifica dónde ocurre el evento: el lugar si es
+   * presencial, y la plataforma si es online.
+   */
+  getEventPlace(event: AmamantaEvent): string {
+    return event.mode === 'online'
+      ? `Online · ${getEventPlatformLabel(event.onlinePlatform)}`
+      : event.location;
+  }
+
   getEventLocality(event: AmamantaEvent): string {
+    if (event.mode === 'online') return 'Online';
+
     const location = event.location;
 
     if (location.includes('L’Eliana')) return 'L’Eliana';

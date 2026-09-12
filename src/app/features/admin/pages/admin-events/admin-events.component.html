@@ -95,9 +95,18 @@
           </p>
 
           <p>
-            <span class="text-[#8f50c4]">Lugar:</span>
-            {{ event.location }}
+            <span class="text-[#8f50c4]">
+              {{ event.mode === "online" ? "Dónde:" : "Lugar:" }}
+            </span>
+            {{ getModeLabel(event) }}
           </p>
+
+          @if (event.mode === "online" && event.onlineCode) {
+            <p>
+              <span class="text-[#8f50c4]">Código:</span>
+              {{ event.onlineCode }}
+            </p>
+          }
         </div>
 
         <p class="mt-4 line-clamp-3 text-sm leading-6 text-zinc-500">

@@ -32,6 +32,8 @@ export interface AnalyticsSummaryResponse {
   currentMonth: AnalyticsPeriodSummary;
   currentYear: AnalyticsPeriodSummary;
 
+  reliableFrom?: string;
+
   dailyHistory: AnalyticsDailySummary[];
   monthlyHistory: AnalyticsMonthlySummary[];
 

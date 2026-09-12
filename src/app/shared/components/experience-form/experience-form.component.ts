@@ -6,9 +6,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import {
   CreateExperienceRequest,
+  EXPERIENCE_TEXT_MAX_LENGTH,
   ExperienceType,
 } from '../../../core/models/experiencies';
+import { getWorkshopLabel, Workshop } from '../../../core/models/workshop';
 import { ExperienceService } from '../../../core/services/experience.service';
+import { WorkshopService } from '../../../core/services/workshop.service';
 import { ErrorModalComponent } from '../status-modals/error-modal/error-modal.component';
 import { SuccessModalComponent } from '../status-modals/success-modal/success-modal.component';
 import { WarningModalComponent } from '../status-modals/warning-modal/warning-modal.component';
@@ -29,6 +32,9 @@ export class ExperienceFormComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly experienceService = inject(ExperienceService);
+  private readonly workshopService = inject(WorkshopService);
+
+  readonly maxTextLength = EXPERIENCE_TEXT_MAX_LENGTH;
 
   type: ExperienceType = 'workshops';
 
@@ -36,11 +42,20 @@ export class ExperienceFormComponent implements OnInit {
   experienceText = '';
   improvement = '';
 
+  workshops: Workshop[] = [];
+  selectedWorkshopId = '';
+  isLoadingWorkshops = false;
+
   isSubmitting = false;
 
   showSuccessModal = false;
   showWarningModal = false;
   showErrorModal = false;
+
+  warningTitle = 'Selecciona una valoración';
+  warningMessage =
+    'Elige entre una y cinco estrellas antes de enviar tu experiencia.';
+  warningButtonText = 'Valorar experiencia';
 
   errorMessage = 'La experiencia no se ha podido enviar. Inténtalo de nuevo.';
 
@@ -50,11 +65,31 @@ export class ExperienceFormComponent implements OnInit {
     if (this.isValidType(routeType)) {
       this.type = routeType;
     }
+
+    if (this.requiresWorkshop) {
+      this.loadWorkshops();
+    }
+  }
+
+  get requiresWorkshop(): boolean {
+    return this.type === 'workshops';
   }
 
   setRating(value: number): void {
     this.rating = value;
     this.showWarningModal = false;
+  }
+
+  getWorkshopLabel(workshop: Workshop): string {
+    return getWorkshopLabel(workshop);
+  }
+
+  getRemainingCharacters(value: string): number {
+    return this.maxTextLength - value.length;
+  }
+
+  isNearCharacterLimit(value: string): boolean {
+    return this.getRemainingCharacters(value) <= 100;
   }
 
   getTitle(): string {
@@ -128,10 +163,26 @@ export class ExperienceFormComponent implements OnInit {
   }
 
   sendExperience(): void {
-    if (this.rating === 0 || this.isSubmitting) {
-      if (this.rating === 0) {
-        this.showWarningModal = true;
-      }
+    if (this.isSubmitting) {
+      return;
+    }
+
+    if (this.requiresWorkshop && !this.selectedWorkshopId) {
+      this.showWarning(
+        'Selecciona el taller',
+        'Indica en qué taller has estado para que tu valoración se agrupe con la del resto de familias.',
+        'Elegir taller',
+      );
+
+      return;
+    }
+
+    if (this.rating === 0) {
+      this.showWarning(
+        'Selecciona una valoración',
+        'Elige entre una y cinco estrellas antes de enviar tu experiencia.',
+        'Valorar experiencia',
+      );
 
       return;
     }
@@ -142,6 +193,12 @@ export class ExperienceFormComponent implements OnInit {
     const payload: CreateExperienceRequest = {
       type: this.type,
       rating: this.rating,
+
+      ...(this.requiresWorkshop
+        ? {
+            workshopId: this.selectedWorkshopId,
+          }
+        : {}),
 
       ...(text
         ? {
@@ -190,10 +247,42 @@ export class ExperienceFormComponent implements OnInit {
     this.showErrorModal = false;
   }
 
+  private loadWorkshops(): void {
+    this.isLoadingWorkshops = true;
+
+    this.workshopService.loadWorkshops().subscribe({
+      next: () => {
+        this.workshops = this.workshopService.getWorkshops();
+        this.isLoadingWorkshops = false;
+      },
+      error: () => {
+        this.workshops = [];
+        this.isLoadingWorkshops = false;
+
+        this.errorMessage =
+          'No se ha podido cargar la lista de talleres. Inténtalo de nuevo más tarde.';
+
+        this.showErrorModal = true;
+      },
+    });
+  }
+
+  private showWarning(
+    title: string,
+    message: string,
+    buttonText: string,
+  ): void {
+    this.warningTitle = title;
+    this.warningMessage = message;
+    this.warningButtonText = buttonText;
+    this.showWarningModal = true;
+  }
+
   private resetForm(): void {
     this.rating = 0;
     this.experienceText = '';
     this.improvement = '';
+    this.selectedWorkshopId = '';
   }
 
   private cleanText(value: string): string {

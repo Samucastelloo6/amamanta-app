@@ -15,8 +15,8 @@
         </h1>
 
         <p class="mt-2 max-w-2xl text-sm leading-6 text-zinc-500">
-          Consulta las experiencias compartidas por las familias y elimina las
-          que estén duplicadas o contengan algún error.
+          Consulta las experiencias compartidas por las familias, corrige los
+          textos y asigna el taller correspondiente a las que no lo tengan.
         </p>
       </div>
 
@@ -51,6 +51,40 @@
       </div>
     </div>
   </header>
+
+  @if (
+    withoutWorkshopCount() > 0 &&
+    selectedWorkshopKey() !== "none" &&
+    (selectedFilter() === "all" || selectedFilter() === "workshops")
+  ) {
+    <section
+      class="flex flex-col gap-3 rounded-2xl border border-[#f0dcb4] bg-[#fdf7ea] p-4 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <div class="min-w-0">
+        <p class="text-sm font-extrabold text-[#8a6314]">
+          {{ withoutWorkshopCount() }}
+          {{
+            withoutWorkshopCount() === 1
+              ? "experiencia de talleres sin taller asignado"
+              : "experiencias de talleres sin taller asignado"
+          }}
+        </p>
+
+        <p class="mt-1 text-sm leading-6 text-[#8a6314]/80">
+          Son las que se compartieron antes de que el taller fuese obligatorio.
+          Puedes asignarlas una a una para que se agrupen en la web.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        (click)="showOnlyWithoutWorkshop()"
+        class="shrink-0 rounded-2xl bg-[#8a6314] px-4 py-2.5 text-sm font-extrabold text-white transition hover:bg-[#70500f]"
+      >
+        Ver solo esas
+      </button>
+    </section>
+  }
 
   <section
     class="grid grid-cols-2 gap-1 rounded-2xl border border-[#eadff5] bg-[#f4eafa] p-1 sm:grid-cols-5"
@@ -121,18 +155,68 @@
     </button>
   </section>
 
+  @if (
+    selectedFilter() === "workshops" &&
+    (workshopOptions().length > 0 || withoutWorkshopCount() > 0)
+  ) {
+    <section
+      class="rounded-2xl border border-[#eadff5] bg-white p-4 shadow-sm sm:flex sm:items-center sm:gap-4"
+    >
+      <label
+        for="adminWorkshopFilter"
+        class="block text-[10px] font-black uppercase tracking-[0.14em] text-zinc-500 sm:shrink-0"
+      >
+        Filtrar por taller
+      </label>
+
+      <select
+        id="adminWorkshopFilter"
+        name="adminWorkshopFilter"
+        [ngModel]="selectedWorkshopKey()"
+        (ngModelChange)="changeWorkshop($event)"
+        class="mt-2 w-full rounded-xl border border-[#eadff5] bg-[#fcfaff] p-2.5 text-sm font-semibold text-zinc-700 outline-none transition focus:border-[#8f50c4] focus:bg-white sm:mt-0 sm:max-w-[420px]"
+      >
+        <option value="all">Todos los talleres</option>
+
+        @for (option of workshopOptions(); track option.id) {
+          <option [value]="option.id">
+            {{ option.name }} ({{ option.count }})
+          </option>
+        }
+
+        @if (withoutWorkshopCount() > 0) {
+          <option value="none">
+            Sin taller indicado ({{ withoutWorkshopCount() }})
+          </option>
+        }
+      </select>
+    </section>
+  }
+
   <section class="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
     @for (experience of filteredExperiences(); track experience.id) {
       <article
         class="flex min-h-[300px] flex-col rounded-[24px] border border-[#eadff5] bg-white p-4 shadow-lg shadow-purple-100/60 sm:rounded-[28px] sm:p-5"
       >
         <div class="flex items-start justify-between gap-3">
-          <div>
+          <div class="min-w-0">
             <p
               class="text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#8f50c4]"
             >
               {{ getTypeLabel(experience.type) }}
             </p>
+
+            @if (experience.type === "workshops") {
+              @if (experience.workshopName) {
+                <p class="mt-1 text-sm font-bold text-zinc-700">
+                  {{ experience.workshopName }}
+                </p>
+              } @else {
+                <p class="mt-1 text-sm font-bold text-[#8a6314]">
+                  Sin taller indicado
+                </p>
+              }
+            }
 
             <div class="mt-2 flex gap-0.5">
               @for (star of [1, 2, 3, 4, 5]; track star) {
@@ -190,13 +274,23 @@
           </div>
         }
 
-        <button
-          type="button"
-          (click)="openDeleteConfirm(experience)"
-          class="mt-auto rounded-2xl border border-red-100 bg-red-50 px-3 py-2.5 text-sm font-extrabold text-red-600 transition hover:bg-red-100"
-        >
-          Eliminar
-        </button>
+        <div class="mt-auto flex gap-2 pt-4">
+          <button
+            type="button"
+            (click)="openEdit(experience)"
+            class="flex-1 rounded-2xl border border-[#eadff5] bg-[#faf5ff] px-3 py-2.5 text-sm font-extrabold text-[#8f50c4] transition hover:bg-[#f0e4fb]"
+          >
+            {{ getEditButtonLabel(experience) }}
+          </button>
+
+          <button
+            type="button"
+            (click)="openDeleteConfirm(experience)"
+            class="rounded-2xl border border-red-100 bg-red-50 px-3 py-2.5 text-sm font-extrabold text-red-600 transition hover:bg-red-100"
+          >
+            Eliminar
+          </button>
+        </div>
       </article>
     } @empty {
       <div
@@ -213,6 +307,172 @@
     }
   </section>
 </section>
+
+<app-modal
+  [open]="experienceToEdit() !== null"
+  title="Editar experiencia"
+  subtitle="Los cambios se publican de inmediato en la web."
+  icon="solar:pen-new-square-bold"
+  [closeOnBackdrop]="!isSavingEdit()"
+  (closed)="closeEdit()"
+>
+  @if (experienceToEdit(); as experience) {
+    <div class="space-y-5">
+      @if (editError()) {
+        <p
+          class="rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600"
+        >
+          {{ editError() }}
+        </p>
+      }
+
+      @if (experience.type === "workshops") {
+        <div>
+          <label
+            for="editWorkshop"
+            class="block text-sm font-extrabold text-zinc-600"
+          >
+            Taller
+          </label>
+
+          <select
+            id="editWorkshop"
+            name="editWorkshop"
+            [(ngModel)]="editForm.workshopId"
+            [disabled]="workshops().length === 0"
+            class="mt-2 w-full rounded-2xl border border-[#eadff5] bg-[#fcfaff] p-3 text-sm leading-6 text-zinc-700 outline-none transition focus:border-[#8f50c4] focus:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <option value="" disabled>Selecciona un taller</option>
+
+            @for (workshop of workshops(); track workshop.id) {
+              <option [value]="workshop.id">
+                {{ getWorkshopLabel(workshop) }}
+              </option>
+            }
+          </select>
+
+          @if (workshops().length === 0) {
+            <p class="mt-2 text-sm leading-6 text-zinc-500">
+              No se ha podido cargar la lista de talleres. Recarga la página e
+              inténtalo de nuevo.
+            </p>
+          } @else if (!experience.workshopId) {
+            <p class="mt-2 text-sm leading-6 text-zinc-500">
+              Esta experiencia se compartió antes de que el taller fuese
+              obligatorio.
+            </p>
+          }
+        </div>
+      }
+
+      <div>
+        <p class="block text-sm font-extrabold text-zinc-600">Valoración</p>
+
+        <div class="mt-2 flex gap-1">
+          @for (star of [1, 2, 3, 4, 5]; track star) {
+            <button
+              type="button"
+              class="text-3xl leading-none transition hover:scale-110"
+              [ngClass]="{
+                'text-[#4aa84f]': star <= editForm.rating,
+                'text-[#d8cde8]': star > editForm.rating,
+              }"
+              [attr.aria-label]="'Valorar con ' + star + ' estrellas'"
+              (click)="setEditRating(star)"
+            >
+              ★
+            </button>
+          }
+        </div>
+
+        <p class="mt-1 text-xs font-extrabold text-[#8f50c4]">
+          {{ getRatingText(editForm.rating) }}
+        </p>
+      </div>
+
+      <div>
+        <div class="flex flex-wrap items-baseline justify-between gap-2">
+          <label for="editText" class="text-sm font-extrabold text-zinc-600">
+            Experiencia
+          </label>
+
+          <span
+            class="text-xs font-bold tabular-nums"
+            [ngClass]="
+              isNearCharacterLimit(editForm.text)
+                ? 'text-[#c0392f]'
+                : 'text-zinc-400'
+            "
+          >
+            {{ editForm.text.length }} / {{ maxTextLength }}
+          </span>
+        </div>
+
+        <textarea
+          id="editText"
+          name="editText"
+          rows="5"
+          [maxlength]="maxTextLength"
+          [(ngModel)]="editForm.text"
+          class="mt-2 w-full resize-y rounded-2xl border border-[#eadff5] bg-[#fcfaff] p-3 text-sm leading-6 text-zinc-700 outline-none transition placeholder:text-zinc-400 focus:border-[#8f50c4] focus:bg-white"
+          placeholder="Déjalo vacío para eliminar el texto."
+        ></textarea>
+      </div>
+
+      <div>
+        <div class="flex flex-wrap items-baseline justify-between gap-2">
+          <label
+            for="editImprovement"
+            class="text-sm font-extrabold text-zinc-600"
+          >
+            Propuesta de mejora
+          </label>
+
+          <span
+            class="text-xs font-bold tabular-nums"
+            [ngClass]="
+              isNearCharacterLimit(editForm.improvement)
+                ? 'text-[#c0392f]'
+                : 'text-zinc-400'
+            "
+          >
+            {{ editForm.improvement.length }} / {{ maxTextLength }}
+          </span>
+        </div>
+
+        <textarea
+          id="editImprovement"
+          name="editImprovement"
+          rows="3"
+          [maxlength]="maxTextLength"
+          [(ngModel)]="editForm.improvement"
+          class="mt-2 w-full resize-y rounded-2xl border border-[#eadff5] bg-[#fcfaff] p-3 text-sm leading-6 text-zinc-700 outline-none transition placeholder:text-zinc-400 focus:border-[#8f50c4] focus:bg-white"
+          placeholder="Déjalo vacío para eliminar la propuesta de mejora."
+        ></textarea>
+      </div>
+
+      <div class="flex flex-col gap-2 sm:flex-row sm:justify-end">
+        <button
+          type="button"
+          (click)="closeEdit()"
+          [disabled]="isSavingEdit()"
+          class="rounded-2xl border border-[#eadff5] bg-white px-5 py-3 text-sm font-extrabold text-zinc-600 transition hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="button"
+          (click)="saveEdit()"
+          [disabled]="isSavingEdit()"
+          class="rounded-2xl bg-[#8f50c4] px-5 py-3 text-sm font-extrabold text-white transition hover:bg-[#7b3fb1] disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {{ isSavingEdit() ? "Guardando..." : "Guardar cambios" }}
+        </button>
+      </div>
+    </div>
+  }
+</app-modal>
 
 @if (showDeleteConfirm()) {
   <app-confirm-modal

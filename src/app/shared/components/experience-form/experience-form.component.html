@@ -31,6 +31,51 @@
         </p>
       </div>
 
+      @if (requiresWorkshop) {
+        <div class="mt-5">
+          <label
+            for="workshop"
+            class="block text-sm font-extrabold text-zinc-600"
+          >
+            ¿A qué taller has asistido?
+            <span class="text-[#4aa84f]">*</span>
+          </label>
+
+          <select
+            id="workshop"
+            name="workshop"
+            [(ngModel)]="selectedWorkshopId"
+            [disabled]="isLoadingWorkshops || workshops.length === 0"
+            class="mt-2 w-full rounded-2xl border border-[#eadff5] bg-[#fcfaff] p-3 text-sm leading-6 text-zinc-700 outline-none transition focus:border-[#8f50c4] focus:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <option value="" disabled>
+              {{
+                isLoadingWorkshops
+                  ? "Cargando talleres..."
+                  : "Selecciona el taller que quieres valorar"
+              }}
+            </option>
+
+            @for (workshop of workshops; track workshop.id) {
+              <option [value]="workshop.id">
+                {{ getWorkshopLabel(workshop) }}
+              </option>
+            }
+          </select>
+
+          @if (!isLoadingWorkshops && workshops.length === 0) {
+            <p class="mt-2 text-sm leading-6 text-zinc-500">
+              Ahora mismo no hay talleres disponibles para valorar.
+            </p>
+          } @else {
+            <p class="mt-2 text-sm leading-6 text-zinc-500">
+              Así podemos agrupar tu valoración con la del resto de familias que
+              han asistido al mismo taller.
+            </p>
+          }
+        </div>
+      }
+
       <div class="mt-5 flex justify-center gap-2 sm:gap-3">
         @for (star of [1, 2, 3, 4, 5]; track star) {
           <button
@@ -53,39 +98,79 @@
       </p>
 
       <div class="mt-5">
-        <label
-          for="experienceText"
-          class="block text-sm font-extrabold text-zinc-600"
-        >
-          Cuéntanos tu experiencia
-        </label>
+        <div class="flex flex-wrap items-baseline justify-between gap-2">
+          <label
+            for="experienceText"
+            class="text-sm font-extrabold text-zinc-600"
+          >
+            Cuéntanos tu experiencia
+          </label>
+
+          <span
+            class="text-xs font-bold tabular-nums"
+            [ngClass]="
+              isNearCharacterLimit(experienceText)
+                ? 'text-[#c0392f]'
+                : 'text-zinc-400'
+            "
+          >
+            {{ experienceText.length }} / {{ maxTextLength }}
+          </span>
+        </div>
 
         <textarea
           id="experienceText"
           name="experienceText"
           rows="5"
+          [maxlength]="maxTextLength"
           [(ngModel)]="experienceText"
           class="mt-2 w-full resize-y rounded-2xl border border-[#eadff5] bg-[#fcfaff] p-3 text-sm leading-6 text-zinc-700 outline-none transition placeholder:text-zinc-400 focus:border-[#8f50c4] focus:bg-white"
           [placeholder]="getPlaceholder()"
         ></textarea>
+
+        @if (isNearCharacterLimit(experienceText)) {
+          <p class="mt-1 text-xs font-semibold text-[#c0392f]">
+            Te quedan {{ getRemainingCharacters(experienceText) }} caracteres.
+          </p>
+        }
       </div>
 
       <div class="mt-5">
-        <label
-          for="improvement"
-          class="block text-sm font-extrabold text-zinc-600"
-        >
-          ¿Añadirías alguna mejora?
-        </label>
+        <div class="flex flex-wrap items-baseline justify-between gap-2">
+          <label
+            for="improvement"
+            class="text-sm font-extrabold text-zinc-600"
+          >
+            ¿Añadirías alguna mejora?
+          </label>
+
+          <span
+            class="text-xs font-bold tabular-nums"
+            [ngClass]="
+              isNearCharacterLimit(improvement)
+                ? 'text-[#c0392f]'
+                : 'text-zinc-400'
+            "
+          >
+            {{ improvement.length }} / {{ maxTextLength }}
+          </span>
+        </div>
 
         <textarea
           id="improvement"
           name="improvement"
           rows="3"
+          [maxlength]="maxTextLength"
           [(ngModel)]="improvement"
           class="mt-2 w-full resize-y rounded-2xl border border-[#eadff5] bg-[#fcfaff] p-3 text-sm leading-6 text-zinc-700 outline-none transition placeholder:text-zinc-400 focus:border-[#8f50c4] focus:bg-white"
           placeholder="Puedes escribir cualquier sugerencia que ayude a mejorar..."
         ></textarea>
+
+        @if (isNearCharacterLimit(improvement)) {
+          <p class="mt-1 text-xs font-semibold text-[#c0392f]">
+            Te quedan {{ getRemainingCharacters(improvement) }} caracteres.
+          </p>
+        }
       </div>
 
       <button
@@ -118,9 +203,9 @@
 </section>
 @if (showWarningModal) {
   <app-warning-modal
-    title="Selecciona una valoración"
-    message="Elige entre una y cinco estrellas antes de enviar tu experiencia."
-    buttonText="Valorar experiencia"
+    [title]="warningTitle"
+    [message]="warningMessage"
+    [buttonText]="warningButtonText"
     (close)="closeWarningModal()"
   />
 }

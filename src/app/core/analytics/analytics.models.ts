@@ -37,6 +37,9 @@ export interface AnalyticsSummary {
   currentMonth: AnalyticsPeriodSummary;
   currentYear: AnalyticsPeriodSummary;
 
+  /* Primer día contado con visitantes únicos, en formato aaaa-mm-dd. */
+  reliableFrom?: string;
+
   dailyHistory: AnalyticsDailySummary[];
   monthlyHistory: AnalyticsMonthlySummary[];
 

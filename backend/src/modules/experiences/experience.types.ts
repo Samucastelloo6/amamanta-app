@@ -6,4 +6,15 @@ export interface CreateExperienceDto {
 
   text?: string;
   improvement?: string;
+
+  workshopId?: string;
+}
+
+export interface UpdateExperienceDto {
+  rating?: number;
+
+  text?: string;
+  improvement?: string;
+
+  workshopId?: string;
 }

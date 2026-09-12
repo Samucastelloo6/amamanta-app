@@ -1,4 +1,4 @@
-import { type HydratedDocument, model, Schema } from 'mongoose';
+import { type HydratedDocument, model, Schema, type Types } from 'mongoose';
 
 export const experienceTypes = [
   'workshops',
@@ -16,6 +16,9 @@ export interface ExperienceDocument {
 
   text?: string;
   improvement?: string;
+
+  workshopId?: Types.ObjectId;
+  workshopName?: string;
 
   createdAt: Date;
   updatedAt: Date;
@@ -50,6 +53,26 @@ const experienceSchema = new Schema<ExperienceDocument>(
       trim: true,
       maxlength: 2000,
     },
+
+    /*
+     * Taller valorado. Solo se rellena cuando el tipo es 'workshops'.
+     * Guardamos también el nombre en el momento del envío para que la
+     * experiencia siga siendo legible aunque el taller se renombre o se
+     * elimine más adelante.
+     */
+    workshopId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Workshop',
+      required: false,
+      index: true,
+    },
+
+    workshopName: {
+      type: String,
+      required: false,
+      trim: true,
+      maxlength: 150,
+    },
   },
   {
     timestamps: true,
@@ -59,6 +82,12 @@ const experienceSchema = new Schema<ExperienceDocument>(
 
 experienceSchema.index({
   type: 1,
+  createdAt: -1,
+});
+
+experienceSchema.index({
+  type: 1,
+  workshopId: 1,
   createdAt: -1,
 });
 

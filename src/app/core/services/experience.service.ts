@@ -7,6 +7,7 @@ import {
   CreateExperienceRequest,
   Experience,
   ExperienceType,
+  UpdateExperienceRequest,
 } from '../models/experiencies';
 
 interface ApiResponse<T> {
@@ -56,6 +57,20 @@ export class ExperienceService {
 
   addExperience(payload: CreateExperienceRequest) {
     return this.http.post<ApiResponse<Experience>>(this.apiUrl, payload);
+  }
+
+  updateExperience(experienceId: string, payload: UpdateExperienceRequest) {
+    return this.http
+      .patch<ApiResponse<Experience>>(`${this.apiUrl}/${experienceId}`, payload)
+      .pipe(
+        tap((response) => {
+          this.experiences.update((experiences) =>
+            experiences.map((experience) =>
+              experience.id === experienceId ? response.data : experience,
+            ),
+          );
+        }),
+      );
   }
 
   deleteExperience(experienceId: string) {

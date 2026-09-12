@@ -74,50 +74,179 @@
 
   <div>
     <label class="block text-sm font-extrabold text-zinc-600">
-      Lugar <span class="text-red-500">*</span>
+      Modalidad <span class="text-red-500">*</span>
     </label>
 
-    <input
-      type="text"
-      name="location"
-      [(ngModel)]="form.location"
-      (input)="clearFieldError('location')"
-      [ngClass]="
-        fieldErrors.location
-          ? 'border-red-300 bg-red-50 focus:border-red-500'
-          : 'border-[#eadff5] bg-[#fcfaff] focus:border-[#8f50c4] focus:bg-white'
-      "
-      class="mt-2 w-full rounded-2xl border px-4 py-3 text-sm font-semibold text-zinc-700 outline-none transition placeholder:text-zinc-400"
-      placeholder="Ej. Banco de Leche Materna de La Fe"
-      autocomplete="off"
-    />
+    <div
+      class="mt-2 grid grid-cols-2 gap-1 rounded-2xl border border-[#eadff5] bg-[#f4eafa] p-1"
+    >
+      <button
+        type="button"
+        (click)="setMode('presential')"
+        class="rounded-xl px-3 py-2.5 text-sm font-extrabold transition"
+        [ngClass]="
+          !isOnline
+            ? 'bg-white text-[#8f50c4] shadow-sm'
+            : 'text-zinc-500 hover:text-[#8f50c4]'
+        "
+      >
+        Presencial
+      </button>
 
-    @if (fieldErrors.location) {
-      <p class="mt-1 text-xs font-bold text-red-600">
-        {{ fieldErrors.location }}
+      <button
+        type="button"
+        (click)="setMode('online')"
+        class="rounded-xl px-3 py-2.5 text-sm font-extrabold transition"
+        [ngClass]="
+          isOnline
+            ? 'bg-white text-[#8f50c4] shadow-sm'
+            : 'text-zinc-500 hover:text-[#8f50c4]'
+        "
+      >
+        Online
+      </button>
+    </div>
+  </div>
+
+  @if (isOnline) {
+    <div>
+      <label class="block text-sm font-extrabold text-zinc-600">
+        Plataforma <span class="text-red-500">*</span>
+      </label>
+
+      <select
+        name="onlinePlatform"
+        [(ngModel)]="form.onlinePlatform"
+        (change)="clearFieldError('onlinePlatform')"
+        [ngClass]="
+          fieldErrors.onlinePlatform
+            ? 'border-red-300 bg-red-50 focus:border-red-500'
+            : 'border-[#eadff5] bg-[#fcfaff] focus:border-[#8f50c4] focus:bg-white'
+        "
+        class="mt-2 w-full rounded-2xl border px-4 py-3 text-sm font-semibold text-zinc-700 outline-none transition"
+      >
+        @for (platform of platforms; track platform) {
+          <option [value]="platform">{{ getPlatformLabel(platform) }}</option>
+        }
+      </select>
+
+      @if (fieldErrors.onlinePlatform) {
+        <p class="mt-1 text-xs font-bold text-red-600">
+          {{ fieldErrors.onlinePlatform }}
+        </p>
+      }
+    </div>
+
+    <div>
+      <label class="block text-sm font-extrabold text-zinc-600">
+        Enlace de la reunión <span class="text-red-500">*</span>
+      </label>
+
+      <input
+        type="url"
+        name="onlineUrl"
+        [(ngModel)]="form.onlineUrl"
+        (input)="clearFieldError('onlineUrl')"
+        [ngClass]="
+          fieldErrors.onlineUrl
+            ? 'border-red-300 bg-red-50 focus:border-red-500'
+            : 'border-[#eadff5] bg-[#fcfaff] focus:border-[#8f50c4] focus:bg-white'
+        "
+        class="mt-2 w-full rounded-2xl border px-4 py-3 text-sm font-semibold text-zinc-700 outline-none transition placeholder:text-zinc-400"
+        placeholder="https://us02web.zoom.us/j/..."
+        autocomplete="off"
+      />
+
+      @if (fieldErrors.onlineUrl) {
+        <p class="mt-1 text-xs font-bold text-red-600">
+          {{ fieldErrors.onlineUrl }}
+        </p>
+      } @else {
+        <p class="mt-1 text-xs font-semibold leading-5 text-zinc-500">
+          Este enlace se publica en la ficha del evento.
+        </p>
+      }
+    </div>
+
+    <div>
+      <label class="block text-sm font-extrabold text-zinc-600">
+        ID o código de acceso
+        <span class="text-xs font-semibold text-zinc-400">(opcional)</span>
+      </label>
+
+      <input
+        type="text"
+        name="onlineCode"
+        [(ngModel)]="form.onlineCode"
+        class="mt-2 w-full rounded-2xl border border-[#eadff5] bg-[#fcfaff] px-4 py-3 text-sm font-semibold text-zinc-700 outline-none transition placeholder:text-zinc-400 focus:border-[#8f50c4] focus:bg-white"
+        placeholder="Ej. ID 123 4567 8901 · Código 4821"
+        autocomplete="off"
+      />
+
+      <p class="mt-1 text-xs font-semibold leading-5 text-zinc-500">
+        Déjalo vacío si el enlace ya lleva el código incluido.
       </p>
-    }
-  </div>
+    </div>
+  } @else {
+    <div>
+      <label class="block text-sm font-extrabold text-zinc-600">
+        Lugar <span class="text-red-500">*</span>
+      </label>
 
-  <div>
-    <label class="block text-sm font-extrabold text-zinc-600">
-      Enlace de Google Maps <span class="text-red-500">*</span>
-    </label>
+      <input
+        type="text"
+        name="location"
+        [(ngModel)]="form.location"
+        (input)="clearFieldError('location')"
+        [ngClass]="
+          fieldErrors.location
+            ? 'border-red-300 bg-red-50 focus:border-red-500'
+            : 'border-[#eadff5] bg-[#fcfaff] focus:border-[#8f50c4] focus:bg-white'
+        "
+        class="mt-2 w-full rounded-2xl border px-4 py-3 text-sm font-semibold text-zinc-700 outline-none transition placeholder:text-zinc-400"
+        placeholder="Ej. Banco de Leche Materna de La Fe"
+        autocomplete="off"
+      />
 
-    <input
-      type="url"
-      name="googleMapsUrl"
-      [(ngModel)]="form.googleMapsUrl"
-      class="mt-2 w-full rounded-2xl border border-[#eadff5] bg-[#fcfaff] px-4 py-3 text-sm font-semibold text-zinc-700 outline-none transition placeholder:text-zinc-400 focus:border-[#8f50c4] focus:bg-white"
-      placeholder="https://maps.app.goo.gl/..."
-      autocomplete="off"
-    />
+      @if (fieldErrors.location) {
+        <p class="mt-1 text-xs font-bold text-red-600">
+          {{ fieldErrors.location }}
+        </p>
+      }
+    </div>
 
-    <p class="mt-1 text-xs font-semibold leading-5 text-zinc-500">
-      Pega el enlace del lugar en Google Maps para que las familias puedan
-      abrirlo.
-    </p>
-  </div>
+    <div>
+      <label class="block text-sm font-extrabold text-zinc-600">
+        Enlace de Google Maps <span class="text-red-500">*</span>
+      </label>
+
+      <input
+        type="url"
+        name="googleMapsUrl"
+        [(ngModel)]="form.googleMapsUrl"
+        (input)="clearFieldError('googleMapsUrl')"
+        [ngClass]="
+          fieldErrors.googleMapsUrl
+            ? 'border-red-300 bg-red-50 focus:border-red-500'
+            : 'border-[#eadff5] bg-[#fcfaff] focus:border-[#8f50c4] focus:bg-white'
+        "
+        class="mt-2 w-full rounded-2xl border px-4 py-3 text-sm font-semibold text-zinc-700 outline-none transition placeholder:text-zinc-400"
+        placeholder="https://maps.app.goo.gl/..."
+        autocomplete="off"
+      />
+
+      @if (fieldErrors.googleMapsUrl) {
+        <p class="mt-1 text-xs font-bold text-red-600">
+          {{ fieldErrors.googleMapsUrl }}
+        </p>
+      } @else {
+        <p class="mt-1 text-xs font-semibold leading-5 text-zinc-500">
+          Pega el enlace del lugar en Google Maps para que las familias puedan
+          abrirlo.
+        </p>
+      }
+    </div>
+  }
 
   <div>
     <label class="block text-sm font-extrabold text-zinc-600">

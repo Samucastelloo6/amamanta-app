@@ -6,8 +6,12 @@ import {
   createExperienceController,
   deleteExperienceController,
   getAllExperiencesController,
+  updateExperienceController,
 } from './experience.controller.js';
-import { createExperienceSchema } from './experience.validation.js';
+import {
+  createExperienceSchema,
+  updateExperienceSchema,
+} from './experience.validation.js';
 
 const experienceRouter = Router();
 
@@ -17,6 +21,13 @@ experienceRouter.post(
   '/',
   validate(createExperienceSchema),
   createExperienceController,
+);
+
+experienceRouter.patch(
+  '/:id',
+  requireAuth,
+  validate(updateExperienceSchema),
+  updateExperienceController,
 );
 
 experienceRouter.delete('/:id', requireAuth, deleteExperienceController);

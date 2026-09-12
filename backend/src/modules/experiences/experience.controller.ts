@@ -6,6 +6,7 @@ import {
   createExperience,
   deleteExperience,
   getAllExperiences,
+  updateExperience,
 } from './experience.service.js';
 
 function getExperienceId(id: string | string[] | undefined): string {
@@ -39,11 +40,28 @@ function getExperienceType(type: unknown): ExperienceType | undefined {
   return type as ExperienceType;
 }
 
+function getWorkshopFilter(workshopId: unknown): string | undefined {
+  if (workshopId === undefined) {
+    return undefined;
+  }
+
+  if (typeof workshopId !== 'string') {
+    throw new AppError(
+      400,
+      'El identificador del taller no es válido',
+      'INVALID_WORKSHOP_ID',
+    );
+  }
+
+  return workshopId;
+}
+
 export const getAllExperiencesController = asyncHandler(
   async (request, response) => {
     const type = getExperienceType(request.query.type);
+    const workshopId = getWorkshopFilter(request.query.workshopId);
 
-    const experiences = await getAllExperiences(type);
+    const experiences = await getAllExperiences(type, workshopId);
 
     response.status(200).json({
       success: true,
@@ -57,6 +75,18 @@ export const createExperienceController = asyncHandler(
     const experience = await createExperience(request.body);
 
     response.status(201).json({
+      success: true,
+      data: mapExperienceToResponse(experience),
+    });
+  },
+);
+
+export const updateExperienceController = asyncHandler(
+  async (request, response) => {
+    const id = getExperienceId(request.params.id);
+    const experience = await updateExperience(id, request.body);
+
+    response.status(200).json({
       success: true,
       data: mapExperienceToResponse(experience),
     });

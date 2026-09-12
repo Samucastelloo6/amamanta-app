@@ -34,6 +34,13 @@ export interface AnalyticsDocument {
 
   sections: AnalyticsSectionsDocument;
 
+  /*
+   * Marca los días registrados con el contador de visitantes únicos. Los días
+   * anteriores contaban cada pestaña y cada bot, así que sus cifras no son
+   * comparables y el panel lo advierte.
+   */
+  reliable: boolean;
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -121,6 +128,12 @@ const analyticsSchema = new Schema<AnalyticsDocument>(
       type: Number,
       default: 0,
       min: 0,
+    },
+
+    reliable: {
+      type: Boolean,
+      default: false,
+      index: true,
     },
 
     sections: {

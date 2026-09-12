@@ -1,3 +1,5 @@
+import { buildVisitorHash } from '../../shared/utils/visitor.js';
+import { AnalyticsVisitorModel } from './analytics-visitor.model.js';
 import { AnalyticsModel } from './analytics.model.js';
 import type {
   AnalyticsSection,
@@ -17,8 +19,36 @@ import type {
 
 const timeZone = 'Europe/Madrid';
 
-export async function registerVisit() {
+function isDuplicateKeyError(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    (error as { code?: unknown }).code === 11000
+  );
+}
+
+/*
+ * Cuenta una visita solo la primera vez que se ve a ese visitante en el día.
+ * La segunda pestaña, la vuelta por la tarde o el recargar la página ya no
+ * suman: lo que se mide son personas distintas, no aperturas.
+ */
+export async function registerVisit(ip: string, userAgent: string) {
   const date = getCurrentDate();
+  const visitorHash = buildVisitorHash(ip, userAgent, date);
+
+  try {
+    await AnalyticsVisitorModel.create({
+      date,
+      visitorHash,
+    });
+  } catch (error) {
+    if (isDuplicateKeyError(error)) {
+      return null;
+    }
+
+    throw error;
+  }
 
   return AnalyticsModel.findOneAndUpdate(
     {
@@ -27,6 +57,10 @@ export async function registerVisit() {
     {
       $inc: {
         visits: 1,
+      },
+
+      $set: {
+        reliable: true,
       },
     },
     {
@@ -50,6 +84,10 @@ export async function registerPageView(data: RegisterPageViewDto) {
       $inc: {
         pageViews: 1,
         [sectionField]: 1,
+      },
+
+      $set: {
+        reliable: true,
       },
     },
     {
@@ -81,39 +119,50 @@ export async function getAnalyticsSummary(
   const isCurrentMonth =
     selectedYear === currentYear && selectedMonth === currentMonth;
 
-  const [todayDocument, monthDocuments, yearDocuments] = await Promise.all([
-    isCurrentMonth
-      ? AnalyticsModel.findOne({
-          date: currentDate,
+  const [firstReliableDocument, todayDocument, monthDocuments, yearDocuments] =
+    await Promise.all([
+      AnalyticsModel.findOne({
+        reliable: true,
+      })
+        .sort({
+          date: 1,
         })
-          .lean()
-          .exec()
-      : Promise.resolve(null),
+        .select('date')
+        .lean()
+        .exec(),
 
-    AnalyticsModel.find({
-      date: {
-        $gte: monthStart,
-        $lt: monthEnd,
-      },
-    })
-      .sort({
-        date: 1,
-      })
-      .lean()
-      .exec(),
+      isCurrentMonth
+        ? AnalyticsModel.findOne({
+            date: currentDate,
+          })
+            .lean()
+            .exec()
+        : Promise.resolve(null),
 
-    AnalyticsModel.find({
-      date: {
-        $gte: yearStart,
-        $lt: nextYearStart,
-      },
-    })
-      .sort({
-        date: 1,
+      AnalyticsModel.find({
+        date: {
+          $gte: monthStart,
+          $lt: monthEnd,
+        },
       })
-      .lean()
-      .exec(),
-  ]);
+        .sort({
+          date: 1,
+        })
+        .lean()
+        .exec(),
+
+      AnalyticsModel.find({
+        date: {
+          $gte: yearStart,
+          $lt: nextYearStart,
+        },
+      })
+        .sort({
+          date: 1,
+        })
+        .lean()
+        .exec(),
+    ]);
 
   const today: AnalyticsPeriodSummary = {
     visits: todayDocument?.visits ?? 0,
@@ -131,6 +180,16 @@ export async function getAnalyticsSummary(
     currentMonth: selectedMonthSummary,
 
     currentYear: selectedYearSummary,
+
+    /*
+     * Primer día registrado con el contador de visitantes únicos. El panel lo
+     * usa para avisar de que las cifras anteriores no son comparables.
+     */
+    ...(firstReliableDocument
+      ? {
+          reliableFrom: firstReliableDocument.date,
+        }
+      : {}),
 
     dailyHistory: monthDocuments.map(mapAnalyticsToDailySummary),
 
