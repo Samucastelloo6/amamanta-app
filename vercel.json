@@ -3,6 +3,12 @@
   "framework": "angular",
   "buildCommand": "npm run build",
   "outputDirectory": "dist/amamanta-app/browser",
+  "rewrites": [
+    {
+      "source": "/calendario/:id/evento.ics",
+      "destination": "https://p01--amamanta-api--wxsj766vh22r.code.run/api/events/:id/calendar.ics"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

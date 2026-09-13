@@ -130,13 +130,13 @@ export function buildGoogleCalendarUrl(event: AmamantaEvent): string {
 }
 
 /*
- * Dirección del fichero de calendario del evento, que sirve la API.
+ * Dirección del fichero de calendario del evento.
  *
- * No se genera en el navegador a propósito: un fichero fabricado aquí solo se
- * puede entregar como descarga, y en el iPhone eso acaba en Archivos sin que
- * pase nada más. Sirviéndolo desde la API con su tipo de contenido, Safari
- * abre directamente la pantalla de «Añadir a Calendario».
+ * En producción es una ruta del propio dominio de la aplicación, no la de la
+ * API: con la aplicación instalada en el móvil, iOS no deja que el código
+ * navegue a otro dominio para abrir un fichero y no ocurre nada. Vercel hace
+ * de puente hacia la API (ver `rewrites` en vercel.json).
  */
 export function buildEventCalendarFileUrl(event: AmamantaEvent): string {
-  return `${environment.apiUrl}/events/${event.id}/calendar.ics`;
+  return environment.calendarUrlPattern.replace('{id}', event.id);
 }

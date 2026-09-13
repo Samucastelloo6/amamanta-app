@@ -116,29 +116,18 @@ export class EventsComponent implements OnInit {
   }
 
   /*
-   * Para Apple y el resto: se abre el fichero de calendario que sirve la API.
+   * Para Apple y el resto: la dirección del fichero de calendario.
    *
-   * Se navega en la misma pestaña, no en una nueva, y esto es importante: si a
-   * Safari se le abre una pestaña vacía y lo que llega es un fichero de
-   * calendario, no tiene dónde ponerlo y la deja en blanco. Navegando aquí,
-   * iOS muestra la hoja de «Añadir a Calendario» encima de la aplicación y no
-   * se sale de ella.
-   *
-   * Google Calendar sí va en pestaña nueva, porque eso es una página web de
-   * verdad y conviene no perder la aplicación de vista.
+   * En la plantilla es un enlace de verdad, no un botón con código detrás, y
+   * es a propósito. Con la aplicación instalada en el móvil, iOS ignora en
+   * silencio las navegaciones que lanza el código hacia un fichero; tocando un
+   * enlace, en cambio, muestra la hoja de «Añadir a Calendario» encima de la
+   * aplicación.
    */
-  openCalendarFile(): void {
-    const event = this.calendarEvent;
-
-    if (!event) {
-      return;
-    }
-
-    const url = buildEventCalendarFileUrl(event);
-
-    this.closeCalendarOptions();
-
-    window.location.href = url;
+  get calendarFileUrl(): string {
+    return this.calendarEvent
+      ? buildEventCalendarFileUrl(this.calendarEvent)
+      : '';
   }
 
   goToWorkshop(workshopId: string): void {
