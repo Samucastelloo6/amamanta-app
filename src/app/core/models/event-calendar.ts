@@ -1,10 +1,11 @@
-import { environment } from '../../../environments/environment';
 import { AmamantaEvent, getEventPlatformLabel } from './amamanta-event';
 
 /*
- * Lo necesario para añadir un evento al calendario del móvil: el enlace de
- * Google Calendar (Android) y la dirección del fichero .ics que sirve la API
- * (Apple, Outlook y cualquier otro).
+ * El enlace que abre Google Calendar con el evento ya relleno.
+ *
+ * Solo se ofrece Google Calendar. El calendario de Apple necesita un fichero
+ * .ics, y con la aplicación instalada en el iPhone iOS no deja abrirlo: no
+ * ocurre nada y no hay manera de avisar a quien lo intenta.
  *
  * Las horas se escriben «flotantes», sin zona horaria: el calendario las
  * interpreta en la hora local de quien las añade. Es lo correcto aquí porque
@@ -127,16 +128,4 @@ export function buildGoogleCalendarUrl(event: AmamantaEvent): string {
   });
 
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
-}
-
-/*
- * Dirección del fichero de calendario del evento.
- *
- * En producción es una ruta del propio dominio de la aplicación, no la de la
- * API: con la aplicación instalada en el móvil, iOS no deja que el código
- * navegue a otro dominio para abrir un fichero y no ocurre nada. Vercel hace
- * de puente hacia la API (ver `rewrites` en vercel.json).
- */
-export function buildEventCalendarFileUrl(event: AmamantaEvent): string {
-  return environment.calendarUrlPattern.replace('{id}', event.id);
 }

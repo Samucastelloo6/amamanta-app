@@ -514,7 +514,7 @@
 
             <button
               type="button"
-              (click)="openCalendarOptions(event)"
+              (click)="addToGoogleCalendar(event)"
               class="mt-2 flex w-full items-center justify-center gap-2 rounded-full border border-[#eadff5] bg-white px-4 py-2 text-sm font-extrabold text-[#6f329b] transition hover:bg-[#faf5ff]"
             >
               <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
@@ -523,7 +523,7 @@
                 />
               </svg>
 
-              Añadir al calendario
+              Añadir a Google Calendar
             </button>
           </article>
         }
@@ -531,88 +531,3 @@
     </section>
   </div>
 </section>
-
-<app-modal
-  [open]="calendarEvent !== null"
-  title="Añadir al calendario"
-  [subtitle]="calendarEvent?.title ?? ''"
-  icon="solar:calendar-add-bold"
-  (closed)="closeCalendarOptions()"
->
-  <div class="space-y-3">
-    <p class="text-sm leading-6 text-zinc-500">
-      Elige dónde quieres guardarlo. Se añadirá con la hora, el lugar y, si es
-      online, el enlace y el código de la reunión.
-    </p>
-
-    <button
-      type="button"
-      (click)="addToGoogleCalendar()"
-      class="flex w-full items-center gap-3 rounded-2xl border border-[#eadff5] bg-white px-4 py-3 text-left transition hover:bg-[#faf5ff]"
-    >
-      <span
-        class="grid size-10 shrink-0 place-items-center rounded-xl bg-[#f5effb] text-[#8f50c4]"
-      >
-        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
-          <path
-            d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1.5A2.5 2.5 0 0 1 22 6.5v13a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 19.5v-13A2.5 2.5 0 0 1 4.5 4H6V3a1 1 0 0 1 1-1Zm13 8H4v9.5c0 .28.22.5.5.5h15a.5.5 0 0 0 .5-.5V10Z"
-          />
-        </svg>
-      </span>
-
-      <span class="min-w-0">
-        <span class="block text-sm font-extrabold text-zinc-800">
-          Google Calendar
-        </span>
-
-        <span class="block text-xs font-semibold leading-5 text-zinc-500">
-          Lo habitual en Android
-        </span>
-      </span>
-    </button>
-
-    <a
-      [href]="calendarFileUrl"
-      (click)="closeCalendarOptions()"
-      class="flex w-full items-center gap-3 rounded-2xl border border-[#eadff5] bg-white px-4 py-3 text-left transition hover:bg-[#faf5ff]"
-    >
-      <span
-        class="grid size-10 shrink-0 place-items-center rounded-xl bg-[#f5effb] text-[#8f50c4]"
-      >
-        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
-          <path
-            d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1.5A2.5 2.5 0 0 1 22 6.5v13a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 19.5v-13A2.5 2.5 0 0 1 4.5 4H6V3a1 1 0 0 1 1-1Zm13 8H4v9.5c0 .28.22.5.5.5h15a.5.5 0 0 0 .5-.5V10Z"
-          />
-        </svg>
-      </span>
-
-      <span class="min-w-0">
-        <span class="block text-sm font-extrabold text-zinc-800">
-          Calendario de Apple u otro
-        </span>
-
-        <span class="block text-xs font-semibold leading-5 text-zinc-500">
-          Vale para iPhone, Outlook y el resto
-        </span>
-      </span>
-    </a>
-  </div>
-</app-modal>
-
-@if (showSuccessModal) {
-  <app-success-modal
-    title="Calendario descargado"
-    message="La imagen del calendario se ha descargado correctamente."
-    buttonText="Aceptar"
-    (close)="closeSuccessModal()"
-  />
-}
-
-@if (showErrorModal) {
-  <app-error-modal
-    [title]="errorTitle"
-    [message]="errorMessage"
-    buttonText="Aceptar"
-    (close)="closeErrorModal()"
-  />
-}

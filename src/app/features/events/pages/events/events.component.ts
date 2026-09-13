@@ -4,14 +4,10 @@ import {
   AmamantaEvent,
   getEventPlatformLabel,
 } from '../../../../core/models/amamanta-event';
-import {
-  buildEventCalendarFileUrl,
-  buildGoogleCalendarUrl,
-} from '../../../../core/models/event-calendar';
+import { buildGoogleCalendarUrl } from '../../../../core/models/event-calendar';
 import { EventsService } from '../../../../core/services/events.service';
 import { Router, RouterLink } from '@angular/router';
 import { DatePipe, NgClass } from '@angular/common';
-import { AppModalComponent } from '../../../../shared/components/app-modal/app-modal.component';
 import { ErrorModalComponent } from '../../../../shared/components/status-modals/error-modal/error-modal.component';
 import { SuccessModalComponent } from '../../../../shared/components/status-modals/success-modal/success-modal.component';
 import { LoadingService } from '../../../../shared/services/loading.service';
@@ -32,13 +28,7 @@ interface CalendarWeek {
 
 @Component({
   selector: 'app-events',
-  imports: [
-    DatePipe,
-    NgClass,
-    AppModalComponent,
-    ErrorModalComponent,
-    SuccessModalComponent,
-  ],
+  imports: [DatePipe, NgClass, ErrorModalComponent, SuccessModalComponent],
   templateUrl: './events.component.html',
   styleUrl: './events.component.scss',
 })
@@ -62,9 +52,6 @@ export class EventsComponent implements OnInit {
 
   mobileCalendarView: MobileCalendarView = 'month';
 
-  /* Evento para el que se han abierto las opciones de calendario. */
-  calendarEvent: AmamantaEvent | null = null;
-
   weekDays = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 
   events: AmamantaEvent[] = [];
@@ -80,28 +67,15 @@ export class EventsComponent implements OnInit {
   }
 
   /*
-   * Añadir al calendario. Se pregunta en vez de adivinar el sistema: hay gente
-   * con iPhone que usa Google Calendar y al revés, y equivocarse deja a esa
-   * persona sin forma de apuntarlo.
+   * Añadir la actividad a Google Calendar, con todo relleno.
+   *
+   * Solo se ofrece Google Calendar. El calendario de Apple necesita un fichero
+   * .ics, y con la aplicación instalada en el iPhone iOS no deja abrirlo: no
+   * ocurre nada y no hay forma de avisar a quien lo intenta. Antes que dejar un
+   * botón que a veces no hace nada, se ofrece solo lo que funciona siempre.
    */
-  openCalendarOptions(event: AmamantaEvent): void {
-    this.calendarEvent = event;
-  }
-
-  closeCalendarOptions(): void {
-    this.calendarEvent = null;
-  }
-
-  addToGoogleCalendar(): void {
-    const event = this.calendarEvent;
-
-    if (!event) {
-      return;
-    }
-
+  addToGoogleCalendar(event: AmamantaEvent): void {
     const url = buildGoogleCalendarUrl(event);
-
-    this.closeCalendarOptions();
 
     if (!url) {
       this.showError(
@@ -113,21 +87,6 @@ export class EventsComponent implements OnInit {
     }
 
     window.open(url, '_blank', 'noopener');
-  }
-
-  /*
-   * Para Apple y el resto: la dirección del fichero de calendario.
-   *
-   * En la plantilla es un enlace de verdad, no un botón con código detrás, y
-   * es a propósito. Con la aplicación instalada en el móvil, iOS ignora en
-   * silencio las navegaciones que lanza el código hacia un fichero; tocando un
-   * enlace, en cambio, muestra la hoja de «Añadir a Calendario» encima de la
-   * aplicación.
-   */
-  get calendarFileUrl(): string {
-    return this.calendarEvent
-      ? buildEventCalendarFileUrl(this.calendarEvent)
-      : '';
   }
 
   goToWorkshop(workshopId: string): void {
