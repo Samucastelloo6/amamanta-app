@@ -5,13 +5,22 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import {
+  EXPERIENCE_PLACE_NAMES,
+  EXPERIENCE_PLACE_NAMES_PLURAL,
+  EXPERIENCE_PLACE_NAMES_WITH_ARTICLE,
+  experienceUsesPlaceList,
+  PlaceOption,
+} from '../../../core/models/experience-place';
+import {
   CreateExperienceRequest,
+  EXPERIENCE_AUTHOR_MAX_LENGTH,
+  EXPERIENCE_PLACE_NAME_MAX_LENGTH,
   EXPERIENCE_TEXT_MAX_LENGTH,
   ExperienceType,
 } from '../../../core/models/experiencies';
-import { getWorkshopLabel, Workshop } from '../../../core/models/workshop';
+import { ExperiencePlaceService } from '../../../core/services/experience-place.service';
 import { ExperienceService } from '../../../core/services/experience.service';
-import { WorkshopService } from '../../../core/services/workshop.service';
+import { PlacePickerComponent } from '../place-picker/place-picker.component';
 import { ErrorModalComponent } from '../status-modals/error-modal/error-modal.component';
 import { SuccessModalComponent } from '../status-modals/success-modal/success-modal.component';
 import { WarningModalComponent } from '../status-modals/warning-modal/warning-modal.component';
@@ -21,6 +30,7 @@ import { WarningModalComponent } from '../status-modals/warning-modal/warning-mo
   imports: [
     FormsModule,
     NgClass,
+    PlacePickerComponent,
     SuccessModalComponent,
     WarningModalComponent,
     ErrorModalComponent,
@@ -32,19 +42,25 @@ export class ExperienceFormComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly experienceService = inject(ExperienceService);
-  private readonly workshopService = inject(WorkshopService);
+  private readonly placeService = inject(ExperiencePlaceService);
 
   readonly maxTextLength = EXPERIENCE_TEXT_MAX_LENGTH;
+  readonly maxAuthorLength = EXPERIENCE_AUTHOR_MAX_LENGTH;
+  readonly maxPlaceNameLength = EXPERIENCE_PLACE_NAME_MAX_LENGTH;
 
   type: ExperienceType = 'workshops';
 
   rating = 0;
+  authorName = '';
   experienceText = '';
   improvement = '';
 
-  workshops: Workshop[] = [];
-  selectedWorkshopId = '';
-  isLoadingWorkshops = false;
+  places: PlaceOption[] = [];
+  selectedPlaceId = '';
+  isLoadingPlaces = false;
+
+  /* Espacios amigos: el nombre del sitio se escribe, no se elige. */
+  typedPlaceName = '';
 
   isSubmitting = false;
 
@@ -66,22 +82,48 @@ export class ExperienceFormComponent implements OnInit {
       this.type = routeType;
     }
 
-    if (this.requiresWorkshop) {
-      this.loadWorkshops();
+    if (this.usesPlaceList) {
+      this.loadPlaces();
     }
   }
 
-  get requiresWorkshop(): boolean {
-    return this.type === 'workshops';
+  /* Si el sitio se elige de una lista o se escribe a mano. */
+  get usesPlaceList(): boolean {
+    return experienceUsesPlaceList(this.type);
+  }
+
+  /* Cómo se llama el sitio en este tipo: «taller», «hospital»... */
+  get placeName(): string {
+    return EXPERIENCE_PLACE_NAMES[this.type];
+  }
+
+  get placeNameWithArticle(): string {
+    return EXPERIENCE_PLACE_NAMES_WITH_ARTICLE[this.type];
+  }
+
+  get placeNamePlural(): string {
+    return EXPERIENCE_PLACE_NAMES_PLURAL[this.type];
+  }
+
+  getPlaceQuestion(): string {
+    switch (this.type) {
+      case 'workshops':
+        return '¿A qué taller has asistido?';
+
+      case 'rooms':
+        return '¿Qué sala de lactancia has utilizado?';
+
+      case 'friendly-spaces':
+        return '¿En qué sitio has estado?';
+
+      case 'hospitals':
+        return '¿En qué hospital estuviste?';
+    }
   }
 
   setRating(value: number): void {
     this.rating = value;
     this.showWarningModal = false;
-  }
-
-  getWorkshopLabel(workshop: Workshop): string {
-    return getWorkshopLabel(workshop);
   }
 
   getRemainingCharacters(value: string): number {
@@ -167,11 +209,11 @@ export class ExperienceFormComponent implements OnInit {
       return;
     }
 
-    if (this.requiresWorkshop && !this.selectedWorkshopId) {
+    if (this.usesPlaceList && !this.selectedPlaceId) {
       this.showWarning(
-        'Selecciona el taller',
-        'Indica en qué taller has estado para que tu valoración se agrupe con la del resto de familias.',
-        'Elegir taller',
+        `Selecciona ${this.placeNameWithArticle}`,
+        `Indica ${this.placeNameWithArticle} para que tu valoración se agrupe con la del resto de familias.`,
+        `Elegir ${this.placeName}`,
       );
 
       return;
@@ -187,6 +229,8 @@ export class ExperienceFormComponent implements OnInit {
       return;
     }
 
+    const authorName = this.cleanText(this.authorName);
+    const typedPlaceName = this.cleanText(this.typedPlaceName);
     const text = this.cleanText(this.experienceText);
     const improvement = this.cleanText(this.improvement);
 
@@ -194,9 +238,21 @@ export class ExperienceFormComponent implements OnInit {
       type: this.type,
       rating: this.rating,
 
-      ...(this.requiresWorkshop
+      ...(this.usesPlaceList
         ? {
-            workshopId: this.selectedWorkshopId,
+            placeId: this.selectedPlaceId,
+          }
+        : {}),
+
+      ...(!this.usesPlaceList && typedPlaceName
+        ? {
+            placeName: typedPlaceName,
+          }
+        : {}),
+
+      ...(authorName
+        ? {
+            authorName,
           }
         : {}),
 
@@ -247,20 +303,19 @@ export class ExperienceFormComponent implements OnInit {
     this.showErrorModal = false;
   }
 
-  private loadWorkshops(): void {
-    this.isLoadingWorkshops = true;
+  private loadPlaces(): void {
+    this.isLoadingPlaces = true;
 
-    this.workshopService.loadWorkshops().subscribe({
-      next: () => {
-        this.workshops = this.workshopService.getWorkshops();
-        this.isLoadingWorkshops = false;
+    this.placeService.loadPlaces(this.type).subscribe({
+      next: (places) => {
+        this.places = places;
+        this.isLoadingPlaces = false;
       },
       error: () => {
-        this.workshops = [];
-        this.isLoadingWorkshops = false;
+        this.places = [];
+        this.isLoadingPlaces = false;
 
-        this.errorMessage =
-          'No se ha podido cargar la lista de talleres. Inténtalo de nuevo más tarde.';
+        this.errorMessage = `No se ha podido cargar la lista. Inténtalo de nuevo más tarde.`;
 
         this.showErrorModal = true;
       },
@@ -280,9 +335,11 @@ export class ExperienceFormComponent implements OnInit {
 
   private resetForm(): void {
     this.rating = 0;
+    this.authorName = '';
     this.experienceText = '';
     this.improvement = '';
-    this.selectedWorkshopId = '';
+    this.selectedPlaceId = '';
+    this.typedPlaceName = '';
   }
 
   private cleanText(value: string): string {

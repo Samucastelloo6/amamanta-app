@@ -1,6 +1,7 @@
 import { isValidObjectId } from 'mongoose';
 
 import { AppError } from '../../shared/errors/app-error.js';
+import { renamePlaceInExperiences } from '../experiences/experience.places.js';
 import { FriendlySpaceCategoryModel } from '../friendly-space-categories/friendly-space-category.model.js';
 import { FriendlySpaceModel } from './friendly-space.model.js';
 import type {
@@ -73,6 +74,10 @@ export async function updateFriendlySpace(
       'El espacio amigo no existe',
       'FRIENDLY_SPACE_NOT_FOUND',
     );
+  }
+
+  if (data.name !== undefined) {
+    await renamePlaceInExperiences(space._id, space.name);
   }
 
   return space;

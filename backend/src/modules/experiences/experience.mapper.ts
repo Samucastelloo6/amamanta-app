@@ -9,11 +9,13 @@ export interface ExperienceResponse {
   type: ExperienceType;
   rating: number;
 
+  authorName?: string;
+
   text?: string;
   improvement?: string;
 
-  workshopId?: string;
-  workshopName?: string;
+  placeId?: string;
+  placeName?: string;
 
   date: string;
 }
@@ -21,11 +23,25 @@ export interface ExperienceResponse {
 export function mapExperienceToResponse(
   experience: ExperienceHydratedDocument,
 ): ExperienceResponse {
+  /*
+   * Se acepta el campo antiguo para que las valoraciones guardadas antes del
+   * cambio de nombre sigan mostrándose en su sitio aunque todavía no se haya
+   * ejecutado `npm run migrate:experiences`.
+   */
+  const placeId = experience.placeId ?? experience.workshopId;
+  const placeName = experience.placeName ?? experience.workshopName;
+
   return {
     id: experience._id.toString(),
 
     type: experience.type,
     rating: experience.rating,
+
+    ...(experience.authorName
+      ? {
+          authorName: experience.authorName,
+        }
+      : {}),
 
     ...(experience.text
       ? {
@@ -39,15 +55,15 @@ export function mapExperienceToResponse(
         }
       : {}),
 
-    ...(experience.workshopId
+    ...(placeId
       ? {
-          workshopId: experience.workshopId.toString(),
+          placeId: placeId.toString(),
         }
       : {}),
 
-    ...(experience.workshopName
+    ...(placeName
       ? {
-          workshopName: experience.workshopName,
+          placeName,
         }
       : {}),
 

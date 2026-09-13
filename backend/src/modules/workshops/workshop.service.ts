@@ -1,7 +1,7 @@
 import { isValidObjectId } from 'mongoose';
 
 import { AppError } from '../../shared/errors/app-error.js';
-import { ExperienceModel } from '../experiences/experience.model.js';
+import { renamePlaceInExperiences } from '../experiences/experience.places.js';
 import { WorkshopModel } from './workshop.model.js';
 import type { CreateWorkshopDto, UpdateWorkshopDto } from './workshop.types.js';
 
@@ -58,23 +58,8 @@ export async function updateWorkshop(id: string, data: UpdateWorkshopDto) {
     throw new AppError(404, 'El taller no existe', 'WORKSHOP_NOT_FOUND');
   }
 
-  /*
-   * Cada experiencia guarda una copia del nombre del taller para seguir
-   * siendo legible aunque el taller se elimine. Al renombrarlo hay que
-   * propagar el nombre nuevo a las experiencias ya asociadas, o el panel
-   * mostraría unas con el nombre viejo y otras con el nuevo.
-   */
   if (data.name !== undefined) {
-    await ExperienceModel.updateMany(
-      {
-        workshopId: workshop._id,
-      },
-      {
-        $set: {
-          workshopName: workshop.name,
-        },
-      },
-    ).exec();
+    await renamePlaceInExperiences(workshop._id, workshop.name);
   }
 
   return workshop;

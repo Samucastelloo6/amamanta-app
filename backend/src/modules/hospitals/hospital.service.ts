@@ -1,6 +1,7 @@
 import { isValidObjectId } from 'mongoose';
 
 import { AppError } from '../../shared/errors/app-error.js';
+import { renamePlaceInExperiences } from '../experiences/experience.places.js';
 import { HospitalModel } from './hospital.model.js';
 import type { CreateHospitalDto, UpdateHospitalDto } from './hospital.types.js';
 
@@ -38,6 +39,10 @@ export async function updateHospital(id: string, data: UpdateHospitalDto) {
 
   if (!hospital) {
     throw new AppError(404, 'El hospital no existe', 'HOSPITAL_NOT_FOUND');
+  }
+
+  if (data.name !== undefined) {
+    await renamePlaceInExperiences(hospital._id, hospital.name);
   }
 
   return hospital;

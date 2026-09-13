@@ -1,0 +1,115 @@
+<button
+  type="button"
+  (click)="open()"
+  [disabled]="isDisabled"
+  class="flex w-full items-center justify-between gap-3 rounded-2xl border border-[#eadff5] bg-[#fcfaff] p-3 text-left text-sm leading-6 transition hover:border-[#d8c4ec] hover:bg-white focus:border-[#8f50c4] focus:bg-white focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+  [ngClass]="{
+    'font-semibold text-zinc-700': selectedLabel || alwaysHasSelection,
+    'text-zinc-400': !selectedLabel && !alwaysHasSelection,
+  }"
+>
+  <span class="min-w-0 truncate">
+    @if (isLoading) {
+      Cargando...
+    } @else {
+      {{ selectedLabel || placeholder }}
+    }
+  </span>
+
+  <svg
+    class="h-5 w-5 shrink-0 text-[#8f50c4]"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="m6 9 6 6 6-6" />
+  </svg>
+</button>
+
+<app-modal
+  [open]="isOpen"
+  [title]="modalTitle"
+  [icon]="icon"
+  (closed)="close()"
+>
+  <div class="space-y-3">
+    @if (showSearch) {
+      <div class="relative">
+        <svg
+          class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-400"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+        >
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-3.5-3.5" />
+        </svg>
+
+        <input
+          type="text"
+          name="placeSearch"
+          [(ngModel)]="search"
+          [placeholder]="searchPlaceholder"
+          class="w-full rounded-2xl border border-[#eadff5] bg-[#fcfaff] py-3 pl-12 pr-4 text-sm leading-6 text-zinc-700 outline-none transition focus:border-[#8f50c4] focus:bg-white"
+        />
+      </div>
+    }
+
+    <div class="space-y-2">
+      @for (place of filteredPlaces; track place.id) {
+        <button
+          type="button"
+          (click)="select(place)"
+          class="flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition"
+          [ngClass]="{
+            'border-[#8f50c4] bg-[#f5effb]': isSelected(place),
+            'border-[#eadff5] bg-white hover:bg-[#faf5ff]': !isSelected(place),
+          }"
+        >
+          <span
+            class="grid size-6 shrink-0 place-items-center rounded-full border-2 transition"
+            [ngClass]="{
+              'border-[#4aa84f] bg-[#4aa84f]': isSelected(place),
+              'border-[#d8cde8]': !isSelected(place),
+            }"
+          >
+            @if (isSelected(place)) {
+              <svg
+                class="h-4 w-4 text-white"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="m5 13 4 4L19 7" />
+              </svg>
+            }
+          </span>
+
+          <span
+            class="min-w-0 text-sm font-bold leading-6"
+            [ngClass]="{
+              'text-[#6f329b]': isSelected(place),
+              'text-zinc-700': !isSelected(place),
+            }"
+          >
+            {{ place.label }}
+          </span>
+        </button>
+      } @empty {
+        <p
+          class="rounded-2xl border border-dashed border-[#d8c4ec] bg-[#faf5ff] p-5 text-center text-sm font-bold text-[#8f50c4]"
+        >
+          No hay ninguna opción que coincida con lo que has escrito.
+        </p>
+      }
+    </div>
+  </div>
+</app-modal>

@@ -40,28 +40,35 @@ function getExperienceType(type: unknown): ExperienceType | undefined {
   return type as ExperienceType;
 }
 
-function getWorkshopFilter(workshopId: unknown): string | undefined {
-  if (workshopId === undefined) {
+function getPlaceFilter(placeId: unknown): string | undefined {
+  if (placeId === undefined) {
     return undefined;
   }
 
-  if (typeof workshopId !== 'string') {
+  if (typeof placeId !== 'string') {
     throw new AppError(
       400,
-      'El identificador del taller no es válido',
-      'INVALID_WORKSHOP_ID',
+      'El identificador del sitio no es válido',
+      'INVALID_PLACE_ID',
     );
   }
 
-  return workshopId;
+  return placeId;
 }
 
 export const getAllExperiencesController = asyncHandler(
   async (request, response) => {
     const type = getExperienceType(request.query.type);
-    const workshopId = getWorkshopFilter(request.query.workshopId);
 
-    const experiences = await getAllExperiences(type, workshopId);
+    /*
+     * Se acepta el nombre anterior del parámetro para no romper a quien
+     * todavía tenga la versión antigua de la app abierta.
+     */
+    const placeId = getPlaceFilter(
+      request.query.placeId ?? request.query.workshopId,
+    );
+
+    const experiences = await getAllExperiences(type, placeId);
 
     response.status(200).json({
       success: true,

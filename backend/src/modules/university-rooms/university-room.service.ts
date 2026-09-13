@@ -1,6 +1,7 @@
 import { isValidObjectId } from 'mongoose';
 
 import { AppError } from '../../shared/errors/app-error.js';
+import { renamePlaceInExperiences } from '../experiences/experience.places.js';
 import { UniversityRoomModel } from './university-room.model.js';
 import type {
   CreateUniversityRoomDto,
@@ -52,6 +53,10 @@ export async function updateUniversityRoom(
       'La sala universitaria no existe',
       'UNIVERSITY_ROOM_NOT_FOUND',
     );
+  }
+
+  if (data.name !== undefined) {
+    await renamePlaceInExperiences(room._id, room.name);
   }
 
   return room;

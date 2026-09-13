@@ -13,7 +13,8 @@
     "seed:workshops": "tsx src/scripts/workshops.seed.ts",
     "seed:friendly-spaces": "tsx src/scripts/friendly-spaces.seed.ts",
     "seed:university-rooms": "tsx src/scripts/university-rooms.seed.ts",
-    "seed:events": "tsx src/scripts/events.seed.ts"
+    "seed:events": "tsx src/scripts/events.seed.ts",
+    "migrate:experiences": "tsx src/scripts/experiences-places.migration.ts"
   },
   "keywords": [],
   "author": "",

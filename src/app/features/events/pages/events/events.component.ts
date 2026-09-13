@@ -4,9 +4,15 @@ import {
   AmamantaEvent,
   getEventPlatformLabel,
 } from '../../../../core/models/amamanta-event';
+import {
+  buildGoogleCalendarUrl,
+  buildIcsContent,
+  buildIcsFileName,
+} from '../../../../core/models/event-calendar';
 import { EventsService } from '../../../../core/services/events.service';
 import { Router, RouterLink } from '@angular/router';
 import { DatePipe, NgClass } from '@angular/common';
+import { AppModalComponent } from '../../../../shared/components/app-modal/app-modal.component';
 import { ErrorModalComponent } from '../../../../shared/components/status-modals/error-modal/error-modal.component';
 import { SuccessModalComponent } from '../../../../shared/components/status-modals/success-modal/success-modal.component';
 import { LoadingService } from '../../../../shared/services/loading.service';
@@ -27,7 +33,13 @@ interface CalendarWeek {
 
 @Component({
   selector: 'app-events',
-  imports: [DatePipe, NgClass, ErrorModalComponent, SuccessModalComponent],
+  imports: [
+    DatePipe,
+    NgClass,
+    AppModalComponent,
+    ErrorModalComponent,
+    SuccessModalComponent,
+  ],
   templateUrl: './events.component.html',
   styleUrl: './events.component.scss',
 })
@@ -51,6 +63,9 @@ export class EventsComponent implements OnInit {
 
   mobileCalendarView: MobileCalendarView = 'month';
 
+  /* Evento para el que se han abierto las opciones de calendario. */
+  calendarEvent: AmamantaEvent | null = null;
+
   weekDays = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 
   events: AmamantaEvent[] = [];
@@ -63,6 +78,103 @@ export class EventsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadEvents();
+  }
+
+  /*
+   * Añadir al calendario. Se pregunta en vez de adivinar el sistema: hay gente
+   * con iPhone que usa Google Calendar y al revés, y equivocarse deja a esa
+   * persona sin forma de apuntarlo.
+   */
+  openCalendarOptions(event: AmamantaEvent): void {
+    this.calendarEvent = event;
+  }
+
+  closeCalendarOptions(): void {
+    this.calendarEvent = null;
+  }
+
+  addToGoogleCalendar(): void {
+    const event = this.calendarEvent;
+
+    if (!event) {
+      return;
+    }
+
+    const url = buildGoogleCalendarUrl(event);
+
+    this.closeCalendarOptions();
+
+    if (!url) {
+      this.showError(
+        'No se ha podido abrir el calendario',
+        'Esta actividad no tiene una fecha válida. Avísanos y lo revisamos.',
+      );
+
+      return;
+    }
+
+    window.open(url, '_blank', 'noopener');
+  }
+
+  /*
+   * Para Apple y el resto: un fichero .ics. Si el móvil permite compartir
+   * ficheros se usa el menú de compartir, que en iPhone ofrece «Calendario»
+   * directamente; si no, se descarga.
+   */
+  async downloadCalendarFile(): Promise<void> {
+    const event = this.calendarEvent;
+
+    if (!event) {
+      return;
+    }
+
+    const content = buildIcsContent(event);
+
+    this.closeCalendarOptions();
+
+    if (!content) {
+      this.showError(
+        'No se ha podido crear el archivo',
+        'Esta actividad no tiene una fecha válida. Avísanos y lo revisamos.',
+      );
+
+      return;
+    }
+
+    const fileName = buildIcsFileName(event);
+
+    const blob = new Blob([content], {
+      type: 'text/calendar;charset=utf-8',
+    });
+
+    const file = new File([blob], fileName, {
+      type: 'text/calendar',
+    });
+
+    const canShareFile =
+      typeof navigator.share === 'function' &&
+      typeof navigator.canShare === 'function' &&
+      navigator.canShare({
+        files: [file],
+      });
+
+    if (canShareFile) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: event.title,
+        });
+
+        return;
+      } catch (error) {
+        /* Si cierra el menú de compartir, no es un error que deba avisarse. */
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          return;
+        }
+      }
+    }
+
+    this.downloadBlob(blob, fileName);
   }
 
   goToWorkshop(workshopId: string): void {
@@ -372,7 +484,7 @@ export class EventsComponent implements OnInit {
         return;
       }
 
-      this.downloadImage(blob, fileName);
+      this.downloadBlob(blob, fileName);
       this.showSuccessModal = true;
     } catch (error) {
       if (error instanceof DOMException && error.name === 'AbortError') {
@@ -391,7 +503,7 @@ export class EventsComponent implements OnInit {
     }
   }
 
-  private downloadImage(blob: Blob, fileName: string): void {
+  private downloadBlob(blob: Blob, fileName: string): void {
     const objectUrl = URL.createObjectURL(blob);
     const link = document.createElement('a');
 

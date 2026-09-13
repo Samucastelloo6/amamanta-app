@@ -10,18 +10,29 @@ import {
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
-import { Experience, ExperienceType } from '../../../core/models/experiencies';
+import {
+  EXPERIENCE_PLACE_ALL_LABELS,
+  EXPERIENCE_PLACE_MISSING_KEY,
+  EXPERIENCE_PLACE_MISSING_LABELS,
+  EXPERIENCE_PLACE_NAMES,
+  experienceUsesPlaceList,
+  PlaceOption,
+} from '../../../core/models/experience-place';
+import {
+  EXPERIENCE_ANONYMOUS_LABEL,
+  Experience,
+  ExperienceType,
+} from '../../../core/models/experiencies';
 import { ExperienceService } from '../../../core/services/experience.service';
+import { PlacePickerComponent } from '../place-picker/place-picker.component';
 import { ErrorModalComponent } from '../status-modals/error-modal/error-modal.component';
 
-export interface WorkshopExperienceGroup {
+export interface PlaceExperienceGroup {
   key: string;
   name: string;
   experiences: Experience[];
   average: number;
 }
-
-const WITHOUT_WORKSHOP_KEY = 'sin-taller';
 
 @Component({
   selector: 'app-experience-section',
@@ -32,6 +43,7 @@ const WITHOUT_WORKSHOP_KEY = 'sin-taller';
     NgClass,
     NgTemplateOutlet,
     RouterLink,
+    PlacePickerComponent,
     ErrorModalComponent,
   ],
   templateUrl: './experience-section.component.html',
@@ -45,7 +57,7 @@ export class ExperienceSectionComponent implements OnInit, OnChanges {
 
   experiences: Experience[] = [];
 
-  groups: WorkshopExperienceGroup[] = [];
+  groups: PlaceExperienceGroup[] = [];
 
   selectedGroupKey = 'all';
 
@@ -73,16 +85,64 @@ export class ExperienceSectionComponent implements OnInit, OnChanges {
     }
   }
 
-  get isGroupedByWorkshop(): boolean {
-    return this.type === 'workshops' && this.groups.length > 0;
+  get isGroupedByPlace(): boolean {
+    return this.groups.length > 0;
   }
 
-  get visibleGroups(): WorkshopExperienceGroup[] {
+  get visibleGroups(): PlaceExperienceGroup[] {
     if (this.selectedGroupKey === 'all') {
       return this.groups;
     }
 
     return this.groups.filter((group) => group.key === this.selectedGroupKey);
+  }
+
+  /* Primera opción del filtro: «Todos los talleres», «Todos los hospitales»... */
+  get allGroupsLabel(): string {
+    if (!this.type) {
+      return 'Todos';
+    }
+
+    return EXPERIENCE_PLACE_ALL_LABELS[this.type];
+  }
+
+  /* Etiqueta del filtro: «Filtrar por taller», «Filtrar por hospital»... */
+  get filterLabel(): string {
+    if (!this.type) {
+      return 'Filtrar';
+    }
+
+    return `Filtrar por ${EXPERIENCE_PLACE_NAMES[this.type]}`;
+  }
+
+  /*
+   * Las opciones del filtro, con el recuento de cada sitio. La primera reúne
+   * todas, y es la que está activa por defecto.
+   */
+  get filterOptions(): PlaceOption[] {
+    return [
+      {
+        id: 'all',
+        label: `${this.allGroupsLabel} (${this.experiences.length})`,
+      },
+
+      ...this.groups.map((group) => ({
+        id: group.key,
+        label: `${group.name} (${group.experiences.length})`,
+      })),
+    ];
+  }
+
+  getAuthorLabel(experience: Experience): string {
+    return experience.authorName ?? EXPERIENCE_ANONYMOUS_LABEL;
+  }
+
+  /*
+   * Cuando no hay agrupación, el nombre del sitio no aparece en ninguna
+   * cabecera, así que se muestra en la propia tarjeta.
+   */
+  get showPlaceOnCard(): boolean {
+    return !this.isGroupedByPlace;
   }
 
   getTitle(): string {
@@ -163,7 +223,7 @@ export class ExperienceSectionComponent implements OnInit, OnChanges {
     this.experienceService.loadExperiences(this.type).subscribe({
       next: () => {
         this.experiences = this.experienceService.getByType(this.type!);
-        this.buildWorkshopGroups();
+        this.buildPlaceGroups();
       },
       error: () => {
         this.experiences = [];
@@ -173,18 +233,30 @@ export class ExperienceSectionComponent implements OnInit, OnChanges {
     });
   }
 
-  private buildWorkshopGroups(): void {
-    if (this.type !== 'workshops') {
+  /*
+   * Agrupa las valoraciones por el sitio valorado, que según el tipo es el
+   * taller, el hospital, la sala universitaria o el espacio amigo. Las que no
+   * indican sitio caen todas en un grupo propio, que se muestra el último.
+   */
+  private buildPlaceGroups(): void {
+    /*
+     * Los espacios amigos no se agrupan: el sitio es texto libre, así que
+     * todas las valoraciones van juntas y el nombre, si lo hay, se muestra en
+     * su propia tarjeta.
+     */
+    if (!this.type || !experienceUsesPlaceList(this.type)) {
       this.groups = [];
       this.selectedGroupKey = 'all';
       return;
     }
 
-    const grouped = new Map<string, WorkshopExperienceGroup>();
+    const missingLabel = EXPERIENCE_PLACE_MISSING_LABELS[this.type];
+
+    const grouped = new Map<string, PlaceExperienceGroup>();
 
     for (const experience of this.experiences) {
-      const key = experience.workshopId ?? WITHOUT_WORKSHOP_KEY;
-      const name = experience.workshopName ?? 'Sin taller indicado';
+      const key = experience.placeId ?? EXPERIENCE_PLACE_MISSING_KEY;
+      const name = experience.placeName ?? missingLabel;
 
       const group = grouped.get(key);
 
@@ -213,11 +285,11 @@ export class ExperienceSectionComponent implements OnInit, OnChanges {
     }
 
     groups.sort((groupA, groupB) => {
-      if (groupA.key === WITHOUT_WORKSHOP_KEY) {
+      if (groupA.key === EXPERIENCE_PLACE_MISSING_KEY) {
         return 1;
       }
 
-      if (groupB.key === WITHOUT_WORKSHOP_KEY) {
+      if (groupB.key === EXPERIENCE_PLACE_MISSING_KEY) {
         return -1;
       }
 

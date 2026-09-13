@@ -27,54 +27,94 @@
         </h2>
 
         <p class="mt-1 text-sm leading-6 text-zinc-500">
-          Tu experiencia es anónima y nos ayuda a seguir mejorando.
+          Puedes firmarla con tu nombre o dejarla anónima. Nos ayuda a seguir
+          mejorando.
         </p>
       </div>
 
-      @if (requiresWorkshop) {
+      @if (!usesPlaceList) {
         <div class="mt-5">
           <label
-            for="workshop"
+            for="typedPlaceName"
             class="block text-sm font-extrabold text-zinc-600"
           >
-            ¿A qué taller has asistido?
-            <span class="text-[#4aa84f]">*</span>
+            {{ getPlaceQuestion() }}
+            <span class="font-semibold text-zinc-400">(opcional)</span>
           </label>
 
-          <select
-            id="workshop"
-            name="workshop"
-            [(ngModel)]="selectedWorkshopId"
-            [disabled]="isLoadingWorkshops || workshops.length === 0"
-            class="mt-2 w-full rounded-2xl border border-[#eadff5] bg-[#fcfaff] p-3 text-sm leading-6 text-zinc-700 outline-none transition focus:border-[#8f50c4] focus:bg-white disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            <option value="" disabled>
-              {{
-                isLoadingWorkshops
-                  ? "Cargando talleres..."
-                  : "Selecciona el taller que quieres valorar"
-              }}
-            </option>
+          <input
+            id="typedPlaceName"
+            name="typedPlaceName"
+            type="text"
+            [maxlength]="maxPlaceNameLength"
+            [(ngModel)]="typedPlaceName"
+            placeholder="Nombre del establecimiento"
+            class="mt-2 w-full rounded-2xl border border-[#eadff5] bg-[#fcfaff] p-3 text-sm leading-6 text-zinc-700 outline-none transition focus:border-[#8f50c4] focus:bg-white"
+          />
 
-            @for (workshop of workshops; track workshop.id) {
-              <option [value]="workshop.id">
-                {{ getWorkshopLabel(workshop) }}
-              </option>
-            }
-          </select>
-
-          @if (!isLoadingWorkshops && workshops.length === 0) {
-            <p class="mt-2 text-sm leading-6 text-zinc-500">
-              Ahora mismo no hay talleres disponibles para valorar.
-            </p>
-          } @else {
-            <p class="mt-2 text-sm leading-6 text-zinc-500">
-              Así podemos agrupar tu valoración con la del resto de familias que
-              han asistido al mismo taller.
-            </p>
-          }
+          <p class="mt-2 text-sm leading-6 text-zinc-500">
+            Si lo pones, aparecerá junto a tu valoración.
+          </p>
         </div>
+      } @else {
+      <div class="mt-5">
+        <p class="block text-sm font-extrabold text-zinc-600">
+          {{ getPlaceQuestion() }}
+          <span class="text-[#4aa84f]">*</span>
+        </p>
+
+        <div class="mt-2">
+          <app-place-picker
+            [places]="places"
+            [value]="selectedPlaceId"
+            [isLoading]="isLoadingPlaces"
+            [placeholder]="
+              'Selecciona ' + placeNameWithArticle + ' que quieres valorar'
+            "
+            [modalTitle]="'Elegir ' + placeName"
+            [searchPlaceholder]="'Buscar ' + placeNameWithArticle + '...'"
+            (valueChange)="selectedPlaceId = $event"
+          />
+        </div>
+
+        @if (!isLoadingPlaces && places.length === 0) {
+          <p class="mt-2 text-sm leading-6 text-zinc-500">
+            Ahora mismo no hay {{ placeNamePlural }} disponibles para valorar.
+          </p>
+        } @else {
+          <p class="mt-2 text-sm leading-6 text-zinc-500">
+            Así podemos agrupar tu valoración con la del resto de familias que
+            han estado en el mismo sitio.
+          </p>
+        }
+      </div>
       }
+
+      <div class="mt-5">
+        <label
+          for="authorName"
+          class="block text-sm font-extrabold text-zinc-600"
+        >
+          Tu nombre
+          <span class="font-semibold text-zinc-400">(opcional)</span>
+        </label>
+
+        <input
+          id="authorName"
+          name="authorName"
+          type="text"
+          autocomplete="given-name"
+          [maxlength]="maxAuthorLength"
+          [(ngModel)]="authorName"
+          placeholder="Como quieras que aparezca"
+          class="mt-2 w-full rounded-2xl border border-[#eadff5] bg-[#fcfaff] p-3 text-sm leading-6 text-zinc-700 outline-none transition focus:border-[#8f50c4] focus:bg-white"
+        />
+
+        <p class="mt-2 text-sm leading-6 text-zinc-500">
+          Se mostrará junto a tu valoración. Si lo dejas vacío aparecerá como
+          «Anónima».
+        </p>
+      </div>
 
       <div class="mt-5 flex justify-center gap-2 sm:gap-3">
         @for (star of [1, 2, 3, 4, 5]; track star) {

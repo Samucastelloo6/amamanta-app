@@ -33,33 +33,25 @@
       </div>
 
       @if (experiences.length > 0) {
-        @if (isGroupedByWorkshop) {
+        @if (isGroupedByPlace) {
           <div
             class="mb-6 flex flex-col gap-2 border-b border-[#eadff5] pb-5 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
           >
-            <label
-              for="workshopFilter"
-              class="text-sm font-extrabold text-zinc-600"
-            >
-              Filtrar por taller
-            </label>
+            <p class="text-sm font-extrabold text-zinc-600">
+              {{ filterLabel }}
+            </p>
 
-            <select
-              id="workshopFilter"
-              name="workshopFilter"
-              [(ngModel)]="selectedGroupKey"
-              class="w-full rounded-2xl border border-[#eadff5] bg-[#fcfaff] p-3 text-sm font-semibold text-zinc-700 outline-none transition focus:border-[#8f50c4] focus:bg-white sm:w-auto sm:min-w-[340px]"
-            >
-              <option value="all">
-                Todos los talleres ({{ experiences.length }})
-              </option>
-
-              @for (group of groups; track group.key) {
-                <option [value]="group.key">
-                  {{ group.name }} ({{ group.experiences.length }})
-                </option>
-              }
-            </select>
+            <div class="w-full sm:w-auto sm:min-w-[340px]">
+              <app-place-picker
+                [places]="filterOptions"
+                [value]="selectedGroupKey"
+                [alwaysHasSelection]="true"
+                [modalTitle]="filterLabel"
+                [searchPlaceholder]="'Buscar...'"
+                icon="solar:filter-bold"
+                (valueChange)="selectedGroupKey = $event"
+              />
+            </div>
           </div>
 
           <div class="space-y-10">
@@ -182,6 +174,12 @@
         <p class="mt-1 text-xs font-extrabold text-[#8f50c4]">
           {{ getRatingText(experience.rating) }}
         </p>
+
+        @if (showPlaceOnCard && experience.placeName) {
+          <p class="mt-1 text-sm font-bold text-zinc-700">
+            {{ experience.placeName }}
+          </p>
+        }
       </div>
 
       <span
@@ -210,6 +208,12 @@
         </p>
       </div>
     }
+
+    <p
+      class="mt-4 border-t border-[#eadff5] pt-3 text-xs font-bold text-zinc-500"
+    >
+      {{ getAuthorLabel(experience) }}
+    </p>
   </article>
 </ng-template>
 

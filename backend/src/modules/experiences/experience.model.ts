@@ -9,14 +9,48 @@ export const experienceTypes = [
 
 export type ExperienceType = (typeof experienceTypes)[number];
 
+/*
+ * En talleres, hospitales y salas el sitio se elige de una lista, y su nombre
+ * se copia del registro real.
+ *
+ * Los espacios amigos no: son muchos, cambian a menudo y una familia puede
+ * haber estado en uno que todavía no está dado de alta. Ahí quien valora
+ * escribe el nombre del sitio si quiere, y las valoraciones no se agrupan.
+ */
+export function usesPlaceList(type: ExperienceType): boolean {
+  return type !== 'friendly-spaces';
+}
+
 export interface ExperienceDocument {
   type: ExperienceType;
 
   rating: number;
 
+  /*
+   * Nombre de quien valora. Es opcional: si no se rellena, la valoración se
+   * muestra como anónima.
+   */
+  authorName?: string;
+
   text?: string;
   improvement?: string;
 
+  /*
+   * Sitio valorado: el taller, el hospital, la sala universitaria o el espacio
+   * amigo, según el tipo. No lleva `ref` porque apunta a una colección
+   * distinta en cada caso; por eso guardamos también el nombre en el momento
+   * del envío, que además mantiene la valoración legible aunque el sitio se
+   * renombre o se elimine más adelante.
+   */
+  placeId?: Types.ObjectId;
+  placeName?: string;
+
+  /*
+   * Campos anteriores, de cuando esto solo existía para talleres. Se conservan
+   * para poder leer lo guardado antes del cambio. El script
+   * `npm run migrate:experiences` los pasa a placeId/placeName; una vez
+   * ejecutado, se pueden borrar de aquí.
+   */
   workshopId?: Types.ObjectId;
   workshopName?: string;
 
@@ -42,6 +76,13 @@ const experienceSchema = new Schema<ExperienceDocument>(
       max: 5,
     },
 
+    authorName: {
+      type: String,
+      required: false,
+      trim: true,
+      maxlength: 60,
+    },
+
     text: {
       type: String,
       trim: true,
@@ -54,17 +95,22 @@ const experienceSchema = new Schema<ExperienceDocument>(
       maxlength: 2000,
     },
 
-    /*
-     * Taller valorado. Solo se rellena cuando el tipo es 'workshops'.
-     * Guardamos también el nombre en el momento del envío para que la
-     * experiencia siga siendo legible aunque el taller se renombre o se
-     * elimine más adelante.
-     */
-    workshopId: {
+    placeId: {
       type: Schema.Types.ObjectId,
-      ref: 'Workshop',
       required: false,
       index: true,
+    },
+
+    placeName: {
+      type: String,
+      required: false,
+      trim: true,
+      maxlength: 150,
+    },
+
+    workshopId: {
+      type: Schema.Types.ObjectId,
+      required: false,
     },
 
     workshopName: {
@@ -87,7 +133,7 @@ experienceSchema.index({
 
 experienceSchema.index({
   type: 1,
-  workshopId: 1,
+  placeId: 1,
   createdAt: -1,
 });
 
