@@ -5,9 +5,8 @@ import {
   getEventPlatformLabel,
 } from '../../../../core/models/amamanta-event';
 import {
+  buildEventCalendarFileUrl,
   buildGoogleCalendarUrl,
-  buildIcsContent,
-  buildIcsFileName,
 } from '../../../../core/models/event-calendar';
 import { EventsService } from '../../../../core/services/events.service';
 import { Router, RouterLink } from '@angular/router';
@@ -117,64 +116,25 @@ export class EventsComponent implements OnInit {
   }
 
   /*
-   * Para Apple y el resto: un fichero .ics. Si el móvil permite compartir
-   * ficheros se usa el menú de compartir, que en iPhone ofrece «Calendario»
-   * directamente; si no, se descarga.
+   * Para Apple y el resto: se abre el fichero de calendario que sirve la API.
+   *
+   * Antes se fabricaba aquí y se forzaba la descarga, y en el iPhone acababa
+   * guardado en Archivos sin llegar al calendario. Abriendo la dirección de la
+   * API, que lo envía con su tipo de contenido, Safari muestra directamente la
+   * pantalla de «Añadir a Calendario».
    */
-  async downloadCalendarFile(): Promise<void> {
+  openCalendarFile(): void {
     const event = this.calendarEvent;
 
     if (!event) {
       return;
     }
 
-    const content = buildIcsContent(event);
+    const url = buildEventCalendarFileUrl(event);
 
     this.closeCalendarOptions();
 
-    if (!content) {
-      this.showError(
-        'No se ha podido crear el archivo',
-        'Esta actividad no tiene una fecha válida. Avísanos y lo revisamos.',
-      );
-
-      return;
-    }
-
-    const fileName = buildIcsFileName(event);
-
-    const blob = new Blob([content], {
-      type: 'text/calendar;charset=utf-8',
-    });
-
-    const file = new File([blob], fileName, {
-      type: 'text/calendar',
-    });
-
-    const canShareFile =
-      typeof navigator.share === 'function' &&
-      typeof navigator.canShare === 'function' &&
-      navigator.canShare({
-        files: [file],
-      });
-
-    if (canShareFile) {
-      try {
-        await navigator.share({
-          files: [file],
-          title: event.title,
-        });
-
-        return;
-      } catch (error) {
-        /* Si cierra el menú de compartir, no es un error que deba avisarse. */
-        if (error instanceof DOMException && error.name === 'AbortError') {
-          return;
-        }
-      }
-    }
-
-    this.downloadBlob(blob, fileName);
+    window.open(url, '_blank', 'noopener');
   }
 
   goToWorkshop(workshopId: string): void {

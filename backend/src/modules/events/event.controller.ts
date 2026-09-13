@@ -1,5 +1,6 @@
 import { AppError } from '../../shared/errors/app-error.js';
 import { asyncHandler } from '../../shared/utils/async-handler.js';
+import { buildEventIcs, buildEventIcsFileName } from './event.calendar.js';
 import { mapEventToResponse } from './event.mapper.js';
 import {
   createEvent,
@@ -72,3 +73,26 @@ export const deleteEventController = asyncHandler(async (request, response) => {
     data: mapEventToResponse(event),
   });
 });
+
+/*
+ * Devuelve el evento como fichero de calendario.
+ *
+ * `Content-Disposition: inline` es la clave: con `attachment` el iPhone se
+ * limita a guardarlo en Archivos, mientras que así Safari abre directamente la
+ * pantalla de «Añadir a Calendario». Es público como el resto de eventos.
+ */
+export const getEventCalendarController = asyncHandler(
+  async (request, response) => {
+    const id = getEventId(request.params.id);
+    const event = await getEventById(id);
+
+    response.setHeader('Content-Type', 'text/calendar; charset=utf-8');
+
+    response.setHeader(
+      'Content-Disposition',
+      `inline; filename="${buildEventIcsFileName(event)}"`,
+    );
+
+    response.status(200).send(buildEventIcs(event));
+  },
+);

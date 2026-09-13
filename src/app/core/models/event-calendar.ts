@@ -1,9 +1,10 @@
+import { environment } from '../../../environments/environment';
 import { AmamantaEvent, getEventPlatformLabel } from './amamanta-event';
 
 /*
- * Genera lo necesario para añadir un evento al calendario del móvil: un enlace
- * de Google Calendar (Android) y un fichero .ics (Apple, Outlook y cualquier
- * otro).
+ * Lo necesario para añadir un evento al calendario del móvil: el enlace de
+ * Google Calendar (Android) y la dirección del fichero .ics que sirve la API
+ * (Apple, Outlook y cualquier otro).
  *
  * Las horas se escriben «flotantes», sin zona horaria: el calendario las
  * interpreta en la hora local de quien las añade. Es lo correcto aquí porque
@@ -129,95 +130,13 @@ export function buildGoogleCalendarUrl(event: AmamantaEvent): string {
 }
 
 /*
- * En un .ics hay que escapar las barras invertidas, las comas, los puntos y
- * coma y los saltos de línea.
+ * Dirección del fichero de calendario del evento, que sirve la API.
+ *
+ * No se genera en el navegador a propósito: un fichero fabricado aquí solo se
+ * puede entregar como descarga, y en el iPhone eso acaba en Archivos sin que
+ * pase nada más. Sirviéndolo desde la API con su tipo de contenido, Safari
+ * abre directamente la pantalla de «Añadir a Calendario».
  */
-function escapeIcsText(value: string): string {
-  return value
-    .replace(/\\/g, '\\\\')
-    .replace(/;/g, '\\;')
-    .replace(/,/g, '\\,')
-    .replace(/\r?\n/g, '\\n');
-}
-
-/*
- * El formato exige líneas de 75 octetos como máximo; las que se pasan se
- * parten y continúan con un espacio al principio. Sin esto, una descripción
- * larga puede romper el fichero en algunos calendarios.
- */
-function foldIcsLine(line: string): string {
-  if (line.length <= 75) {
-    return line;
-  }
-
-  const parts: string[] = [line.slice(0, 75)];
-  let rest = line.slice(75);
-
-  while (rest.length > 74) {
-    parts.push(` ${rest.slice(0, 74)}`);
-    rest = rest.slice(74);
-  }
-
-  if (rest.length > 0) {
-    parts.push(` ${rest}`);
-  }
-
-  return parts.join('\r\n');
-}
-
-export function buildIcsContent(event: AmamantaEvent): string {
-  const start = buildStartDate(event);
-
-  if (!start) {
-    return '';
-  }
-
-  const stamp = `${formatDateTime(new Date())}Z`;
-
-  const when = event.startTime
-    ? [
-        `DTSTART:${formatDateTime(start)}`,
-        `DTEND:${formatDateTime(
-          addMinutes(start, DEFAULT_DURATION_MINUTES),
-        )}`,
-      ]
-    : [
-        `DTSTART;VALUE=DATE:${formatDate(start)}`,
-        `DTEND;VALUE=DATE:${formatDate(addDays(start, 1))}`,
-      ];
-
-  const url = getCalendarUrl(event);
-
-  const lines = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'PRODID:-//Amamanta//App Amamanta//ES',
-    'CALSCALE:GREGORIAN',
-    'METHOD:PUBLISH',
-    'BEGIN:VEVENT',
-    `UID:${event.id}@app.amamanta.es`,
-    `DTSTAMP:${stamp}`,
-    ...when,
-    `SUMMARY:${escapeIcsText(event.title)}`,
-    `DESCRIPTION:${escapeIcsText(buildCalendarDescription(event))}`,
-    `LOCATION:${escapeIcsText(getCalendarLocation(event))}`,
-    /* URL es de tipo URI, no texto: no se escapa. */
-    ...(url ? [`URL:${url}`] : []),
-    'END:VEVENT',
-    'END:VCALENDAR',
-  ];
-
-  return `${lines.map(foldIcsLine).join('\r\n')}\r\n`;
-}
-
-export function buildIcsFileName(event: AmamantaEvent): string {
-  const slug = event.title
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 60);
-
-  return `${slug || 'actividad'}-amamanta.ics`;
+export function buildEventCalendarFileUrl(event: AmamantaEvent): string {
+  return `${environment.apiUrl}/events/${event.id}/calendar.ics`;
 }

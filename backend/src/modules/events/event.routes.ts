@@ -5,6 +5,7 @@ import {
   deleteEventController,
   getAllEventsController,
   getEventByIdController,
+  getEventCalendarController,
   updateEventController,
 } from './event.controller.js';
 import { createEventSchema, updateEventSchema } from './event.validation.js';
@@ -15,6 +16,9 @@ const eventRouter = Router();
 eventRouter.get('/', getAllEventsController);
 
 eventRouter.get('/:id', getEventByIdController);
+
+/* Público: lo abre el botón «Añadir al calendario» de la aplicación. */
+eventRouter.get('/:id/calendar.ics', getEventCalendarController);
 
 eventRouter.post(
   '/',
